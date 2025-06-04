@@ -245,7 +245,7 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
 
         binData.withUnsafeBytes { bufferPointer in
             let rawPointer = bufferPointer.baseAddress!
-             self.values.rawPointer.advanced(by: Int(currentIndex))
+            self.values.rawPointer.advanced(by: Int(currentIndex))
                 .copyMemory(from: rawPointer, byteCount: binData.count)
         }
 

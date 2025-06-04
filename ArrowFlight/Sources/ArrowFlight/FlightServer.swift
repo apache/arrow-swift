@@ -81,7 +81,7 @@ extension ArrowFlightServer {
 }
 
 public func makeFlightServer(_ handler: ArrowFlightServer) -> CallHandlerProvider {
-  return InternalFlightServer(handler)
+    return InternalFlightServer(handler)
 }
 
 internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAsyncProvider {
@@ -189,6 +189,6 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
         throw ArrowFlightError.notImplemented()
     }
 
-  internal var interceptors: Arrow_Flight_Protocol_FlightServiceServerInterceptorFactoryProtocol? { return nil }
+    internal var interceptors: Arrow_Flight_Protocol_FlightServiceServerInterceptorFactoryProtocol? { return nil }
 
 }

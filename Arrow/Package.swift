@@ -33,34 +33,34 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", branch: "v25.2.10"),
         .package(
-              url: "https://github.com/apple/swift-atomics.git",
-              .upToNextMajor(from: "1.2.0") // or `.upToNextMinor
-            )
+            url: "https://github.com/apple/swift-atomics.git",
+            .upToNextMajor(from: "1.2.0") // or `.upToNextMinor
+        )
     ],
     targets: [
         .target(
             name: "ArrowC",
             path: "Sources/ArrowC",
             swiftSettings: [
-                 // build: .unsafeFlags(["-warnings-as-errors"])
+                // build: .unsafeFlags(["-warnings-as-errors"])
             ]
 
         ),
         .target(
             name: "Arrow",
             dependencies: ["ArrowC",
-                .product(name: "FlatBuffers", package: "flatbuffers"),
-                .product(name: "Atomics", package: "swift-atomics")
+                           .product(name: "FlatBuffers", package: "flatbuffers"),
+                           .product(name: "Atomics", package: "swift-atomics")
             ],
             swiftSettings: [
-                 // build: .unsafeFlags(["-warnings-as-errors"])
+                // build: .unsafeFlags(["-warnings-as-errors"])
             ]
         ),
         .testTarget(
             name: "ArrowTests",
             dependencies: ["Arrow", "ArrowC"],
             swiftSettings: [
-                 // build: .unsafeFlags(["-warnings-as-errors"])
+                // build: .unsafeFlags(["-warnings-as-errors"])
             ]
         )
     ]

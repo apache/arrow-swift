@@ -117,7 +117,7 @@ private func makeFixedHolder<T>(
     }
 }
 
- func makeStructHolder(
+func makeStructHolder(
     _ field: ArrowField,
     buffers: [ArrowBuffer],
     nullCount: UInt,

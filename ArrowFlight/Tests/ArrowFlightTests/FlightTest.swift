@@ -238,7 +238,7 @@ public class FlightClientTester {
             XCTAssertEqual(rb.batches[0].length, 4)
             switch ArrowTable.from(recordBatches: rb.batches) {
             case .success(let table):
-                    for column in table.columns {
+                for column in table.columns {
                     switch column.type.id {
                     case .double:
                         let doubleArray = column.data() as? ChunkedArray<Double>
