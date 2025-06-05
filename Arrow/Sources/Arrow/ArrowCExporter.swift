@@ -79,7 +79,7 @@ public class ArrowCExporter {
     public init() {}
 
     public func exportType(_ cSchema: inout ArrowC.ArrowSchema, arrowType: ArrowType, name: String = "") ->
-        Result<Bool, ArrowError> {
+    Result<Bool, ArrowError> {
         do {
             let exportSchema = try ExportSchema(arrowType, name: name)
             cSchema.format = exportSchema.arrowTypeNameCstr
@@ -106,8 +106,8 @@ public class ArrowCExporter {
     }
 
     public func exportField(_ schema: inout ArrowC.ArrowSchema, field: ArrowField) ->
-        Result<Bool, ArrowError> {
-            return exportType(&schema, arrowType: field.type, name: field.name)
+    Result<Bool, ArrowError> {
+        return exportType(&schema, arrowType: field.type, name: field.name)
     }
 
     public func exportArray(_ cArray: inout ArrowC.ArrowArray, arrowData: ArrowData) {
