@@ -23,4 +23,3 @@ repos:
         args:
           - "--fix"
           - "--format"
-          - "--strict"
