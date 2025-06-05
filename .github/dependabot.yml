@@ -25,6 +25,13 @@ updates:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore: "
+    open-pull-requests-limit: 10
+  - package-ecosystem: "swift"
     directory: "/Arrow/"
     schedule:
       interval: "weekly"

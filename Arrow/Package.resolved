@@ -1,0 +1,24 @@
+{
+  "originHash" : "e67f1e8991668b9995542ad611ac8d108d6689394edfa3a2597eeb3995615ec3",
+  "pins" : [
+    {
+      "identity" : "flatbuffers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/flatbuffers.git",
+      "state" : {
+        "branch" : "v25.2.10",
+        "revision" : "1c514626e83c20fffa8557e75641848e1e15cd5e"
+      }
+    },
+    {
+      "identity" : "swift-atomics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-atomics.git",
+      "state" : {
+        "revision" : "b601256eab081c0f92f059e12818ac1d4f178ff7",
+        "version" : "1.3.0"
+      }
+    }
+  ],
+  "version" : 3
+}
