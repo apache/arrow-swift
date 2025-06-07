@@ -54,3 +54,48 @@ jobs:
       - name: Run pre-commit
         run: |
           pre-commit run --show-diff-on-failure --color=always --all-files
+
+  docker:
+    name: Ubuntu Swift 5.10
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DOCKER_VOLUME_PREFIX: .docker/
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: .docker
+          key: docker-${{ hashFiles('**/Package.resolved', '**/go.sum') }}
+          restore-keys: docker-
+      - name: Pull
+        run: |
+          docker compose pull --ignore-pull-failures ubuntu
+      - name: Build
+        run: |
+          docker compose build ubuntu
+      - name: Run
+        run: |
+          docker compose run --rm ubuntu
+      - name: Fix permission for .docker/
+        if: always()
+        run: |
+          sudo chown -R ${USER}: .docker
+      - name: Login to GitHub Container registry
+        if: >-
+          github.event_name == 'push' &&
+          github.repository == 'apache/arrow-swift' &&
+          github.ref_name == 'main'
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push
+        if: >-
+          github.event_name == 'push' &&
+          github.repository == 'apache/arrow-swift' &&
+          github.ref_name == 'main'
+        run: |
+          docker compose push ubuntu
