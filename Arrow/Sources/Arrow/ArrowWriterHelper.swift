@@ -41,6 +41,8 @@ func toFBTypeEnum(_ arrowType: ArrowType) -> Result<org_apache_arrow_flatbuf_Typ
         return .success(org_apache_arrow_flatbuf_Type_.date)
     case .time32, .time64:
         return .success(org_apache_arrow_flatbuf_Type_.time)
+    case .timestamp:
+        return .success(org_apache_arrow_flatbuf_Type_.timestamp)
     case .strct:
         return .success(org_apache_arrow_flatbuf_Type_.struct_)
     default:
@@ -56,29 +58,29 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
     switch arrowType.id {
     case .int8, .uint8:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 8, isSigned: infoType == ArrowType.ArrowInt8))
+            &fbb, bitWidth: 8, isSigned: infoType == ArrowType.ArrowInt8))
     case .int16, .uint16:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 16, isSigned: infoType == ArrowType.ArrowInt16))
+            &fbb, bitWidth: 16, isSigned: infoType == ArrowType.ArrowInt16))
     case .int32, .uint32:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 32, isSigned: infoType == ArrowType.ArrowInt32))
+            &fbb, bitWidth: 32, isSigned: infoType == ArrowType.ArrowInt32))
     case .int64, .uint64:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 64, isSigned: infoType == ArrowType.ArrowInt64))
+            &fbb, bitWidth: 64, isSigned: infoType == ArrowType.ArrowInt64))
     case .float:
         return .success(org_apache_arrow_flatbuf_FloatingPoint.createFloatingPoint(&fbb, precision: .single))
     case .double:
         return .success(org_apache_arrow_flatbuf_FloatingPoint.createFloatingPoint(&fbb, precision: .double))
     case .string:
         return .success(org_apache_arrow_flatbuf_Utf8.endUtf8(
-                            &fbb, start: org_apache_arrow_flatbuf_Utf8.startUtf8(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Utf8.startUtf8(&fbb)))
     case .binary:
         return .success(org_apache_arrow_flatbuf_Binary.endBinary(
-                            &fbb, start: org_apache_arrow_flatbuf_Binary.startBinary(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Binary.startBinary(&fbb)))
     case .boolean:
         return .success(org_apache_arrow_flatbuf_Bool.endBool(
-                            &fbb, start: org_apache_arrow_flatbuf_Bool.startBool(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Bool.startBool(&fbb)))
     case .date32:
         let startOffset = org_apache_arrow_flatbuf_Date.startDate(&fbb)
         org_apache_arrow_flatbuf_Date.add(unit: .day, &fbb)
@@ -103,6 +105,32 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
         }
 
         return .failure(.invalid("Unable to case to Time64"))
+    case .timestamp:
+        if let timestampType = arrowType as? ArrowTypeTimestamp {
+            let startOffset = org_apache_arrow_flatbuf_Timestamp.startTimestamp(&fbb)
+            
+            let fbUnit: org_apache_arrow_flatbuf_TimeUnit
+            switch timestampType.unit {
+            case .seconds:
+                fbUnit = .second
+            case .milliseconds:
+                fbUnit = .millisecond
+            case .microseconds:
+                fbUnit = .microsecond
+            case .nanoseconds:
+                fbUnit = .nanosecond
+            }
+            org_apache_arrow_flatbuf_Timestamp.add(unit: fbUnit, &fbb)
+            
+            if let timezone = timestampType.timezone {
+                let timezoneOffset = fbb.create(string: timezone)
+                org_apache_arrow_flatbuf_Timestamp.add(timezone: timezoneOffset, &fbb)
+            }
+            
+            return .success(org_apache_arrow_flatbuf_Timestamp.endTimestamp(&fbb, start: startOffset))
+        }
+        
+        return .failure(.invalid("Unable to cast to Timestamp"))
     case .strct:
         let startOffset = org_apache_arrow_flatbuf_Struct_.startStruct_(&fbb)
         return .success(org_apache_arrow_flatbuf_Struct_.endStruct_(&fbb, start: startOffset))

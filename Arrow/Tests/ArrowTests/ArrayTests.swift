@@ -211,6 +211,76 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(microArray[1], 20000)
         XCTAssertEqual(microArray[2], 987654321)
     }
+    
+    func testTimestampArray() throws {
+        // Test timestamp with seconds unit
+        let secBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.seconds, timezone: nil)
+        secBuilder.append(1609459200) // 2021-01-01 00:00:00
+        secBuilder.append(1609545600) // 2021-01-02 00:00:00
+        secBuilder.append(nil)
+        XCTAssertEqual(secBuilder.nullCount, 1)
+        XCTAssertEqual(secBuilder.length, 3)
+        XCTAssertEqual(secBuilder.capacity, 264)
+        let secArray = try secBuilder.finish()
+        let secType = secArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
+        XCTAssertEqual(secType.unit, .seconds)
+        XCTAssertNil(secType.timezone)
+        XCTAssertEqual(secArray.length, 3)
+        XCTAssertEqual(secArray[0], 1609459200)
+        XCTAssertEqual(secArray[1], 1609545600)
+        XCTAssertNil(secArray[2])
+
+        // Test timestamp with milliseconds unit and timezone America/New_York
+        let msBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.milliseconds, timezone: "America/New_York")
+        msBuilder.append(1609459200000) // 2021-01-01 00:00:00.000
+        msBuilder.append(nil)
+        msBuilder.append(1609545600000) // 2021-01-02 00:00:00.000
+        XCTAssertEqual(msBuilder.nullCount, 1)
+        XCTAssertEqual(msBuilder.length, 3)
+        XCTAssertEqual(msBuilder.capacity, 264)
+        let msArray = try msBuilder.finish()
+        let msType = msArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
+        XCTAssertEqual(msType.unit, .milliseconds)
+        XCTAssertEqual(msType.timezone, "America/New_York")
+        XCTAssertEqual(msArray.length, 3)
+        XCTAssertEqual(msArray[0], 1609459200000)
+        XCTAssertNil(msArray[1])
+        XCTAssertEqual(msArray[2], 1609545600000)
+
+        // Test timestamp with microseconds unit and timezone America/New_York
+        let usBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.microseconds, timezone: "UTC")
+        usBuilder.append(1609459200000000) // 2021-01-01 00:00:00.000000
+        usBuilder.append(1609545600000000) // 2021-01-02 00:00:00.000000
+        usBuilder.append(1609632000000000) // 2021-01-03 00:00:00.000000
+        XCTAssertEqual(usBuilder.nullCount, 0)
+        XCTAssertEqual(usBuilder.length, 3)
+        XCTAssertEqual(usBuilder.capacity, 264)
+        let usArray = try usBuilder.finish()
+        let usType = usArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
+        XCTAssertEqual(usType.unit, .microseconds)
+        XCTAssertEqual(usType.timezone, "UTC")
+        XCTAssertEqual(usArray.length, 3)
+        XCTAssertEqual(usArray[0], 1609459200000000)
+        XCTAssertEqual(usArray[1], 1609545600000000)
+        XCTAssertEqual(usArray[2], 1609632000000000)
+
+        // Test timestamp with nanoseconds unit
+        let nsBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.nanoseconds, timezone: nil)
+        nsBuilder.append(nil)
+        nsBuilder.append(1609459200000000000) // 2021-01-01 00:00:00.000000000
+        nsBuilder.append(1609545600000000000) // 2021-01-02 00:00:00.000000000
+        XCTAssertEqual(nsBuilder.nullCount, 1)
+        XCTAssertEqual(nsBuilder.length, 3)
+        XCTAssertEqual(nsBuilder.capacity, 264)
+        let nsArray = try nsBuilder.finish()
+        let nsType = nsArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
+        XCTAssertEqual(nsType.unit, .nanoseconds)
+        XCTAssertNil(nsType.timezone)
+        XCTAssertEqual(nsArray.length, 3)
+        XCTAssertNil(nsArray[0])
+        XCTAssertEqual(nsArray[1], 1609459200000000000)
+        XCTAssertEqual(nsArray[2], 1609545600000000000)
+    }
 
     func testStructArray() throws { // swiftlint:disable:this function_body_length
         class StructTest {
@@ -270,14 +340,14 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         dateFormatter.timeStyle = .full
         XCTAssertTrue(
             dateFormatter.string(from: (structArray[0]![STIndex.date.rawValue] as? Date)!) ==
-                dateFormatter.string(from: dateNow))
+            dateFormatter.string(from: dateNow))
     }
 
     func checkHolderForType(_ checkType: ArrowType) throws {
         let buffers = [ArrowBuffer(length: 0, capacity: 0,
-                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)),
+                                rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)),
                        ArrowBuffer(length: 0, capacity: 0,
-                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))]
+                               rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))]
         let field = ArrowField("", type: checkType, isNullable: true)
         switch makeArrayHolder(field, buffers: buffers, nullCount: 0, children: nil, rbLength: 0) {
         case .success(let holder):
@@ -320,13 +390,13 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         let stringHBuilder: ArrowArrayHolderBuilder =
             (try ArrowArrayBuilders.loadStringArrayBuilder())
-        for index in 0..<100 {
-            if index % 10 == 9 {
-                stringHBuilder.appendAny(nil)
-            } else {
-                stringHBuilder.appendAny("test" + String(index))
-            }
-        }
+         for index in 0..<100 {
+             if index % 10 == 9 {
+                 stringHBuilder.appendAny(nil)
+             } else {
+                 stringHBuilder.appendAny("test" + String(index))
+             }
+         }
 
         let stringHolder = try stringHBuilder.toHolder()
         XCTAssertEqual(stringHolder.nullCount, 10)
