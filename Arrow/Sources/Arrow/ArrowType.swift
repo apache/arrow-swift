@@ -134,28 +134,28 @@ public enum ArrowTimestampUnit {
 public class ArrowTypeTimestamp: ArrowType {
     let unit: ArrowTimestampUnit
     let timezone: String?
-    
+
     public init(_ unit: ArrowTimestampUnit, timezone: String? = nil) {
         self.unit = unit
         self.timezone = timezone
         
         super.init(ArrowType.ArrowTimestamp)
     }
-    
+
     public convenience init(type: ArrowTypeId) {
         self.init(.milliseconds, timezone: nil)
     }
-    
+
     public override var cDataFormatId: String {
         get throws {
             let unitChar: String
             switch self.unit {
-                case .seconds: unitChar = "s"
-                case .milliseconds: unitChar = "m"
-                case .microseconds: unitChar = "u"
-                case .nanoseconds: unitChar = "n"
+            case .seconds: unitChar = "s"
+            case .milliseconds: unitChar = "m"
+            case .microseconds: unitChar = "u"
+            case .nanoseconds: unitChar = "n"
             }
-            
+
             if let timezone = self.timezone {
                 return "ts\(unitChar):\(timezone)"
             } else {
@@ -163,7 +163,6 @@ public class ArrowTypeTimestamp: ArrowType {
             }
         }
     }
-    
 }
 
 
@@ -424,7 +423,7 @@ public class ArrowType {
             guard let unitPart = components.first, unitPart.count == 3 else {
                 throw ArrowError.notImplemented
             }
-            
+
             let unitChar = unitPart.suffix(1)
             let unit: ArrowTimestampUnit
             switch unitChar {
@@ -434,7 +433,7 @@ public class ArrowType {
             case "n": unit = .nanoseconds
             default: unit = .milliseconds
             }
-            
+
             let timezone = components.count > 1 ? String(components[1]) : nil
             return ArrowTypeTimestamp(unit, timezone: timezone)
         } else if  from == "z" {

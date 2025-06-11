@@ -91,21 +91,21 @@ private func makeTimeHolder(_ field: ArrowField,
 }
 
 private func makeTimestampHolder(_ field: ArrowField,
-                                  buffers: [ArrowBuffer],
-                                  nullCount: UInt
+                                 buffers: [ArrowBuffer],
+                                 nullCount: UInt
 ) -> Result<ArrowArrayHolder, ArrowError> {
     do {
-            if let arrowType = field.type as? ArrowTypeTimestamp {
-                let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-                return .success(ArrowArrayHolderImpl(try TimestampArray(arrowData)))
-            } else {
-                return .failure(.invalid("Incorrect field type for timestamp: \(field.type)"))
-            }
-        } catch let error as ArrowError {
-            return .failure(error)
-        } catch {
-            return .failure(.unknownError("\(error)"))
+        if let arrowType = field.type as? ArrowTypeTimestamp {
+            let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
+            return .success(ArrowArrayHolderImpl(try TimestampArray(arrowData)))
+        } else {
+            return .failure(.invalid("Incorrect field type for timestamp: \(field.type)"))
         }
+    } catch let error as ArrowError {
+        return .failure(error)
+    } catch {
+        return .failure(.unknownError("\(error)"))
+    }
 }
 
 private func makeBoolHolder(_ buffers: [ArrowBuffer],
@@ -135,7 +135,7 @@ private func makeFixedHolder<T>(
     }
 }
 
- func makeStructHolder(
+func makeStructHolder(
     _ field: ArrowField,
     buffers: [ArrowBuffer],
     nullCount: UInt,
