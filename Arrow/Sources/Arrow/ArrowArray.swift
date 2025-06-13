@@ -236,13 +236,13 @@ public class Time32Array: FixedArray<Time32> {}
 public class Time64Array: FixedArray<Time64> {}
 
 public class TimestampArray: FixedArray<Timestamp> {
-    
-    public struct FormattingOptions {
+
+    public struct FormattingOptions: Equatable {
         public var dateFormat: String = "yyyy-MM-dd HH:mm:ss.SSS"
         public var locale: Locale = .current
         public var includeTimezone: Bool = true
         public var fallbackToRaw: Bool = true
-        
+
         public init(dateFormat: String = "yyyy-MM-dd HH:mm:ss.SSS",
                     locale: Locale = .current,
                     includeTimezone: Bool = true,
@@ -252,8 +252,18 @@ public class TimestampArray: FixedArray<Timestamp> {
             self.includeTimezone = includeTimezone
             self.fallbackToRaw = fallbackToRaw
         }
+
+        public static func == (lhs: FormattingOptions, rhs: FormattingOptions) -> Bool {
+            return lhs.dateFormat == rhs.dateFormat &&
+                lhs.locale.identifier == rhs.locale.identifier &&
+                lhs.includeTimezone == rhs.includeTimezone &&
+                lhs.fallbackToRaw == rhs.fallbackToRaw
+        }
     }
-    
+
+    private var cachedFormatter: DateFormatter?
+    private var cachedOptions: FormattingOptions?
+
     public func formattedDate(at index: UInt, options: FormattingOptions = FormattingOptions()) -> String? {
         guard let timestamp = self[index] else { return nil }
 
@@ -263,17 +273,20 @@ public class TimestampArray: FixedArray<Timestamp> {
 
         let date = dateFromTimestamp(timestamp, unit: timestampType.unit)
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = options.dateFormat
-        formatter.locale = options.locale
-
-        if options.includeTimezone, let timezone = timestampType.timezone {
-            formatter.timeZone = TimeZone(identifier: timezone)
+        if cachedFormatter == nil || cachedOptions != options {
+            let formatter = DateFormatter()
+            formatter.dateFormat = options.dateFormat
+            formatter.locale = options.locale
+            if options.includeTimezone, let timezone = timestampType.timezone {
+                formatter.timeZone = TimeZone(identifier: timezone)
+            }
+            cachedFormatter = formatter
+            cachedOptions = options
         }
 
-        return formatter.string(from: date)
+        return cachedFormatter?.string(from: date)
     }
-    
+
     private func dateFromTimestamp(_ timestamp: Int64, unit: ArrowTimestampUnit) -> Date {
         let timeInterval: TimeInterval
 
@@ -290,7 +303,7 @@ public class TimestampArray: FixedArray<Timestamp> {
 
         return Date(timeIntervalSince1970: timeInterval)
     }
-    
+
     public override func asString(_ index: UInt) -> String {
         if let formatted = formattedDate(at: index) {
             return formatted

@@ -349,7 +349,7 @@ public class ArrowArrayBuilders {
     public static func loadTime64ArrayBuilder(_ unit: ArrowTime64Unit) throws -> Time64ArrayBuilder {
         return try Time64ArrayBuilder(unit)
     }
-    
+
     public static func loadTimestampArrayBuilder(_ unit: ArrowTimestampUnit, timezone: String? = nil) throws -> TimestampArrayBuilder {
         return try TimestampArrayBuilder(unit, timezone: timezone)
     }

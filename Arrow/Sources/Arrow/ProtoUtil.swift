@@ -77,7 +77,7 @@ func fromProto( // swiftlint:disable:this cyclomatic_complexity function_body_le
         case .nanosecond:
             arrowUnit = .nanoseconds
         }
-        
+
         let timezone = timestampType.timezone
         arrowType = ArrowTypeTimestamp(arrowUnit, timezone: timezone?.isEmpty == true ? nil : timezone)
     case .struct_:

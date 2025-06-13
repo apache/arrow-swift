@@ -211,7 +211,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(microArray[1], 20000)
         XCTAssertEqual(microArray[2], 987654321)
     }
-    
+
     func testTimestampArray() throws {
         // Test timestamp with seconds unit
         let secBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.seconds, timezone: nil)
@@ -340,14 +340,14 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         dateFormatter.timeStyle = .full
         XCTAssertTrue(
             dateFormatter.string(from: (structArray[0]![STIndex.date.rawValue] as? Date)!) ==
-            dateFormatter.string(from: dateNow))
+                dateFormatter.string(from: dateNow))
     }
 
     func checkHolderForType(_ checkType: ArrowType) throws {
         let buffers = [ArrowBuffer(length: 0, capacity: 0,
-                                rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)),
+                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)),
                        ArrowBuffer(length: 0, capacity: 0,
-                               rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))]
+                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))]
         let field = ArrowField("", type: checkType, isNullable: true)
         switch makeArrayHolder(field, buffers: buffers, nullCount: 0, children: nil, rbLength: 0) {
         case .success(let holder):
@@ -390,13 +390,13 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         let stringHBuilder: ArrowArrayHolderBuilder =
             (try ArrowArrayBuilders.loadStringArrayBuilder())
-         for index in 0..<100 {
-             if index % 10 == 9 {
-                 stringHBuilder.appendAny(nil)
-             } else {
-                 stringHBuilder.appendAny("test" + String(index))
-             }
-         }
+        for index in 0..<100 {
+            if index % 10 == 9 {
+                stringHBuilder.appendAny(nil)
+            } else {
+                stringHBuilder.appendAny("test" + String(index))
+            }
+        }
 
         let stringHolder = try stringHBuilder.toHolder()
         XCTAssertEqual(stringHolder.nullCount, 10)

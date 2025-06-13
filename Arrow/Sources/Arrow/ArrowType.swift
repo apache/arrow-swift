@@ -138,7 +138,7 @@ public class ArrowTypeTimestamp: ArrowType {
     public init(_ unit: ArrowTimestampUnit, timezone: String? = nil) {
         self.unit = unit
         self.timezone = timezone
-        
+
         super.init(ArrowType.ArrowTimestamp)
     }
 
@@ -164,7 +164,6 @@ public class ArrowTypeTimestamp: ArrowType {
         }
     }
 }
-
 
 public class ArrowNestedType: ArrowType {
     let fields: [ArrowField]
