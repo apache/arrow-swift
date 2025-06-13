@@ -53,14 +53,14 @@ final class TableTests: XCTestCase {
 
         let testObj = StructTest()
         var fields = [ArrowField]()
-        let buildStructType = {() -> ArrowNestedType in
+        let buildStructType = {() -> ArrowTypeStruct in
             let mirror = Mirror(reflecting: testObj)
             for (property, value) in mirror.children {
                 let arrowType = ArrowType(ArrowType.infoForType(type(of: value)))
                 fields.append(ArrowField(property!, type: arrowType, isNullable: true))
             }
 
-            return ArrowNestedType(ArrowType.ArrowStruct, fields: fields)
+            return ArrowTypeStruct(ArrowType.ArrowStruct, fields: fields)
         }
 
         let structType = buildStructType()
