@@ -121,14 +121,14 @@ func makeSchema() -> ArrowSchema {
 func makeStructSchema() -> ArrowSchema {
     let testObj = StructTest()
     var fields = [ArrowField]()
-    let buildStructType = {() -> ArrowNestedType in
+    let buildStructType = {() -> ArrowTypeStruct in
         let mirror = Mirror(reflecting: testObj)
         for (property, value) in mirror.children {
             let arrowType = ArrowType(ArrowType.infoForType(type(of: value)))
             fields.append(ArrowField(property!, type: arrowType, isNullable: true))
         }
 
-        return ArrowNestedType(ArrowType.ArrowStruct, fields: fields)
+        return ArrowTypeStruct(ArrowType.ArrowStruct, fields: fields)
     }
 
     return ArrowSchema.Builder()
@@ -515,8 +515,8 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
                     XCTAssertEqual(recordBatch.schema.fields.count, 1)
                     XCTAssertEqual(recordBatch.schema.fields[0].name, "struct1")
                     XCTAssertEqual(recordBatch.schema.fields[0].type.id, .strct)
-                    XCTAssertTrue(recordBatch.schema.fields[0].type is ArrowNestedType)
-                    let nestedType = (recordBatch.schema.fields[0].type as? ArrowNestedType)!
+                    XCTAssertTrue(recordBatch.schema.fields[0].type is ArrowTypeStruct)
+                    let nestedType = (recordBatch.schema.fields[0].type as? ArrowTypeStruct)!
                     XCTAssertEqual(nestedType.fields.count, 14)
                     let columns = recordBatch.columns
                     XCTAssertEqual(columns[0].nullCount, 1)
