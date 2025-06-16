@@ -79,7 +79,7 @@ func fromProto( // swiftlint:disable:this cyclomatic_complexity function_body_le
         }
 
         let timezone = timestampType.timezone
-        arrowType = ArrowTypeTimestamp(arrowUnit, timezone: timezone?.isEmpty == true ? nil : timezone)
+        arrowType = ArrowTypeTimestamp(arrowUnit, timezone: timezone?.isEmpty ? nil : timezone)
     case .struct_:
         var children = [ArrowField]()
         for index in 0..<field.childrenCount {
