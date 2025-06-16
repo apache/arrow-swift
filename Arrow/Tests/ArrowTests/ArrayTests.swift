@@ -247,7 +247,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertNil(msArray[1])
         XCTAssertEqual(msArray[2], 1609545600000)
 
-        // Test timestamp with microseconds unit and timezone America/New_York
+        // Test timestamp with microseconds unit and timezone UTC
         let usBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.microseconds, timezone: "UTC")
         usBuilder.append(1609459200000000) // 2021-01-01 00:00:00.000000
         usBuilder.append(1609545600000000) // 2021-01-02 00:00:00.000000
