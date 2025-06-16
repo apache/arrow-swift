@@ -59,6 +59,8 @@ jobs:
     name: Ubuntu Swift 5.10
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      packages: write
     env:
       DOCKER_VOLUME_PREFIX: .docker/
     steps:
