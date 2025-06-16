@@ -17,6 +17,7 @@
 
 name: Enhancement Request
 description: Request an enhancement to the project
+type: Feature
 body:
   - type: markdown
     attributes:

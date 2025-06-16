@@ -17,6 +17,7 @@
 
 name: Bug Report
 description: File a bug report
+type: Bug
 body:
   - type: textarea
     id: description
