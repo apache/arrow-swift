@@ -15,19 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-*.xcodeproj
-.DS_Store
-.build/
-.netrc
-.swiftpm/
-DerivedData/
-Packages/
-xcuserdata/
-
-# Docker
-/.docker/
-
-# Release Audit Tool
-/dev/release/apache-rat-*.jar
-/dev/release/filtered_rat.txt
-/dev/release/rat.xml
+*/*/go.sum
+*/Package.resolved
+*/go.sum
+.github/pull_request_template.md
+Package.resolved
