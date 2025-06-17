@@ -165,7 +165,7 @@ public class ArrowTypeTimestamp: ArrowType {
     }
 }
 
-public class ArrowNestedType: ArrowType {
+public class ArrowTypeStruct: ArrowType {
     let fields: [ArrowField]
     public init(_ info: ArrowType.Info, fields: [ArrowField]) {
         self.fields = fields

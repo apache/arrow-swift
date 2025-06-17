@@ -387,6 +387,7 @@ public class ArrowArrayBuilders {
 
     public static func loadTimestampArrayBuilder(_ unit: ArrowTimestampUnit, timezone: String? = nil) throws -> TimestampArrayBuilder {
         return try TimestampArrayBuilder(unit, timezone: timezone)
+    }
 
     public static func loadStructArrayBuilder(_ fields: [ArrowField]) throws -> StructArrayBuilder {
         return try StructArrayBuilder(fields)
