@@ -191,8 +191,10 @@ We have a script to verify a RC.
 You must install the following commands to use the script:
 
 * `curl`
+* `go`
 * `gpg`
 * `shasum` or `sha256sum`/`sha512sum`
+* `swift` 5.10 (6.0 or later don't work)
 * `tar`
 
 To verify a RC, run the following command line:
