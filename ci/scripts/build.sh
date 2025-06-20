@@ -37,14 +37,18 @@ rm -rf "${build_dir}"
 mkdir -p "${build_dir}"
 cp -a "${source_dir}" "${build_dir}/source"
 rm -rf "${build_dir}/source/.build"
-mkdir -p /cache/swift-build
-ln -s /cache/swift-build "${build_dir}/source/.build"
+if [ -d /cache ]; then
+  mkdir -p /cache/swift-build
+  ln -s /cache/swift-build "${build_dir}/source/.build"
+fi
 github_actions_group_end
 
 github_actions_group_begin "Generate data"
 data_gen_dir="${build_dir}/source/data-generator/swift-datagen"
-export GOCACHE="/cache/go-build"
-export GOMODCACHE="/cache/go-mod"
+if [ -d /cache ]; then
+  export GOCACHE="/cache/go-build"
+  export GOMODCACHE="/cache/go-mod"
+fi
 export GOPATH="${build_dir}"
 pushd "${data_gen_dir}"
 go get -d ./...
