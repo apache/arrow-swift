@@ -38,7 +38,7 @@ public enum ArrowError: Error {
     case invalid(String)
 }
 
-public enum ArrowTypeId {
+public enum ArrowTypeId: Sendable {
     case binary
     case boolean
     case date32
@@ -213,7 +213,7 @@ public class ArrowType {
         }
     }
 
-    public enum Info {
+    public enum Info: Sendable {
         case primitiveInfo(ArrowTypeId)
         case variableInfo(ArrowTypeId)
         case timeInfo(ArrowTypeId)
