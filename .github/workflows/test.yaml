@@ -86,6 +86,8 @@ jobs:
         run: |
           docker compose build ubuntu
       - name: Run
+        # We remove this when we support Swift 6.0 or later.
+        continue-on-error: ${{ matrix.swift-version != '5.10' }}
         run: |
           docker compose run --rm ubuntu
       - name: Fix permission for .docker/
