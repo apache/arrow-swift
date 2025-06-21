@@ -37,12 +37,12 @@ services:
     # Usage:
     #   docker compose build ubuntu
     #   docker compose run ubuntu
-    image: ${REPO}:${ARCH}-ubuntu-${UBUNTU_CODE_NAME}
+    image: ${REPO}:${ARCH}-${SWIFT}-ubuntu-${UBUNTU_CODE_NAME}
     build:
       context: .
       dockerfile: ci/docker/ubuntu.dockerfile
       cache_from:
-        - ${REPO}:${ARCH}-ubuntu-${UBUNTU_CODE_NAME}
+        - ${REPO}:${ARCH}-${SWIFT}-ubuntu-${UBUNTU_CODE_NAME}
       args:
         SWIFT: ${SWIFT}
         UBUNTU_CODE_NAME: ${UBUNTU_CODE_NAME}
