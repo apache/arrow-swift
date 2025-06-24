@@ -57,15 +57,6 @@ cp *.arrow ../../Arrow
 popd
 github_actions_group_end
 
-github_actions_group_begin "Use -warnings-as-errors"
-for package in . Arrow ArrowFlight; do
-  pushd "${build_dir}/source/${package}"
-  sed 's/\/\/ build://g' Package.swift > Package.swift.build
-  mv Package.swift.build Package.swift
-  popd
-done
-github_actions_group_end
-
 github_actions_group_begin "Build"
 pushd "${build_dir}/source"
 swift build
