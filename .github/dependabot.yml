@@ -20,42 +20,42 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "swift"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "swift"
     directory: "/Arrow/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "swift"
     directory: "/ArrowFlight/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "gomod"
     directory: "/CDataWGo/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
   - package-ecosystem: "gomod"
     directory: "/data-generator/swift-datagen/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10

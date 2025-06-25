@@ -78,7 +78,11 @@ jobs:
         with:
           path: .docker
           key: docker-${{ matrix.swift-version }}-${{ hashFiles('**/Package.resolved', '**/go.sum') }}
-          restore-keys: docker-${{ matrix.swift-version }}-
+          # Don't reuse existing cache because "git fetch" is failed
+          # in Docker without "git config --global --add
+          # safe.directory".
+          #
+          # restore-keys: docker-${{ matrix.swift-version }}-
       - name: Pull
         run: |
           docker compose pull --ignore-pull-failures ubuntu
