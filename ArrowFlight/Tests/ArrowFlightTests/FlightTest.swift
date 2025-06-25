@@ -160,6 +160,10 @@ struct FlightServerImpl {
             print("Unknown server error: \(error)")
         }
     }
+
+    static func syncShutdown() throws {
+        try group?.syncShutdownGracefully()
+    }
 }
 
 public class FlightClientTester {
@@ -179,9 +183,9 @@ public class FlightClientTester {
         client = FlightClient(channel: channel)
     }
 
-    deinit {
-        try? group?.syncShutdownGracefully()
-        try? channel?.close().wait()
+    func syncShutdown() throws {
+        try group?.syncShutdownGracefully()
+        try channel?.close().wait()
     }
 
     func listActionTest() async throws {
@@ -319,7 +323,7 @@ final class FlightTest: XCTestCase {
             defer {
                 print("server shutting down")
                 do {
-                    try FlightServerImpl.group?.syncShutdownGracefully()
+                    try FlightServerImpl.syncShutdown()
                 } catch {
                 }
             }
@@ -339,6 +343,12 @@ final class FlightTest: XCTestCase {
             }
 
             let clientImpl = try await FlightClientTester()
+            defer {
+                do {
+                    try clientImpl.syncShutdown()
+                } catch {
+                }
+            }
             try await clientImpl.listActionTest()
             try await clientImpl.doPutTest("flight_ticket")
             try await clientImpl.doPutTest("flight_another")

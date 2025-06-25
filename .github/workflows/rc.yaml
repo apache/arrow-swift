@@ -105,7 +105,14 @@ jobs:
       - source
       - target
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        swift-version:
+          - "5.10"
+          - "6.0"
+          - "6.1"
     env:
       RC: ${{ needs.target.outputs.rc }}
       VERSION: ${{ needs.target.outputs.version }}
@@ -115,7 +122,7 @@ jobs:
       - name: Setup Swift
         uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
         with:
-          swift-version: "5.10"
+          swift-version: ${{ matrix.swift-version }}
       - name: Download
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
