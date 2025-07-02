@@ -27,7 +27,7 @@ TODO: We should update this after we register this package to Swift Package Inde
 
 ## Getting Started
 
-TODO: We should refer auto generated documentation on Swift Package Index after after we register this package to Swift Package Index.
+TODO: We should refer auto generated documentation on Swift Package Index after we register this package to Swift Package Index.
 
 ## Getting involved
 
