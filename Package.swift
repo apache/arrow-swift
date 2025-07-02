@@ -21,7 +21,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "ArrowSwift",
+    name: "Arrow",
     platforms: [
         .macOS(.v10_15)
     ],
