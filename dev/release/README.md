@@ -194,7 +194,7 @@ You must install the following commands to use the script:
 * `go`
 * `gpg`
 * `shasum` or `sha256sum`/`sha512sum`
-* `swift` 5.10 (6.0 or later don't work)
+* `swift` 5.10 or later
 * `tar`
 
 To verify a RC, run the following command line:
