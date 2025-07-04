@@ -115,6 +115,8 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
             return try ArrowArrayHolderImpl(BinaryArray(with))
         case .strct:
             return try ArrowArrayHolderImpl(StructArray(with))
+        case .list:
+            return try ArrowArrayHolderImpl(ListArray(with))
         default:
             throw ArrowError.invalid("Array not found for type: \(arrowType)")
         }
@@ -402,6 +404,72 @@ public class StructArray: ArrowArray<[Any?]> {
         }
 
         output += "}"
+        return output
+    }
+}
+
+public class ListArray: ArrowArray<[Any?]> {
+    public private(set) var values: ArrowArrayHolder?
+
+    public required init(_ arrowData: ArrowData) throws {
+        try super.init(arrowData)
+        guard arrowData.children.count == 1 else {
+            throw ArrowError.invalid("List array must have exactly one child")
+        }
+
+        guard let listType = arrowData.type as? ArrowTypeList else {
+            throw ArrowError.invalid("Expected ArrowTypeList")
+        }
+
+        self.values = try ArrowArrayHolderImpl.loadArray(
+            listType.elementType,
+            with: arrowData.children[0]
+        )
+    }
+
+    public override subscript(_ index: UInt) -> [Any?]? {
+        guard let values = self.values else { return nil }
+
+        if self.arrowData.isNull(index) {
+            return nil
+        }
+
+        let offsets = self.arrowData.buffers[1]
+        let offsetIndex = Int(index) * MemoryLayout<Int32>.stride
+
+        let startOffset = offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
+        let endOffset = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride).load(as: Int32.self)
+
+        var items = [Any?]()
+        for i in startOffset..<endOffset {
+            items.append(values.array.asAny(UInt(i)))
+        }
+
+        return items
+    }
+
+    public override func asString(_ index: UInt) -> String {
+        guard let list = self[index] else {
+            return "null"
+        }
+
+        var output = "["
+
+        for (i, item) in list.enumerated() {
+            if i > 0 {
+                output.append(",")
+            }
+
+            if item == nil {
+                output.append("null")
+            } else if let asStringItem = item as? AsString {
+                output.append(asStringItem.asString(0))
+            } else {
+                output.append("\(item!)")
+            }
+        }
+
+        output.append("]")
         return output
     }
 }
