@@ -107,6 +107,50 @@ if [ "${RELEASE_CLEAN}" -gt 0 ]; then
   done
 fi
 
+echo
+echo "Draft email for announce@apache.org, dev@arrow.apache.org"
+echo "and user@arrow.apache.org mailing lists"
+echo ""
+echo "---------------------------------------------------------"
+cat <<MAIL
+To: announce@apache.org
+Cc: dev@arrow.apache.org, user@arrow.apache.org
+Subject: [ANNOUNCE] Apache Arrow Swift ${version} released
+
+The Apache Arrow community is pleased to announce the Apache Arrow Swift
+${version} release.
+
+The release is available now.
+
+Source archive:
+  https://www.apache.org/dyn/closer.lua/arrow/apache-arrow-swift-${version}/
+
+On Swift Package Index:
+  https://swiftpackageindex.com/apache/arrow-swift
+
+Read the full changelog:
+  https://github.com/apache/arrow-swift/releases/tag/${tag}
+
+What is Apache Arrow?
+---------------------
+
+Apache Arrow is a universal columnar format and multi-language toolbox
+for fast data interchange and in-memory analytics. It houses a set of
+canonical in-memory representations of flat and hierarchical data
+along with multiple language-bindings for structure manipulation. It
+also provides low-overhead streaming and batch messaging, zero-copy
+interprocess communication (IPC), and vectorized in-memory analytics
+libraries.
+
+Please report any feedback to the GitHub repository:
+  https://github.com/apache/arrow-swift/issues
+  https://github.com/apache/arrow-swift/discussions
+
+Regards,
+The Apache Arrow community.
+MAIL
+echo "---------------------------------------------------------"
+echo
 echo "Success! The release is available here:"
 echo "  https://dist.apache.org/repos/dist/release/arrow/${release_id}"
 echo "  https://swiftpackageindex.com/apache/arrow"
