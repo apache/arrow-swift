@@ -126,13 +126,12 @@ jobs:
       - name: Download
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: release-*
+          name: release-source
       - name: Verify
         env:
           VERIFY_DEFAULT: 0
           VERIFY_SOURCE: 1
         run: |
-          mv release-*/* ./
           dev/release/verify_rc.sh "${VERSION}" "${RC}"
 
   upload:
@@ -151,7 +150,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: release-*
+          name: release-source
       - name: Upload
         if: github.ref_type == 'tag'
         env:
@@ -163,4 +162,4 @@ jobs:
             --repo ${GITHUB_REPOSITORY} \
             --title "Apache Arrow Swift ${VERSION} RC${RC}" \
             --verify-tag \
-            release-*/*.tar.gz*
+            *.tar.gz*
