@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "../../Arrow/Sources/ArrowC/include/ArrowCData.h"
+#include "../ArrowC/include/ArrowCData.h"
 
 void stringTypeFromSwift(struct ArrowSchema*);
 
