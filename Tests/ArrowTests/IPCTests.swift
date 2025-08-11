@@ -329,7 +329,7 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
     }
 
     func testFileReader_struct() throws {
-        let fileURL = currentDirectory().appendingPathComponent("../../testdata_struct.arrow")
+        let fileURL = currentDirectory().appendingPathComponent("../testdata_struct.arrow")
         let arrowReader = ArrowReader()
         try checkStructRecordBatch(arrowReader.fromFile(fileURL))
     }
