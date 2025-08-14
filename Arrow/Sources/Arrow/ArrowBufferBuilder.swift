@@ -390,7 +390,7 @@ public class ListBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
         super.init(nulls)
         self.offsets.rawPointer.storeBytes(of: Int32(0), as: Int32.self)
     }
-    
+
     public func append(_ count: Int) {
         let index = UInt(self.length)
         self.length += 1

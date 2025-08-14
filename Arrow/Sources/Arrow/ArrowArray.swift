@@ -359,92 +359,92 @@ public class BinaryArray: ArrowArray<Data> {
 
 public class NestedArray: ArrowArray<[Any?]> {
     private var children: [ArrowArrayHolder]?
-    
+
     public required init(_ arrowData: ArrowData) throws {
         try super.init(arrowData)
-        
+
         switch arrowData.type.id {
         case .list:
             guard arrowData.children.count == 1 else {
                 throw ArrowError.invalid("List array must have exactly one child")
             }
-            
+
             guard let listType = arrowData.type as? ArrowTypeList else {
                 throw ArrowError.invalid("Expected ArrowTypeList for list type ID")
             }
-            
+
             self.children = [try ArrowArrayHolderImpl.loadArray(
                 listType.elementType,
                 with: arrowData.children[0]
             )]
-            
+
         case .strct:
             var fields = [ArrowArrayHolder]()
             for child in arrowData.children {
                 fields.append(try ArrowArrayHolderImpl.loadArray(child.type, with: child))
             }
             self.children = fields
-            
+
         default:
             throw ArrowError.invalid("NestedArray only supports list and struct types, got: \(arrowData.type.id)")
         }
     }
-    
+
     public override subscript(_ index: UInt) -> [Any?]? {
         if self.arrowData.isNull(index) {
             return nil
         }
-        
+
         guard let children = self.children else {
             return nil
         }
-        
+
         switch arrowData.type.id {
         case .list:
             guard let values = children.first else { return nil }
-            
+
             let offsets = self.arrowData.buffers[1]
             let offsetIndex = Int(index) * MemoryLayout<Int32>.stride
-            
+
             let startOffset = offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
             let endOffset = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride).load(as: Int32.self)
-            
+
             var items = [Any?]()
             for i in startOffset..<endOffset {
                 items.append(values.array.asAny(UInt(i)))
             }
-            
+
             return items
-            
+
         case .strct:
             var result = [Any?]()
             for field in children {
                 result.append(field.array.asAny(index))
             }
             return result
-            
+
         default:
             return nil
         }
     }
-    
+
     public override func asString(_ index: UInt) -> String {
         switch arrowData.type.id {
         case .list:
             if self.arrowData.isNull(index) {
                 return "null"
             }
-            
+
             guard let list = self[index] else {
                 return "null"
             }
-            
+
             var output = "["
             for (i, item) in list.enumerated() {
                 if i > 0 {
                     output.append(",")
                 }
-                
+
                 if item == nil {
                     output.append("null")
                 } else if let asStringItem = item as? AsString {
@@ -455,12 +455,12 @@ public class NestedArray: ArrowArray<[Any?]> {
             }
             output.append("]")
             return output
-            
+
         case .strct:
             if self.arrowData.isNull(index) {
                 return ""
             }
-            
+
             var output = "{"
             if let children = self.children {
                 for fieldIndex in 0..<children.count {
@@ -474,24 +474,24 @@ public class NestedArray: ArrowArray<[Any?]> {
             }
             output += "}"
             return output
-            
+
         default:
             return ""
         }
     }
-    
+
     public var isListArray: Bool {
         return arrowData.type.id == .list
     }
-    
+
     public var isStructArray: Bool {
         return arrowData.type.id == .strct
     }
-    
+
     public var fields: [ArrowArrayHolder]? {
         return arrowData.type.id == .strct ? children : nil
     }
-    
+
     public var values: ArrowArrayHolder? {
         return arrowData.type.id == .list ? children?.first : nil
     }

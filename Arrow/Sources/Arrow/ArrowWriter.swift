@@ -240,7 +240,6 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         return .success((fbb.data, Offset(offset: UInt32(fbb.data.count))))
     }
 
-    
     private func writeRecordBatchData(
         _ writer: inout DataWriter, fields: [ArrowField],
         columns: [ArrowArrayHolder]
