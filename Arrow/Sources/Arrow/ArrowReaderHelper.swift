@@ -135,7 +135,7 @@ private func makeFixedHolder<T>(
     }
 }
 
-func makeStructHolder(
+func makeNestedHolder(
     _ field: ArrowField,
     buffers: [ArrowBuffer],
     nullCount: UInt,
@@ -143,27 +143,14 @@ func makeStructHolder(
     rbLength: UInt
 ) -> Result<ArrowArrayHolder, ArrowError> {
     do {
-        let arrowData = try ArrowData(field.type,
-                                      buffers: buffers, children: children,
-                                      nullCount: nullCount, length: rbLength)
-        return .success(ArrowArrayHolderImpl(try StructArray(arrowData)))
-    } catch let error as ArrowError {
-        return .failure(error)
-    } catch {
-        return .failure(.unknownError("\(error)"))
-    }
-}
-
-func makeListHolder(
-    _ field: ArrowField,
-    buffers: [ArrowBuffer],
-    nullCount: UInt,
-    children: [ArrowData],
-    rbLength: UInt
-) -> Result<ArrowArrayHolder, ArrowError> {
-    do {
-        let arrowData = try ArrowData(field.type, buffers: buffers, children: children, nullCount: nullCount, length: rbLength)
-        return .success(ArrowArrayHolderImpl(try ListArray(arrowData)))
+        let arrowData = try ArrowData(
+            field.type,
+            buffers: buffers,
+            children: children,
+            nullCount: nullCount,
+            length: rbLength
+        )
+        return .success(ArrowArrayHolderImpl(try NestedArray(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -224,9 +211,9 @@ func makeArrayHolder( // swiftlint:disable:this cyclomatic_complexity
     case .timestamp:
         return makeTimestampHolder(field, buffers: buffers, nullCount: nullCount)
     case .strct:
-        return makeStructHolder(field, buffers: buffers, nullCount: nullCount, children: children!, rbLength: rbLength)
+        return makeNestedHolder(field, buffers: buffers, nullCount: nullCount, children: children!, rbLength: rbLength)
     case .list:
-        return makeListHolder(field, buffers: buffers, nullCount: nullCount, children: children!, rbLength: rbLength)
+        return makeNestedHolder(field, buffers: buffers, nullCount: nullCount, children: children!, rbLength: rbLength)
     default:
         return .failure(.unknownType("Type \(typeId) currently not supported"))
     }

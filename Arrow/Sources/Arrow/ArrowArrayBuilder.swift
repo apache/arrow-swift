@@ -125,7 +125,7 @@ public class TimestampArrayBuilder: ArrowArrayBuilder<FixedBufferBuilder<Int64>,
     }
 }
 
-public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructArray> {
+public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, NestedArray> {
     let builders: [any ArrowArrayHolderBuilder]
     let fields: [ArrowField]
     public init(_ fields: [ArrowField], builders: [any ArrowArrayHolderBuilder]) throws {
@@ -159,7 +159,7 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructAr
         }
     }
 
-    public override func finish() throws -> StructArray {
+    public override func finish() throws -> NestedArray {
         let buffers = self.bufferBuilder.finish()
         var childData = [ArrowData]()
         for builder in self.builders {
@@ -169,12 +169,12 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructAr
         let arrowData = try ArrowData(self.type, buffers: buffers,
                                       children: childData, nullCount: self.nullCount,
                                       length: self.length)
-        let structArray = try StructArray(arrowData)
+        let structArray = try NestedArray(arrowData)
         return structArray
     }
 }
 
-public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, ListArray> {
+public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, NestedArray> {
     let valueBuilder: any ArrowArrayHolderBuilder
 
     public override init(_ elementType: ArrowType) throws {
@@ -191,11 +191,11 @@ public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, ListArray> {
         }
     }
 
-    public override func finish() throws -> ListArray {
+    public override func finish() throws -> NestedArray {
         let buffers = self.bufferBuilder.finish()
         let childData = try valueBuilder.toHolder().array.arrowData
         let arrowData = try ArrowData(self.type, buffers: buffers, children: [childData], nullCount: self.nullCount, length: self.length)
-        return try ListArray(arrowData)
+        return try NestedArray(arrowData)
     }
 }
 

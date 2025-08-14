@@ -351,7 +351,7 @@ public final class StructBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
     public func append(_ newValue: [Any?]?) {
         let index = UInt(self.length)
         self.length += 1
-        if length > self.nulls.length {
+        if self.length > self.nulls.length {
             self.resize(length)
         }
 
@@ -389,6 +389,22 @@ public class ListBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
         let nulls = ArrowBuffer.createBuffer(0, size: UInt(MemoryLayout<UInt8>.stride))
         super.init(nulls)
         self.offsets.rawPointer.storeBytes(of: Int32(0), as: Int32.self)
+    }
+    
+    public func append(_ count: Int) {
+        let index = UInt(self.length)
+        self.length += 1
+
+        if length >= self.offsets.length {
+            self.resize(length + 1)
+        }
+
+        let offsetIndex = Int(index) * MemoryLayout<Int32>.stride
+        let currentOffset = self.offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
+
+        BitUtility.setBit(index + self.offset, buffer: self.nulls)
+        let newOffset = currentOffset + Int32(count)
+        self.offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride).storeBytes(of: newOffset, as: Int32.self)
     }
 
     public func append(_ newValue: [Any?]?) {

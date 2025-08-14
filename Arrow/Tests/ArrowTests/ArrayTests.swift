@@ -320,8 +320,8 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let structArray = try structBuilder.finish()
         XCTAssertEqual(structArray.length, 3)
         XCTAssertNil(structArray[1])
-        XCTAssertEqual(structArray.arrowFields![0].length, 3)
-        XCTAssertNil(structArray.arrowFields![0].array.asAny(1))
+        XCTAssertEqual(structArray.fields![0].length, 3)
+        XCTAssertNil(structArray.fields![0].array.asAny(1))
         XCTAssertEqual(structArray[0]![STIndex.bool.rawValue] as? Bool, true)
         XCTAssertEqual(structArray[0]![STIndex.int8.rawValue] as? Int8, 1)
         XCTAssertEqual(structArray[0]![STIndex.int16.rawValue] as? Int16, 2)
@@ -482,11 +482,11 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
             return
         }
 
-        outerListBuilder.bufferBuilder.append([nil, nil])
+        outerListBuilder.bufferBuilder.append(2)
         innerListBuilder.append([Int32(1), Int32(2)])
         innerListBuilder.append([Int32(3), Int32(4), Int32(5)])
 
-        outerListBuilder.bufferBuilder.append([nil])
+        outerListBuilder.bufferBuilder.append(1)
         innerListBuilder.append([Int32(6)])
 
         outerListBuilder.bufferBuilder.append(nil)

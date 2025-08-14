@@ -90,10 +90,12 @@ func checkStructRecordBatch(_ result: Result<ArrowReader.ArrowReaderResult, Arro
         XCTAssertEqual(recordBatch.schema.fields.count, 1)
         XCTAssertEqual(recordBatch.schema.fields[0].name, "my struct")
         XCTAssertEqual(recordBatch.schema.fields[0].type.id, .strct)
-        let structArray = recordBatch.columns[0].array as? StructArray
-        XCTAssertEqual(structArray!.arrowFields!.count, 2)
-        XCTAssertEqual(structArray!.arrowFields![0].type.id, .string)
-        XCTAssertEqual(structArray!.arrowFields![1].type.id, .boolean)
+        let nestedArray = recordBatch.columns[0].array as? NestedArray
+        XCTAssertNotNil(nestedArray)
+        XCTAssertNotNil(nestedArray!.fields)
+        XCTAssertEqual(nestedArray!.fields!.count, 2)
+        XCTAssertEqual(nestedArray!.fields![0].type.id, .string)
+        XCTAssertEqual(nestedArray!.fields![1].type.id, .boolean)
         let column = recordBatch.columns[0]
         let str = column.array as? AsString
         XCTAssertEqual("\(str!.asString(0))", "{0,false}")
@@ -524,23 +526,24 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
                     let structVal =
                         "\((columns[0].array as? AsString)!.asString(0))"
                     XCTAssertEqual(structVal, "{true,1,2,3,4,5,6,7,8,9.9,10.1,11,12,\(currentDate)}")
-                    let structArray = (recordBatch.columns[0].array as? StructArray)!
-                    XCTAssertEqual(structArray.length, 3)
-                    XCTAssertEqual(structArray.arrowFields!.count, 14)
-                    XCTAssertEqual(structArray.arrowFields![0].type.id, .boolean)
-                    XCTAssertEqual(structArray.arrowFields![1].type.id, .int8)
-                    XCTAssertEqual(structArray.arrowFields![2].type.id, .int16)
-                    XCTAssertEqual(structArray.arrowFields![3].type.id, .int32)
-                    XCTAssertEqual(structArray.arrowFields![4].type.id, .int64)
-                    XCTAssertEqual(structArray.arrowFields![5].type.id, .uint8)
-                    XCTAssertEqual(structArray.arrowFields![6].type.id, .uint16)
-                    XCTAssertEqual(structArray.arrowFields![7].type.id, .uint32)
-                    XCTAssertEqual(structArray.arrowFields![8].type.id, .uint64)
-                    XCTAssertEqual(structArray.arrowFields![9].type.id, .double)
-                    XCTAssertEqual(structArray.arrowFields![10].type.id, .float)
-                    XCTAssertEqual(structArray.arrowFields![11].type.id, .string)
-                    XCTAssertEqual(structArray.arrowFields![12].type.id, .binary)
-                    XCTAssertEqual(structArray.arrowFields![13].type.id, .date64)
+                    let nestedArray = (recordBatch.columns[0].array as? NestedArray)!
+                    XCTAssertEqual(nestedArray.length, 3)
+                    XCTAssertNotNil(nestedArray.fields)
+                    XCTAssertEqual(nestedArray.fields!.count, 14)
+                    XCTAssertEqual(nestedArray.fields![0].type.id, .boolean)
+                    XCTAssertEqual(nestedArray.fields![1].type.id, .int8)
+                    XCTAssertEqual(nestedArray.fields![2].type.id, .int16)
+                    XCTAssertEqual(nestedArray.fields![3].type.id, .int32)
+                    XCTAssertEqual(nestedArray.fields![4].type.id, .int64)
+                    XCTAssertEqual(nestedArray.fields![5].type.id, .uint8)
+                    XCTAssertEqual(nestedArray.fields![6].type.id, .uint16)
+                    XCTAssertEqual(nestedArray.fields![7].type.id, .uint32)
+                    XCTAssertEqual(nestedArray.fields![8].type.id, .uint64)
+                    XCTAssertEqual(nestedArray.fields![9].type.id, .double)
+                    XCTAssertEqual(nestedArray.fields![10].type.id, .float)
+                    XCTAssertEqual(nestedArray.fields![11].type.id, .string)
+                    XCTAssertEqual(nestedArray.fields![12].type.id, .binary)
+                    XCTAssertEqual(nestedArray.fields![13].type.id, .date64)
                 }
             case.failure(let error):
                 throw error
