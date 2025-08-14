@@ -395,8 +395,8 @@ public class ListBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
         let index = UInt(self.length)
         self.length += 1
 
-        if length >= self.offsets.length {
-            self.resize(length + 1)
+        if self.length >= self.offsets.length {
+            self.resize(self.length + 1)
         }
 
         let offsetIndex = Int(index) * MemoryLayout<Int32>.stride
