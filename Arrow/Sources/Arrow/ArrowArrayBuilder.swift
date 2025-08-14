@@ -315,16 +315,16 @@ public class ArrowArrayBuilders {
                 throw ArrowError.invalid("Expected arrow type for \(arrowType.id) not found")
             }
             return try TimestampArrayBuilder(timestampType.unit)
-        case .list:
-            guard let listType = arrowType as? ArrowTypeList else {
-                throw ArrowError.invalid("Expected ArrowTypeList for \(arrowType.id)")
-            }
-            return try ListArrayBuilder(listType.elementType)
         case .strct:
             guard let structType = arrowType as? ArrowTypeStruct else {
                 throw ArrowError.invalid("Expected ArrowStructType for \(arrowType.id)")
             }
             return try StructArrayBuilder(structType.fields)
+        case .list:
+            guard let listType = arrowType as? ArrowTypeList else {
+                throw ArrowError.invalid("Expected ArrowTypeList for \(arrowType.id)")
+            }
+            return try ListArrayBuilder(listType.elementType)
         default:
             throw ArrowError.unknownType("Builder not found for arrow type: \(arrowType.id)")
         }
