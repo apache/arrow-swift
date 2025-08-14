@@ -473,7 +473,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(fourthList![3] as? Int32, 9)
     }
 
-    func testNestedListArray() throws {
+    func testListArrayNested() throws {
         let innerListType = ArrowTypeList(ArrowType(ArrowType.ArrowInt32))
         let outerListBuilder = try ListArrayBuilder(innerListType)
 
