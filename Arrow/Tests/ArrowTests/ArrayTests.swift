@@ -477,7 +477,10 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let innerListType = ArrowTypeList(ArrowType(ArrowType.ArrowInt32))
         let outerListBuilder = try ListArrayBuilder(innerListType)
 
-        let innerListBuilder = outerListBuilder.valueBuilder as! ListArrayBuilder
+        guard let innerListBuilder = outerListBuilder.valueBuilder as? ListArrayBuilder else {
+            XCTFail("Failed to cast valueBuilder to ListArrayBuilder")
+            return
+        }
 
         outerListBuilder.bufferBuilder.append([nil, nil])
         innerListBuilder.append([Int32(1), Int32(2)])
