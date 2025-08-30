@@ -28,18 +28,18 @@ let package = Package(
     products: [
         .library(
             name: "Arrow",
-            targets: ["Arrow"])
+            targets: ["Arrow"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", from: "25.2.10"),
         .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.25.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.29.0"),
-        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
+        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0"),
     ],
     targets: [
         .target(
             name: "ArrowC",
-            path: "Arrow/Sources/ArrowC",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
@@ -47,11 +47,11 @@ let package = Package(
         ),
         .target(
             name: "Arrow",
-            dependencies: ["ArrowC",
-                           .product(name: "FlatBuffers", package: "flatbuffers"),
-                           .product(name: "Atomics", package: "swift-atomics")
+            dependencies: [
+                .target(name: "ArrowC"),
+                .product(name: "FlatBuffers", package: "flatbuffers"),
+                .product(name: "Atomics", package: "swift-atomics"),
             ],
-            path: "Arrow/Sources/Arrow",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
@@ -59,19 +59,28 @@ let package = Package(
         .target(
             name: "ArrowFlight",
             dependencies: [
-                "Arrow",
+                .target(name: "Arrow"),
                 .product(name: "GRPC", package: "grpc-swift"),
-                .product(name: "SwiftProtobuf", package: "swift-protobuf")
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
-            path: "ArrowFlight/Sources/ArrowFlight",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
+            ]
+        ),
+        .target(
+            name: "go-swift",
+            dependencies: [
+                .target(name: "Arrow")
             ]
         ),
         .testTarget(
             name: "ArrowTests",
             dependencies: ["Arrow", "ArrowC"],
-            path: "Arrow/Tests",
+            resources: [
+                .process("Resources/testdata_double.arrow"),
+                .process("Resources/testdata_bool.arrow"),
+                .process("Resources/testdata_struct.arrow"),
+            ],
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
@@ -79,11 +88,9 @@ let package = Package(
         .testTarget(
             name: "ArrowFlightTests",
             dependencies: ["ArrowFlight"],
-            path: "ArrowFlight/Tests",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
-        )
-
+        ),
     ]
 )
