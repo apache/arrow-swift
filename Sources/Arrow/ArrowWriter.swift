@@ -240,7 +240,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         _ writer: inout DataWriter, fields: [ArrowField],
         columns: [ArrowArrayHolder]
     )
-        -> Result<Bool, ArrowError> {
+    -> Result<Bool, ArrowError> {
         for index in 0 ..< fields.count {
             let column = columns[index]
             let colBufferData = column.getBufferData()
@@ -401,7 +401,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
             case .success:
                 return .success([
                     (writer as! InMemDataWriter).data, // swiftlint:disable:this force_cast
-                    (dataWriter as! InMemDataWriter).data, // swiftlint:disable:this force_cast
+                    (dataWriter as! InMemDataWriter).data // swiftlint:disable:this force_cast
                 ])
             case let .failure(error):
                 return .failure(error)

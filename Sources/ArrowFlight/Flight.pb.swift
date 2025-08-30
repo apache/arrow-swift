@@ -95,7 +95,7 @@ extension Arrow_Flight_Protocol_CancelStatus: CaseIterable {
         .unspecified,
         .cancelled,
         .cancelling,
-        .notCancellable,
+        .notCancellable
     ]
 }
 
@@ -118,7 +118,6 @@ struct Arrow_Flight_Protocol_HandshakeRequest {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 struct Arrow_Flight_Protocol_HandshakeResponse {
@@ -136,7 +135,6 @@ struct Arrow_Flight_Protocol_HandshakeResponse {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -152,7 +150,6 @@ struct Arrow_Flight_Protocol_BasicAuth {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 struct Arrow_Flight_Protocol_Empty {
@@ -162,7 +159,6 @@ struct Arrow_Flight_Protocol_Empty {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -179,7 +175,6 @@ struct Arrow_Flight_Protocol_ActionType {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -194,7 +189,6 @@ struct Arrow_Flight_Protocol_Criteria {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -210,7 +204,6 @@ struct Arrow_Flight_Protocol_Action {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -233,8 +226,6 @@ struct Arrow_Flight_Protocol_CancelFlightInfoRequest {
     mutating func clearInfo() { _info = nil }
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _info: Arrow_Flight_Protocol_FlightInfo?
 }
@@ -260,8 +251,6 @@ struct Arrow_Flight_Protocol_RenewFlightEndpointRequest {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _endpoint: Arrow_Flight_Protocol_FlightEndpoint?
 }
 
@@ -276,7 +265,6 @@ struct Arrow_Flight_Protocol_Result {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -292,7 +280,6 @@ struct Arrow_Flight_Protocol_CancelFlightInfoResult {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -310,7 +297,6 @@ struct Arrow_Flight_Protocol_SchemaResult {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -377,7 +363,6 @@ struct Arrow_Flight_Protocol_FlightDescriptor {
         }
     }
 
-    init() {}
 }
 
 #if swift(>=4.2)
@@ -387,7 +372,7 @@ extension Arrow_Flight_Protocol_FlightDescriptor.DescriptorType: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_FlightDescriptor.DescriptorType] = [
         .unknown,
         .path,
-        .cmd,
+        .cmd
     ]
 }
 
@@ -455,8 +440,6 @@ struct Arrow_Flight_Protocol_FlightInfo {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor?
 }
 
@@ -512,8 +495,6 @@ struct Arrow_Flight_Protocol_FlightEndpoint {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _ticket: Arrow_Flight_Protocol_Ticket?
     fileprivate var _expirationTime: SwiftProtobuf.Google_Protobuf_Timestamp?
 }
@@ -530,7 +511,6 @@ struct Arrow_Flight_Protocol_Location {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -548,7 +528,6 @@ struct Arrow_Flight_Protocol_Ticket {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 ///
@@ -588,8 +567,6 @@ struct Arrow_Flight_Protocol_FlightData {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor?
 }
 
@@ -604,7 +581,6 @@ struct Arrow_Flight_Protocol_PutResult {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -640,7 +616,7 @@ extension Arrow_Flight_Protocol_CancelStatus: SwiftProtobuf._ProtoNameProviding 
         0: .same(proto: "CANCEL_STATUS_UNSPECIFIED"),
         1: .same(proto: "CANCEL_STATUS_CANCELLED"),
         2: .same(proto: "CANCEL_STATUS_CANCELLING"),
-        3: .same(proto: "CANCEL_STATUS_NOT_CANCELLABLE"),
+        3: .same(proto: "CANCEL_STATUS_NOT_CANCELLABLE")
     ]
 }
 
@@ -648,7 +624,7 @@ extension Arrow_Flight_Protocol_HandshakeRequest: SwiftProtobuf.Message, SwiftPr
     static let protoMessageName: String = _protobuf_package + ".HandshakeRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "protocol_version"),
-        2: .same(proto: "payload"),
+        2: .same(proto: "payload")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -686,7 +662,7 @@ extension Arrow_Flight_Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftP
     static let protoMessageName: String = _protobuf_package + ".HandshakeResponse"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "protocol_version"),
-        2: .same(proto: "payload"),
+        2: .same(proto: "payload")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -724,7 +700,7 @@ extension Arrow_Flight_Protocol_BasicAuth: SwiftProtobuf.Message, SwiftProtobuf.
     static let protoMessageName: String = _protobuf_package + ".BasicAuth"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         2: .same(proto: "username"),
-        3: .same(proto: "password"),
+        3: .same(proto: "password")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -780,7 +756,7 @@ extension Arrow_Flight_Protocol_ActionType: SwiftProtobuf.Message, SwiftProtobuf
     static let protoMessageName: String = _protobuf_package + ".ActionType"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "type"),
-        2: .same(proto: "description"),
+        2: .same(proto: "description")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -817,7 +793,7 @@ extension Arrow_Flight_Protocol_ActionType: SwiftProtobuf.Message, SwiftProtobuf
 extension Arrow_Flight_Protocol_Criteria: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".Criteria"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "expression"),
+        1: .same(proto: "expression")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -850,7 +826,7 @@ extension Arrow_Flight_Protocol_Action: SwiftProtobuf.Message, SwiftProtobuf._Me
     static let protoMessageName: String = _protobuf_package + ".Action"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "type"),
-        2: .same(proto: "body"),
+        2: .same(proto: "body")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -887,7 +863,7 @@ extension Arrow_Flight_Protocol_Action: SwiftProtobuf.Message, SwiftProtobuf._Me
 extension Arrow_Flight_Protocol_CancelFlightInfoRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "info"),
+        1: .same(proto: "info")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -923,7 +899,7 @@ extension Arrow_Flight_Protocol_CancelFlightInfoRequest: SwiftProtobuf.Message, 
 extension Arrow_Flight_Protocol_RenewFlightEndpointRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".RenewFlightEndpointRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "endpoint"),
+        1: .same(proto: "endpoint")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -959,7 +935,7 @@ extension Arrow_Flight_Protocol_RenewFlightEndpointRequest: SwiftProtobuf.Messag
 extension Arrow_Flight_Protocol_Result: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".Result"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "body"),
+        1: .same(proto: "body")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -991,7 +967,7 @@ extension Arrow_Flight_Protocol_Result: SwiftProtobuf.Message, SwiftProtobuf._Me
 extension Arrow_Flight_Protocol_CancelFlightInfoResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "status"),
+        1: .same(proto: "status")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1023,7 +999,7 @@ extension Arrow_Flight_Protocol_CancelFlightInfoResult: SwiftProtobuf.Message, S
 extension Arrow_Flight_Protocol_SchemaResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".SchemaResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "schema"),
+        1: .same(proto: "schema")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1057,7 +1033,7 @@ extension Arrow_Flight_Protocol_FlightDescriptor: SwiftProtobuf.Message, SwiftPr
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "type"),
         2: .same(proto: "cmd"),
-        3: .same(proto: "path"),
+        3: .same(proto: "path")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1100,7 +1076,7 @@ extension Arrow_Flight_Protocol_FlightDescriptor.DescriptorType: SwiftProtobuf._
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "UNKNOWN"),
         1: .same(proto: "PATH"),
-        2: .same(proto: "CMD"),
+        2: .same(proto: "CMD")
     ]
 }
 
@@ -1112,7 +1088,7 @@ extension Arrow_Flight_Protocol_FlightInfo: SwiftProtobuf.Message, SwiftProtobuf
         3: .same(proto: "endpoint"),
         4: .standard(proto: "total_records"),
         5: .standard(proto: "total_bytes"),
-        6: .same(proto: "ordered"),
+        6: .same(proto: "ordered")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1175,7 +1151,7 @@ extension Arrow_Flight_Protocol_FlightEndpoint: SwiftProtobuf.Message, SwiftProt
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "ticket"),
         2: .same(proto: "location"),
-        3: .standard(proto: "expiration_time"),
+        3: .standard(proto: "expiration_time")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1221,7 +1197,7 @@ extension Arrow_Flight_Protocol_FlightEndpoint: SwiftProtobuf.Message, SwiftProt
 extension Arrow_Flight_Protocol_Location: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".Location"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "uri"),
+        1: .same(proto: "uri")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1253,7 +1229,7 @@ extension Arrow_Flight_Protocol_Location: SwiftProtobuf.Message, SwiftProtobuf._
 extension Arrow_Flight_Protocol_Ticket: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".Ticket"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "ticket"),
+        1: .same(proto: "ticket")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1288,7 +1264,7 @@ extension Arrow_Flight_Protocol_FlightData: SwiftProtobuf.Message, SwiftProtobuf
         1: .standard(proto: "flight_descriptor"),
         2: .standard(proto: "data_header"),
         3: .standard(proto: "app_metadata"),
-        1000: .standard(proto: "data_body"),
+        1000: .standard(proto: "data_body")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1339,7 +1315,7 @@ extension Arrow_Flight_Protocol_FlightData: SwiftProtobuf.Message, SwiftProtobuf
 extension Arrow_Flight_Protocol_PutResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".PutResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "app_metadata"),
+        1: .standard(proto: "app_metadata")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {

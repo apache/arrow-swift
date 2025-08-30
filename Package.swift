@@ -23,13 +23,13 @@ import PackageDescription
 let package = Package(
     name: "Arrow",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v10_15)
     ],
     products: [
         .library(
             name: "Arrow",
             targets: ["Arrow"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", from: "25.2.10"),
@@ -70,7 +70,7 @@ let package = Package(
         .target(
             name: "go-swift",
             dependencies: [
-                .target(name: "Arrow"),
+                .target(name: "Arrow")
             ]
         ),
         .testTarget(

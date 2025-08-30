@@ -60,7 +60,7 @@ public class ArrowCImporter {
     public init() {}
 
     public func importType(_ cArrow: String, name: String = "") ->
-        Result<ArrowField, ArrowError> {
+    Result<ArrowField, ArrowError> {
         do {
             let type = try ArrowType.fromCDataFormatId(cArrow)
             return .success(ArrowField(name, type: ArrowType(type.info), isNullable: true))
@@ -70,7 +70,7 @@ public class ArrowCImporter {
     }
 
     public func importField(_ cSchema: ArrowC.ArrowSchema) ->
-        Result<ArrowField, ArrowError> {
+    Result<ArrowField, ArrowError> {
         if cSchema.n_children > 0 {
             ArrowCImporter.release(cSchema)
             return .failure(.invalid("Children currently not supported"))

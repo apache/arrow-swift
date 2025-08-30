@@ -88,7 +88,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
 
     private func loadStructData(_ loadInfo: DataLoadInfo,
                                 field: org_apache_arrow_flatbuf_Field)
-        -> Result<ArrowArrayHolder, ArrowError> {
+    -> Result<ArrowArrayHolder, ArrowError> {
         guard let node = loadInfo.batchData.nextNode() else {
             return .failure(.invalid("Node not found"))
         }
@@ -120,7 +120,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         _ loadInfo: DataLoadInfo,
         field: org_apache_arrow_flatbuf_Field
     )
-        -> Result<ArrowArrayHolder, ArrowError> {
+    -> Result<ArrowArrayHolder, ArrowError> {
         guard let node = loadInfo.batchData.nextNode() else {
             return .failure(.invalid("Node not found"))
         }
@@ -147,7 +147,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         _ loadInfo: DataLoadInfo,
         field: org_apache_arrow_flatbuf_Field
     )
-        -> Result<ArrowArrayHolder, ArrowError> {
+    -> Result<ArrowArrayHolder, ArrowError> {
         guard let node = loadInfo.batchData.nextNode() else {
             return .failure(.invalid("Node not found"))
         }
@@ -180,7 +180,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         _ loadInfo: DataLoadInfo,
         field: org_apache_arrow_flatbuf_Field
     )
-        -> Result<ArrowArrayHolder, ArrowError> {
+    -> Result<ArrowArrayHolder, ArrowError> {
         if isNestedType(field.typeType) {
             return loadStructData(loadInfo, field: field)
         } else if isFixedPrimitive(field.typeType) {

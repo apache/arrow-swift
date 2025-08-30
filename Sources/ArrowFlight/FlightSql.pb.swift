@@ -1014,7 +1014,7 @@ extension Arrow_Flight_Protocol_Sql_SqlInfo: CaseIterable {
         .sqlSavepointsSupported,
         .sqlNamedParametersSupported,
         .sqlLocatorsUpdateCopy,
-        .sqlStoredFunctionsUsingCallSyntaxSupported,
+        .sqlStoredFunctionsUsingCallSyntaxSupported
     ]
 }
 
@@ -1066,7 +1066,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedTransaction: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedTransaction] = [
         .none,
         .transaction,
-        .savepoint,
+        .savepoint
     ]
 }
 
@@ -1113,7 +1113,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedCaseSensitivity: CaseIterable {
         .sqlCaseSensitivityUnknown,
         .sqlCaseSensitivityCaseInsensitive,
         .sqlCaseSensitivityUppercase,
-        .sqlCaseSensitivityLowercase,
+        .sqlCaseSensitivityLowercase
     ]
 }
 
@@ -1160,7 +1160,7 @@ extension Arrow_Flight_Protocol_Sql_SqlNullOrdering: CaseIterable {
         .sqlNullsSortedHigh,
         .sqlNullsSortedLow,
         .sqlNullsSortedAtStart,
-        .sqlNullsSortedAtEnd,
+        .sqlNullsSortedAtEnd
     ]
 }
 
@@ -1203,7 +1203,7 @@ extension Arrow_Flight_Protocol_Sql_SupportedSqlGrammar: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_SupportedSqlGrammar] = [
         .sqlMinimumGrammar,
         .sqlCoreGrammar,
-        .sqlExtendedGrammar,
+        .sqlExtendedGrammar
     ]
 }
 
@@ -1246,7 +1246,7 @@ extension Arrow_Flight_Protocol_Sql_SupportedAnsi92SqlGrammarLevel: CaseIterable
     static var allCases: [Arrow_Flight_Protocol_Sql_SupportedAnsi92SqlGrammarLevel] = [
         .ansi92EntrySql,
         .ansi92IntermediateSql,
-        .ansi92FullSql,
+        .ansi92FullSql
     ]
 }
 
@@ -1289,7 +1289,7 @@ extension Arrow_Flight_Protocol_Sql_SqlOuterJoinsSupportLevel: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlOuterJoinsSupportLevel] = [
         .sqlJoinsUnsupported,
         .sqlLimitedOuterJoins,
-        .sqlFullOuterJoins,
+        .sqlFullOuterJoins
     ]
 }
 
@@ -1328,7 +1328,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedGroupBy: CaseIterable {
     // The compiler won't synthesize support with the UNRECOGNIZED case.
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedGroupBy] = [
         .sqlGroupByUnrelated,
-        .sqlGroupByBeyondSelect,
+        .sqlGroupByBeyondSelect
     ]
 }
 
@@ -1371,7 +1371,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedElementActions: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedElementActions] = [
         .sqlElementInProcedureCalls,
         .sqlElementInIndexDefinitions,
-        .sqlElementInPrivilegeDefinitions,
+        .sqlElementInPrivilegeDefinitions
     ]
 }
 
@@ -1410,7 +1410,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedPositionedCommands: CaseIterable
     // The compiler won't synthesize support with the UNRECOGNIZED case.
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedPositionedCommands] = [
         .sqlPositionedDelete,
-        .sqlPositionedUpdate,
+        .sqlPositionedUpdate
     ]
 }
 
@@ -1457,7 +1457,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedSubqueries: CaseIterable {
         .sqlSubqueriesInComparisons,
         .sqlSubqueriesInExists,
         .sqlSubqueriesInIns,
-        .sqlSubqueriesInQuantifieds,
+        .sqlSubqueriesInQuantifieds
     ]
 }
 
@@ -1496,7 +1496,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedUnions: CaseIterable {
     // The compiler won't synthesize support with the UNRECOGNIZED case.
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedUnions] = [
         .sqlUnion,
-        .sqlUnionAll,
+        .sqlUnionAll
     ]
 }
 
@@ -1547,7 +1547,7 @@ extension Arrow_Flight_Protocol_Sql_SqlTransactionIsolationLevel: CaseIterable {
         .sqlTransactionReadUncommitted,
         .sqlTransactionReadCommitted,
         .sqlTransactionRepeatableRead,
-        .sqlTransactionSerializable,
+        .sqlTransactionSerializable
     ]
 }
 
@@ -1590,7 +1590,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedTransactions: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedTransactions] = [
         .sqlTransactionUnspecified,
         .sqlDataDefinitionTransactions,
-        .sqlDataManipulationTransactions,
+        .sqlDataManipulationTransactions
     ]
 }
 
@@ -1637,7 +1637,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedResultSetType: CaseIterable {
         .sqlResultSetTypeUnspecified,
         .sqlResultSetTypeForwardOnly,
         .sqlResultSetTypeScrollInsensitive,
-        .sqlResultSetTypeScrollSensitive,
+        .sqlResultSetTypeScrollSensitive
     ]
 }
 
@@ -1680,7 +1680,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedResultSetConcurrency: CaseIterab
     static var allCases: [Arrow_Flight_Protocol_Sql_SqlSupportedResultSetConcurrency] = [
         .sqlResultSetConcurrencyUnspecified,
         .sqlResultSetConcurrencyReadOnly,
-        .sqlResultSetConcurrencyUpdatable,
+        .sqlResultSetConcurrencyUpdatable
     ]
 }
 
@@ -1791,7 +1791,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportsConvert: CaseIterable {
         .sqlConvertTimestamp,
         .sqlConvertTinyint,
         .sqlConvertVarbinary,
-        .sqlConvertVarchar,
+        .sqlConvertVarchar
     ]
 }
 
@@ -1921,7 +1921,7 @@ extension Arrow_Flight_Protocol_Sql_XdbcDataType: CaseIterable {
         .xdbcTinyint,
         .xdbcBit,
         .xdbcWchar,
-        .xdbcWvarchar,
+        .xdbcWvarchar
     ]
 }
 
@@ -2067,7 +2067,7 @@ extension Arrow_Flight_Protocol_Sql_XdbcDatetimeSubcode: CaseIterable {
         .xdbcSubcodeIntervalDayToSecond,
         .xdbcSubcodeIntervalHourToMinute,
         .xdbcSubcodeIntervalHourToSecond,
-        .xdbcSubcodeIntervalMinuteToSecond,
+        .xdbcSubcodeIntervalMinuteToSecond
     ]
 }
 
@@ -2119,7 +2119,7 @@ extension Arrow_Flight_Protocol_Sql_Nullable: CaseIterable {
     static var allCases: [Arrow_Flight_Protocol_Sql_Nullable] = [
         .nullabilityNoNulls,
         .nullabilityNullable,
-        .nullabilityUnknown,
+        .nullabilityUnknown
     ]
 }
 
@@ -2183,7 +2183,7 @@ extension Arrow_Flight_Protocol_Sql_Searchable: CaseIterable {
         .none,
         .char,
         .basic,
-        .full,
+        .full
     ]
 }
 
@@ -2234,7 +2234,7 @@ extension Arrow_Flight_Protocol_Sql_UpdateDeleteRules: CaseIterable {
         .restrict,
         .setNull,
         .noAction,
-        .setDefault,
+        .setDefault
     ]
 }
 
@@ -2284,8 +2284,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetSqlInfo {
     var info: [UInt32] = []
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -2364,8 +2362,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetXdbcTypeInfo {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _dataType: Int32?
 }
 
@@ -2387,8 +2383,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetCatalogs {
     // methods supported on all messages.
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -2440,8 +2434,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetDbSchemas {
     mutating func clearDbSchemaFilterPattern() { _dbSchemaFilterPattern = nil }
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _catalog: String?
     fileprivate var _dbSchemaFilterPattern: String?
@@ -2536,8 +2528,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetTables {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _catalog: String?
     fileprivate var _dbSchemaFilterPattern: String?
     fileprivate var _tableNameFilterPattern: String?
@@ -2562,8 +2552,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetTableTypes {
     // methods supported on all messages.
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -2619,8 +2607,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetPrimaryKeys {
     var table: String = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _catalog: String?
     fileprivate var _dbSchema: String?
@@ -2688,8 +2674,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetExportedKeys {
     var table: String = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _catalog: String?
     fileprivate var _dbSchema: String?
@@ -2761,8 +2745,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetImportedKeys {
     var table: String = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _catalog: String?
     fileprivate var _dbSchema: String?
@@ -2870,8 +2852,6 @@ struct Arrow_Flight_Protocol_Sql_CommandGetCrossReference {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _pkCatalog: String?
     fileprivate var _pkDbSchema: String?
     fileprivate var _fkCatalog: String?
@@ -2902,8 +2882,6 @@ struct Arrow_Flight_Protocol_Sql_ActionCreatePreparedStatementRequest {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _transactionID: Data?
 }
 
@@ -2926,8 +2904,6 @@ struct Arrow_Flight_Protocol_Sql_SubstraitPlan {
     var version: String = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -2962,8 +2938,6 @@ struct Arrow_Flight_Protocol_Sql_ActionCreatePreparedSubstraitPlanRequest {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _plan: Arrow_Flight_Protocol_Sql_SubstraitPlan?
     fileprivate var _transactionID: Data?
 }
@@ -2993,8 +2967,6 @@ struct Arrow_Flight_Protocol_Sql_ActionCreatePreparedStatementResult {
     var parameterSchema: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3009,8 +2981,6 @@ struct Arrow_Flight_Protocol_Sql_ActionClosePreparedStatementRequest {
     var preparedStatementHandle: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3022,8 +2992,6 @@ struct Arrow_Flight_Protocol_Sql_ActionBeginTransactionRequest {
     // methods supported on all messages.
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3044,8 +3012,6 @@ struct Arrow_Flight_Protocol_Sql_ActionBeginSavepointRequest {
     var name: String = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3065,8 +3031,6 @@ struct Arrow_Flight_Protocol_Sql_ActionBeginTransactionResult {
     var transactionID: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3086,8 +3050,6 @@ struct Arrow_Flight_Protocol_Sql_ActionBeginSavepointResult {
     var savepointID: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3143,8 +3105,6 @@ struct Arrow_Flight_Protocol_Sql_ActionEndTransactionRequest {
             }
         }
     }
-
-    init() {}
 }
 
 #if swift(>=4.2)
@@ -3154,7 +3114,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndTransactionRequest.EndTransaction: 
     static var allCases: [Arrow_Flight_Protocol_Sql_ActionEndTransactionRequest.EndTransaction] = [
         .unspecified,
         .commit,
-        .rollback,
+        .rollback
     ]
 }
 
@@ -3215,8 +3175,6 @@ struct Arrow_Flight_Protocol_Sql_ActionEndSavepointRequest {
             }
         }
     }
-
-    init() {}
 }
 
 #if swift(>=4.2)
@@ -3226,7 +3184,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndSavepointRequest.EndSavepoint: Case
     static var allCases: [Arrow_Flight_Protocol_Sql_ActionEndSavepointRequest.EndSavepoint] = [
         .unspecified,
         .release,
-        .rollback,
+        .rollback
     ]
 }
 
@@ -3268,8 +3226,6 @@ struct Arrow_Flight_Protocol_Sql_CommandStatementQuery {
     mutating func clearTransactionID() { _transactionID = nil }
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 
     fileprivate var _transactionID: Data?
 }
@@ -3320,8 +3276,6 @@ struct Arrow_Flight_Protocol_Sql_CommandStatementSubstraitPlan {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _plan: Arrow_Flight_Protocol_Sql_SubstraitPlan?
     fileprivate var _transactionID: Data?
 }
@@ -3338,8 +3292,6 @@ struct Arrow_Flight_Protocol_Sql_TicketStatementQuery {
     var statementHandle: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3368,8 +3320,6 @@ struct Arrow_Flight_Protocol_Sql_CommandPreparedStatementQuery {
     var preparedStatementHandle: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3396,8 +3346,6 @@ struct Arrow_Flight_Protocol_Sql_CommandStatementUpdate {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    init() {}
-
     fileprivate var _transactionID: Data?
 }
 
@@ -3414,8 +3362,6 @@ struct Arrow_Flight_Protocol_Sql_CommandPreparedStatementUpdate {
     var preparedStatementHandle: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3432,8 +3378,6 @@ struct Arrow_Flight_Protocol_Sql_DoPutUpdateResult {
     var recordCount: Int64 = 0
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3464,8 +3408,6 @@ struct Arrow_Flight_Protocol_Sql_ActionCancelQueryRequest {
     var info: Data = .init()
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
-
-    init() {}
 }
 
 ///
@@ -3529,8 +3471,6 @@ struct Arrow_Flight_Protocol_Sql_ActionCancelQueryResult {
             }
         }
     }
-
-    init() {}
 }
 
 #if swift(>=4.2)
@@ -3541,7 +3481,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCancelQueryResult.CancelResult: CaseIt
         .unspecified,
         .cancelled,
         .cancelling,
-        .notCancellable,
+        .notCancellable
     ]
 }
 
@@ -3640,7 +3580,7 @@ extension SwiftProtobuf.Google_Protobuf_MessageOptions {
 /// in parsing, or it can be combined with other `SwiftProtobuf.SimpleExtensionMap`s to create
 /// a larger `SwiftProtobuf.SimpleExtensionMap`.
 let Arrow_Flight_Protocol_Sql_FlightSql_Extensions: SwiftProtobuf.SimpleExtensionMap = [
-    Arrow_Flight_Protocol_Sql_Extensions_experimental,
+    Arrow_Flight_Protocol_Sql_Extensions_experimental
 ]
 
 // Extension Objects - The only reason these might be needed is when manually
@@ -3746,7 +3686,7 @@ extension Arrow_Flight_Protocol_Sql_SqlInfo: SwiftProtobuf._ProtoNameProviding {
         573: .same(proto: "SQL_SAVEPOINTS_SUPPORTED"),
         574: .same(proto: "SQL_NAMED_PARAMETERS_SUPPORTED"),
         575: .same(proto: "SQL_LOCATORS_UPDATE_COPY"),
-        576: .same(proto: "SQL_STORED_FUNCTIONS_USING_CALL_SYNTAX_SUPPORTED"),
+        576: .same(proto: "SQL_STORED_FUNCTIONS_USING_CALL_SYNTAX_SUPPORTED")
     ]
 }
 
@@ -3754,7 +3694,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedTransaction: SwiftProtobuf._Prot
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_SUPPORTED_TRANSACTION_NONE"),
         1: .same(proto: "SQL_SUPPORTED_TRANSACTION_TRANSACTION"),
-        2: .same(proto: "SQL_SUPPORTED_TRANSACTION_SAVEPOINT"),
+        2: .same(proto: "SQL_SUPPORTED_TRANSACTION_SAVEPOINT")
     ]
 }
 
@@ -3763,7 +3703,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedCaseSensitivity: SwiftProtobuf._
         0: .same(proto: "SQL_CASE_SENSITIVITY_UNKNOWN"),
         1: .same(proto: "SQL_CASE_SENSITIVITY_CASE_INSENSITIVE"),
         2: .same(proto: "SQL_CASE_SENSITIVITY_UPPERCASE"),
-        3: .same(proto: "SQL_CASE_SENSITIVITY_LOWERCASE"),
+        3: .same(proto: "SQL_CASE_SENSITIVITY_LOWERCASE")
     ]
 }
 
@@ -3772,7 +3712,7 @@ extension Arrow_Flight_Protocol_Sql_SqlNullOrdering: SwiftProtobuf._ProtoNamePro
         0: .same(proto: "SQL_NULLS_SORTED_HIGH"),
         1: .same(proto: "SQL_NULLS_SORTED_LOW"),
         2: .same(proto: "SQL_NULLS_SORTED_AT_START"),
-        3: .same(proto: "SQL_NULLS_SORTED_AT_END"),
+        3: .same(proto: "SQL_NULLS_SORTED_AT_END")
     ]
 }
 
@@ -3780,7 +3720,7 @@ extension Arrow_Flight_Protocol_Sql_SupportedSqlGrammar: SwiftProtobuf._ProtoNam
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_MINIMUM_GRAMMAR"),
         1: .same(proto: "SQL_CORE_GRAMMAR"),
-        2: .same(proto: "SQL_EXTENDED_GRAMMAR"),
+        2: .same(proto: "SQL_EXTENDED_GRAMMAR")
     ]
 }
 
@@ -3788,7 +3728,7 @@ extension Arrow_Flight_Protocol_Sql_SupportedAnsi92SqlGrammarLevel: SwiftProtobu
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "ANSI92_ENTRY_SQL"),
         1: .same(proto: "ANSI92_INTERMEDIATE_SQL"),
-        2: .same(proto: "ANSI92_FULL_SQL"),
+        2: .same(proto: "ANSI92_FULL_SQL")
     ]
 }
 
@@ -3796,14 +3736,14 @@ extension Arrow_Flight_Protocol_Sql_SqlOuterJoinsSupportLevel: SwiftProtobuf._Pr
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_JOINS_UNSUPPORTED"),
         1: .same(proto: "SQL_LIMITED_OUTER_JOINS"),
-        2: .same(proto: "SQL_FULL_OUTER_JOINS"),
+        2: .same(proto: "SQL_FULL_OUTER_JOINS")
     ]
 }
 
 extension Arrow_Flight_Protocol_Sql_SqlSupportedGroupBy: SwiftProtobuf._ProtoNameProviding {
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_GROUP_BY_UNRELATED"),
-        1: .same(proto: "SQL_GROUP_BY_BEYOND_SELECT"),
+        1: .same(proto: "SQL_GROUP_BY_BEYOND_SELECT")
     ]
 }
 
@@ -3811,14 +3751,14 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedElementActions: SwiftProtobuf._P
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_ELEMENT_IN_PROCEDURE_CALLS"),
         1: .same(proto: "SQL_ELEMENT_IN_INDEX_DEFINITIONS"),
-        2: .same(proto: "SQL_ELEMENT_IN_PRIVILEGE_DEFINITIONS"),
+        2: .same(proto: "SQL_ELEMENT_IN_PRIVILEGE_DEFINITIONS")
     ]
 }
 
 extension Arrow_Flight_Protocol_Sql_SqlSupportedPositionedCommands: SwiftProtobuf._ProtoNameProviding {
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_POSITIONED_DELETE"),
-        1: .same(proto: "SQL_POSITIONED_UPDATE"),
+        1: .same(proto: "SQL_POSITIONED_UPDATE")
     ]
 }
 
@@ -3827,14 +3767,14 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedSubqueries: SwiftProtobuf._Proto
         0: .same(proto: "SQL_SUBQUERIES_IN_COMPARISONS"),
         1: .same(proto: "SQL_SUBQUERIES_IN_EXISTS"),
         2: .same(proto: "SQL_SUBQUERIES_IN_INS"),
-        3: .same(proto: "SQL_SUBQUERIES_IN_QUANTIFIEDS"),
+        3: .same(proto: "SQL_SUBQUERIES_IN_QUANTIFIEDS")
     ]
 }
 
 extension Arrow_Flight_Protocol_Sql_SqlSupportedUnions: SwiftProtobuf._ProtoNameProviding {
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_UNION"),
-        1: .same(proto: "SQL_UNION_ALL"),
+        1: .same(proto: "SQL_UNION_ALL")
     ]
 }
 
@@ -3844,7 +3784,7 @@ extension Arrow_Flight_Protocol_Sql_SqlTransactionIsolationLevel: SwiftProtobuf.
         1: .same(proto: "SQL_TRANSACTION_READ_UNCOMMITTED"),
         2: .same(proto: "SQL_TRANSACTION_READ_COMMITTED"),
         3: .same(proto: "SQL_TRANSACTION_REPEATABLE_READ"),
-        4: .same(proto: "SQL_TRANSACTION_SERIALIZABLE"),
+        4: .same(proto: "SQL_TRANSACTION_SERIALIZABLE")
     ]
 }
 
@@ -3852,7 +3792,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedTransactions: SwiftProtobuf._Pro
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_TRANSACTION_UNSPECIFIED"),
         1: .same(proto: "SQL_DATA_DEFINITION_TRANSACTIONS"),
-        2: .same(proto: "SQL_DATA_MANIPULATION_TRANSACTIONS"),
+        2: .same(proto: "SQL_DATA_MANIPULATION_TRANSACTIONS")
     ]
 }
 
@@ -3861,7 +3801,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedResultSetType: SwiftProtobuf._Pr
         0: .same(proto: "SQL_RESULT_SET_TYPE_UNSPECIFIED"),
         1: .same(proto: "SQL_RESULT_SET_TYPE_FORWARD_ONLY"),
         2: .same(proto: "SQL_RESULT_SET_TYPE_SCROLL_INSENSITIVE"),
-        3: .same(proto: "SQL_RESULT_SET_TYPE_SCROLL_SENSITIVE"),
+        3: .same(proto: "SQL_RESULT_SET_TYPE_SCROLL_SENSITIVE")
     ]
 }
 
@@ -3869,7 +3809,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportedResultSetConcurrency: SwiftProto
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "SQL_RESULT_SET_CONCURRENCY_UNSPECIFIED"),
         1: .same(proto: "SQL_RESULT_SET_CONCURRENCY_READ_ONLY"),
-        2: .same(proto: "SQL_RESULT_SET_CONCURRENCY_UPDATABLE"),
+        2: .same(proto: "SQL_RESULT_SET_CONCURRENCY_UPDATABLE")
     ]
 }
 
@@ -3894,7 +3834,7 @@ extension Arrow_Flight_Protocol_Sql_SqlSupportsConvert: SwiftProtobuf._ProtoName
         16: .same(proto: "SQL_CONVERT_TIMESTAMP"),
         17: .same(proto: "SQL_CONVERT_TINYINT"),
         18: .same(proto: "SQL_CONVERT_VARBINARY"),
-        19: .same(proto: "SQL_CONVERT_VARCHAR"),
+        19: .same(proto: "SQL_CONVERT_VARCHAR")
     ]
 }
 
@@ -3923,7 +3863,7 @@ extension Arrow_Flight_Protocol_Sql_XdbcDataType: SwiftProtobuf._ProtoNameProvid
         12: .same(proto: "XDBC_VARCHAR"),
         91: .same(proto: "XDBC_DATE"),
         92: .same(proto: "XDBC_TIME"),
-        93: .same(proto: "XDBC_TIMESTAMP"),
+        93: .same(proto: "XDBC_TIMESTAMP")
     ]
 }
 
@@ -3955,7 +3895,7 @@ extension Arrow_Flight_Protocol_Sql_XdbcDatetimeSubcode: SwiftProtobuf._ProtoNam
         110: .same(proto: "XDBC_SUBCODE_INTERVAL_DAY_TO_SECOND"),
         111: .same(proto: "XDBC_SUBCODE_INTERVAL_HOUR_TO_MINUTE"),
         112: .same(proto: "XDBC_SUBCODE_INTERVAL_HOUR_TO_SECOND"),
-        113: .same(proto: "XDBC_SUBCODE_INTERVAL_MINUTE_TO_SECOND"),
+        113: .same(proto: "XDBC_SUBCODE_INTERVAL_MINUTE_TO_SECOND")
     ]
 }
 
@@ -3963,7 +3903,7 @@ extension Arrow_Flight_Protocol_Sql_Nullable: SwiftProtobuf._ProtoNameProviding 
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "NULLABILITY_NO_NULLS"),
         1: .same(proto: "NULLABILITY_NULLABLE"),
-        2: .same(proto: "NULLABILITY_UNKNOWN"),
+        2: .same(proto: "NULLABILITY_UNKNOWN")
     ]
 }
 
@@ -3972,7 +3912,7 @@ extension Arrow_Flight_Protocol_Sql_Searchable: SwiftProtobuf._ProtoNameProvidin
         0: .same(proto: "SEARCHABLE_NONE"),
         1: .same(proto: "SEARCHABLE_CHAR"),
         2: .same(proto: "SEARCHABLE_BASIC"),
-        3: .same(proto: "SEARCHABLE_FULL"),
+        3: .same(proto: "SEARCHABLE_FULL")
     ]
 }
 
@@ -3982,14 +3922,14 @@ extension Arrow_Flight_Protocol_Sql_UpdateDeleteRules: SwiftProtobuf._ProtoNameP
         1: .same(proto: "RESTRICT"),
         2: .same(proto: "SET_NULL"),
         3: .same(proto: "NO_ACTION"),
-        4: .same(proto: "SET_DEFAULT"),
+        4: .same(proto: "SET_DEFAULT")
     ]
 }
 
 extension Arrow_Flight_Protocol_Sql_CommandGetSqlInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CommandGetSqlInfo"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "info"),
+        1: .same(proto: "info")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4021,7 +3961,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetSqlInfo: SwiftProtobuf.Message, Sw
 extension Arrow_Flight_Protocol_Sql_CommandGetXdbcTypeInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CommandGetXdbcTypeInfo"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "data_type"),
+        1: .standard(proto: "data_type")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4076,7 +4016,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetDbSchemas: SwiftProtobuf.Message, 
     static let protoMessageName: String = _protobuf_package + ".CommandGetDbSchemas"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "catalog"),
-        2: .standard(proto: "db_schema_filter_pattern"),
+        2: .standard(proto: "db_schema_filter_pattern")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4121,7 +4061,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetTables: SwiftProtobuf.Message, Swi
         2: .standard(proto: "db_schema_filter_pattern"),
         3: .standard(proto: "table_name_filter_pattern"),
         4: .standard(proto: "table_types"),
-        5: .standard(proto: "include_schema"),
+        5: .standard(proto: "include_schema")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4197,7 +4137,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetPrimaryKeys: SwiftProtobuf.Message
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "catalog"),
         2: .standard(proto: "db_schema"),
-        3: .same(proto: "table"),
+        3: .same(proto: "table")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4245,7 +4185,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetExportedKeys: SwiftProtobuf.Messag
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "catalog"),
         2: .standard(proto: "db_schema"),
-        3: .same(proto: "table"),
+        3: .same(proto: "table")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4293,7 +4233,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetImportedKeys: SwiftProtobuf.Messag
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "catalog"),
         2: .standard(proto: "db_schema"),
-        3: .same(proto: "table"),
+        3: .same(proto: "table")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4344,7 +4284,7 @@ extension Arrow_Flight_Protocol_Sql_CommandGetCrossReference: SwiftProtobuf.Mess
         3: .standard(proto: "pk_table"),
         4: .standard(proto: "fk_catalog"),
         5: .standard(proto: "fk_db_schema"),
-        6: .standard(proto: "fk_table"),
+        6: .standard(proto: "fk_table")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4406,7 +4346,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCreatePreparedStatementRequest: SwiftP
     static let protoMessageName: String = _protobuf_package + ".ActionCreatePreparedStatementRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "query"),
-        2: .standard(proto: "transaction_id"),
+        2: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4448,7 +4388,7 @@ extension Arrow_Flight_Protocol_Sql_SubstraitPlan: SwiftProtobuf.Message, SwiftP
     static let protoMessageName: String = _protobuf_package + ".SubstraitPlan"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "plan"),
-        2: .same(proto: "version"),
+        2: .same(proto: "version")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4486,7 +4426,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCreatePreparedSubstraitPlanRequest: Sw
     static let protoMessageName: String = _protobuf_package + ".ActionCreatePreparedSubstraitPlanRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "plan"),
-        2: .standard(proto: "transaction_id"),
+        2: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4529,7 +4469,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCreatePreparedStatementResult: SwiftPr
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "prepared_statement_handle"),
         2: .standard(proto: "dataset_schema"),
-        3: .standard(proto: "parameter_schema"),
+        3: .standard(proto: "parameter_schema")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4571,7 +4511,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCreatePreparedStatementResult: SwiftPr
 extension Arrow_Flight_Protocol_Sql_ActionClosePreparedStatementRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".ActionClosePreparedStatementRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "prepared_statement_handle"),
+        1: .standard(proto: "prepared_statement_handle")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4622,7 +4562,7 @@ extension Arrow_Flight_Protocol_Sql_ActionBeginSavepointRequest: SwiftProtobuf.M
     static let protoMessageName: String = _protobuf_package + ".ActionBeginSavepointRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "transaction_id"),
-        2: .same(proto: "name"),
+        2: .same(proto: "name")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4659,7 +4599,7 @@ extension Arrow_Flight_Protocol_Sql_ActionBeginSavepointRequest: SwiftProtobuf.M
 extension Arrow_Flight_Protocol_Sql_ActionBeginTransactionResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".ActionBeginTransactionResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "transaction_id"),
+        1: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4691,7 +4631,7 @@ extension Arrow_Flight_Protocol_Sql_ActionBeginTransactionResult: SwiftProtobuf.
 extension Arrow_Flight_Protocol_Sql_ActionBeginSavepointResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".ActionBeginSavepointResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "savepoint_id"),
+        1: .standard(proto: "savepoint_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4724,7 +4664,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndTransactionRequest: SwiftProtobuf.M
     static let protoMessageName: String = _protobuf_package + ".ActionEndTransactionRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "transaction_id"),
-        2: .same(proto: "action"),
+        2: .same(proto: "action")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4762,7 +4702,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndTransactionRequest.EndTransaction: 
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "END_TRANSACTION_UNSPECIFIED"),
         1: .same(proto: "END_TRANSACTION_COMMIT"),
-        2: .same(proto: "END_TRANSACTION_ROLLBACK"),
+        2: .same(proto: "END_TRANSACTION_ROLLBACK")
     ]
 }
 
@@ -4770,7 +4710,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndSavepointRequest: SwiftProtobuf.Mes
     static let protoMessageName: String = _protobuf_package + ".ActionEndSavepointRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .standard(proto: "savepoint_id"),
-        2: .same(proto: "action"),
+        2: .same(proto: "action")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4808,7 +4748,7 @@ extension Arrow_Flight_Protocol_Sql_ActionEndSavepointRequest.EndSavepoint: Swif
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         0: .same(proto: "END_SAVEPOINT_UNSPECIFIED"),
         1: .same(proto: "END_SAVEPOINT_RELEASE"),
-        2: .same(proto: "END_SAVEPOINT_ROLLBACK"),
+        2: .same(proto: "END_SAVEPOINT_ROLLBACK")
     ]
 }
 
@@ -4816,7 +4756,7 @@ extension Arrow_Flight_Protocol_Sql_CommandStatementQuery: SwiftProtobuf.Message
     static let protoMessageName: String = _protobuf_package + ".CommandStatementQuery"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "query"),
-        2: .standard(proto: "transaction_id"),
+        2: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4858,7 +4798,7 @@ extension Arrow_Flight_Protocol_Sql_CommandStatementSubstraitPlan: SwiftProtobuf
     static let protoMessageName: String = _protobuf_package + ".CommandStatementSubstraitPlan"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "plan"),
-        2: .standard(proto: "transaction_id"),
+        2: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4899,7 +4839,7 @@ extension Arrow_Flight_Protocol_Sql_CommandStatementSubstraitPlan: SwiftProtobuf
 extension Arrow_Flight_Protocol_Sql_TicketStatementQuery: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".TicketStatementQuery"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "statement_handle"),
+        1: .standard(proto: "statement_handle")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4931,7 +4871,7 @@ extension Arrow_Flight_Protocol_Sql_TicketStatementQuery: SwiftProtobuf.Message,
 extension Arrow_Flight_Protocol_Sql_CommandPreparedStatementQuery: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CommandPreparedStatementQuery"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "prepared_statement_handle"),
+        1: .standard(proto: "prepared_statement_handle")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -4964,7 +4904,7 @@ extension Arrow_Flight_Protocol_Sql_CommandStatementUpdate: SwiftProtobuf.Messag
     static let protoMessageName: String = _protobuf_package + ".CommandStatementUpdate"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
         1: .same(proto: "query"),
-        2: .standard(proto: "transaction_id"),
+        2: .standard(proto: "transaction_id")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -5005,7 +4945,7 @@ extension Arrow_Flight_Protocol_Sql_CommandStatementUpdate: SwiftProtobuf.Messag
 extension Arrow_Flight_Protocol_Sql_CommandPreparedStatementUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".CommandPreparedStatementUpdate"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "prepared_statement_handle"),
+        1: .standard(proto: "prepared_statement_handle")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -5037,7 +4977,7 @@ extension Arrow_Flight_Protocol_Sql_CommandPreparedStatementUpdate: SwiftProtobu
 extension Arrow_Flight_Protocol_Sql_DoPutUpdateResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".DoPutUpdateResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .standard(proto: "record_count"),
+        1: .standard(proto: "record_count")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -5069,7 +5009,7 @@ extension Arrow_Flight_Protocol_Sql_DoPutUpdateResult: SwiftProtobuf.Message, Sw
 extension Arrow_Flight_Protocol_Sql_ActionCancelQueryRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".ActionCancelQueryRequest"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "info"),
+        1: .same(proto: "info")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -5101,7 +5041,7 @@ extension Arrow_Flight_Protocol_Sql_ActionCancelQueryRequest: SwiftProtobuf.Mess
 extension Arrow_Flight_Protocol_Sql_ActionCancelQueryResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
     static let protoMessageName: String = _protobuf_package + ".ActionCancelQueryResult"
     static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-        1: .same(proto: "result"),
+        1: .same(proto: "result")
     ]
 
     mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -5135,6 +5075,6 @@ extension Arrow_Flight_Protocol_Sql_ActionCancelQueryResult.CancelResult: SwiftP
         0: .same(proto: "CANCEL_RESULT_UNSPECIFIED"),
         1: .same(proto: "CANCEL_RESULT_CANCELLED"),
         2: .same(proto: "CANCEL_RESULT_CANCELLING"),
-        3: .same(proto: "CANCEL_RESULT_NOT_CANCELLABLE"),
+        3: .same(proto: "CANCEL_RESULT_NOT_CANCELLABLE")
     ]
 }

@@ -166,9 +166,12 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructAr
             try childData.append(builder.toHolder().array.arrowData)
         }
 
-        let arrowData = try ArrowData(type, buffers: buffers,
-                                      children: childData, nullCount: nullCount,
-                                      length: length)
+        let arrowData = try ArrowData(
+            type, buffers: buffers,
+            children: childData,
+            nullCount: nullCount,
+            length: length
+        )
         let structArray = try StructArray(arrowData)
         return structArray
     }

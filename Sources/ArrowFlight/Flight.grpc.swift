@@ -754,7 +754,7 @@ enum Arrow_Flight_Protocol_FlightServiceClientMetadata {
             Arrow_Flight_Protocol_FlightServiceClientMetadata.Methods.doPut,
             Arrow_Flight_Protocol_FlightServiceClientMetadata.Methods.doExchange,
             Arrow_Flight_Protocol_FlightServiceClientMetadata.Methods.doAction,
-            Arrow_Flight_Protocol_FlightServiceClientMetadata.Methods.listActions,
+            Arrow_Flight_Protocol_FlightServiceClientMetadata.Methods.listActions
         ]
     )
 
@@ -1279,7 +1279,7 @@ enum Arrow_Flight_Protocol_FlightServiceServerMetadata {
             Arrow_Flight_Protocol_FlightServiceServerMetadata.Methods.doPut,
             Arrow_Flight_Protocol_FlightServiceServerMetadata.Methods.doExchange,
             Arrow_Flight_Protocol_FlightServiceServerMetadata.Methods.doAction,
-            Arrow_Flight_Protocol_FlightServiceServerMetadata.Methods.listActions,
+            Arrow_Flight_Protocol_FlightServiceServerMetadata.Methods.listActions
         ]
     )
 
