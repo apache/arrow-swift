@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import FlatBuffers
+import Foundation
 
 extension Data {
     func hexEncodedString() -> String {
@@ -58,29 +58,36 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
     switch arrowType.id {
     case .int8, .uint8:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 8, isSigned: infoType == ArrowType.ArrowInt8))
+            &fbb, bitWidth: 8, isSigned: infoType == ArrowType.ArrowInt8
+        ))
     case .int16, .uint16:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 16, isSigned: infoType == ArrowType.ArrowInt16))
+            &fbb, bitWidth: 16, isSigned: infoType == ArrowType.ArrowInt16
+        ))
     case .int32, .uint32:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 32, isSigned: infoType == ArrowType.ArrowInt32))
+            &fbb, bitWidth: 32, isSigned: infoType == ArrowType.ArrowInt32
+        ))
     case .int64, .uint64:
         return .success(org_apache_arrow_flatbuf_Int.createInt(
-                            &fbb, bitWidth: 64, isSigned: infoType == ArrowType.ArrowInt64))
+            &fbb, bitWidth: 64, isSigned: infoType == ArrowType.ArrowInt64
+        ))
     case .float:
         return .success(org_apache_arrow_flatbuf_FloatingPoint.createFloatingPoint(&fbb, precision: .single))
     case .double:
         return .success(org_apache_arrow_flatbuf_FloatingPoint.createFloatingPoint(&fbb, precision: .double))
     case .string:
         return .success(org_apache_arrow_flatbuf_Utf8.endUtf8(
-                            &fbb, start: org_apache_arrow_flatbuf_Utf8.startUtf8(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Utf8.startUtf8(&fbb)
+        ))
     case .binary:
         return .success(org_apache_arrow_flatbuf_Binary.endBinary(
-                            &fbb, start: org_apache_arrow_flatbuf_Binary.startBinary(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Binary.startBinary(&fbb)
+        ))
     case .boolean:
         return .success(org_apache_arrow_flatbuf_Bool.endBool(
-                            &fbb, start: org_apache_arrow_flatbuf_Bool.startBool(&fbb)))
+            &fbb, start: org_apache_arrow_flatbuf_Bool.startBool(&fbb)
+        ))
     case .date32:
         let startOffset = org_apache_arrow_flatbuf_Date.startDate(&fbb)
         org_apache_arrow_flatbuf_Date.add(unit: .day, &fbb)

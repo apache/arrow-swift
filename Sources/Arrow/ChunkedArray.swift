@@ -18,9 +18,9 @@
 import Foundation
 
 public protocol AnyArray {
-    var arrowData: ArrowData {get}
+    var arrowData: ArrowData { get }
     func asAny(_ index: UInt) -> Any?
-    var length: UInt {get}
+    var length: UInt { get }
 }
 
 public protocol AsString {
@@ -36,19 +36,19 @@ public class ChunkedArrayHolder {
     public let getBufferData: () -> Result<[Data], ArrowError>
     public let getBufferDataSizes: () -> Result<[Int], ArrowError>
     public init<T>(_ chunked: ChunkedArray<T>) { // swiftlint:disable:this cyclomatic_complexity
-        self.holder = chunked
-        self.length = chunked.length
-        self.type = chunked.type
-        self.nullCount = chunked.nullCount
-        self.getBufferData = {() -> Result<[Data], ArrowError> in
+        holder = chunked
+        length = chunked.length
+        type = chunked.type
+        nullCount = chunked.nullCount
+        getBufferData = { () -> Result<[Data], ArrowError> in
             var bufferData = [Data]()
             var numBuffers = 2
             switch toFBTypeEnum(chunked.type) {
-            case .success(let fbType):
+            case let .success(fbType):
                 if !isFixedPrimitive(fbType) {
                     numBuffers = 3
                 }
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
 
@@ -65,16 +65,16 @@ public class ChunkedArrayHolder {
             return .success(bufferData)
         }
 
-        self.getBufferDataSizes = {() -> Result<[Int], ArrowError> in
+        getBufferDataSizes = { () -> Result<[Int], ArrowError> in
             var bufferDataSizes = [Int]()
             var numBuffers = 2
 
             switch toFBTypeEnum(chunked.type) {
-            case .success(let fbType):
+            case let .success(fbType):
                 if !isFixedPrimitive(fbType) {
                     numBuffers = 3
                 }
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
 
@@ -98,14 +98,14 @@ public class ChunkedArray<T>: AsString {
     public let type: ArrowType
     public let nullCount: UInt
     public let length: UInt
-    public var arrayCount: UInt {return UInt(self.arrays.count)}
+    public var arrayCount: UInt { return UInt(arrays.count) }
 
     public init(_ arrays: [ArrowArray<T>]) throws {
         if arrays.count == 0 {
             throw ArrowError.arrayHasNoElements
         }
 
-        self.type = arrays[0].arrowData.type
+        type = arrays[0].arrowData.type
         var len: UInt = 0
         var nullCount: UInt = 0
         for array in arrays {
@@ -114,7 +114,7 @@ public class ChunkedArray<T>: AsString {
         }
 
         self.arrays = arrays
-        self.length = len
+        length = len
         self.nullCount = nullCount
     }
 

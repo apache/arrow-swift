@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import Arrow
+import Foundation
 import GRPC
 
 public class ActionTypeStreamWriter {
@@ -26,7 +26,7 @@ public class ActionTypeStreamWriter {
     }
 
     public func write(_ actionType: FlightActionType) async throws {
-        try await self.stream.send(actionType.toProtocol())
+        try await stream.send(actionType.toProtocol())
     }
 }
 
@@ -37,7 +37,7 @@ public class ResultStreamWriter {
     }
 
     public func write(_ result: FlightResult) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await stream.send(result.toProtocol())
     }
 }
 
@@ -48,7 +48,7 @@ public class FlightInfoStreamWriter {
     }
 
     public func write(_ result: FlightInfo) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await stream.send(result.toProtocol())
     }
 }
 
@@ -59,7 +59,7 @@ public class PutResultDataStreamWriter {
     }
 
     public func write(_ result: FlightPutResult) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await stream.send(result.toProtocol())
     }
 }
 
@@ -72,24 +72,24 @@ public class RecordBatchStreamWriter {
 
     public func write(_ rb: RecordBatch) async throws {
         switch writer.toMessage(rb.schema) {
-        case .success(let schemaData):
+        case let .success(schemaData):
             let schemaFlightData = Arrow_Flight_Protocol_FlightData.with {
                 $0.dataHeader = schemaData
             }
 
-            try await self.stream.send(schemaFlightData)
+            try await stream.send(schemaFlightData)
             switch writer.toMessage(rb) {
-            case .success(let recordMessages):
+            case let .success(recordMessages):
                 let rbMessage = Arrow_Flight_Protocol_FlightData.with {
                     $0.dataHeader = recordMessages[0]
                     $0.dataBody = recordMessages[1]
                 }
 
-                try await self.stream.send(rbMessage)
-            case .failure(let error):
+                try await stream.send(rbMessage)
+            case let .failure(error):
                 throw error
             }
-        case .failure(let error):
+        case let .failure(error):
             throw error
         }
     }

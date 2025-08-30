@@ -20,7 +20,7 @@ import Foundation
 public class FlightTicket {
     public let data: Data
     init(_ ticket: Arrow_Flight_Protocol_Ticket) {
-        self.data = ticket.ticket
+        data = ticket.ticket
     }
 
     public init(_ data: Data) {
@@ -29,7 +29,7 @@ public class FlightTicket {
 
     func toProtocol() -> Arrow_Flight_Protocol_Ticket {
         var ticket = Arrow_Flight_Protocol_Ticket()
-        ticket.ticket = self.data
+        ticket.ticket = data
         return ticket
     }
 }

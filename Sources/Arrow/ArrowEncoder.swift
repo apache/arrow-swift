@@ -60,7 +60,7 @@ public class ArrowEncoder: Encoder {
         // this will check if T is a simple built in type
         // (UInt, Int, Int8, String, Date, etc...).
         if ArrowArrayBuilders.isValidBuilderType(T.self) {
-            let builders = ["col0": try ArrowArrayBuilders.loadBuilder(T.self)]
+            let builders = try ["col0": ArrowArrayBuilders.loadBuilder(T.self)]
             return ArrowEncoder(builders, byIndex: ["col0"])
         } else {
             let encoder = ArrowEncoder()
@@ -76,25 +76,25 @@ public class ArrowEncoder: Encoder {
         try throwIfInvalid()
         let batchBuilder = RecordBatch.Builder()
         for key in byIndex {
-            batchBuilder.addColumn(key, arrowArray: try builders[key]!.toHolder())
+            try batchBuilder.addColumn(key, arrowArray: builders[key]!.toHolder())
         }
 
         switch batchBuilder.finish() {
-        case .success(let rb):
+        case let .success(rb):
             return rb
-        case .failure(let error):
+        case let .failure(error):
             throw error
         }
     }
 
-    public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
+    public func container<Key>(keyedBy _: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         var container = ArrowKeyedEncoding<Key>(self)
         container.codingPath = codingPath
         return KeyedEncodingContainer(container)
     }
 
     public func unkeyedContainer() -> UnkeyedEncodingContainer {
-        return ArrowUnkeyedEncoding(self, codingPath: self.codingPath)
+        return ArrowUnkeyedEncoding(self, codingPath: codingPath)
     }
 
     public func singleValueContainer() -> SingleValueEncodingContainer {
@@ -115,7 +115,7 @@ public class ArrowEncoder: Encoder {
     // to limitations in the Swifts Mirror API (ex: it is unable to correctly
     // find the type for String? in [Int: String?])
     @discardableResult
-    func ensureColumnExists<T>(_ value: T, key: String) throws -> ArrowArrayHolderBuilder {
+    func ensureColumnExists<T>(_: T, key: String) throws -> ArrowArrayHolderBuilder {
         try throwIfInvalid()
         var builder = builders[key]
         if builder == nil {
@@ -128,12 +128,12 @@ public class ArrowEncoder: Encoder {
     }
 
     func getIndex(_ index: Int) -> Int {
-        return self.modForIndex == nil ? index : index % self.modForIndex!
+        return modForIndex == nil ? index : index % modForIndex!
     }
 
     func doEncodeNil(_ keyIndex: Int) throws {
         try throwIfInvalid()
-        let index = self.getIndex(keyIndex)
+        let index = getIndex(keyIndex)
         if index >= builders.count {
             throw ArrowError.outOfBounds(index: Int64(index))
         }
@@ -149,7 +149,7 @@ public class ArrowEncoder: Encoder {
 
     func doEncode<T>(_ value: T, keyIndex: Int) throws {
         try throwIfInvalid()
-        let index = self.getIndex(keyIndex)
+        let index = getIndex(keyIndex)
         if index >= builders.count {
             if index == builders.count {
                 try ensureColumnExists(value, key: "col\(index)")
@@ -162,7 +162,7 @@ public class ArrowEncoder: Encoder {
     }
 
     func throwIfInvalid() throws {
-        if let errorMsg = self.errorMsg {
+        if let errorMsg = errorMsg {
             throw ArrowError.invalid(errorMsg)
         }
     }
@@ -229,12 +229,12 @@ private struct ArrowKeyedEncoding<Key: CodingKey>: KeyedEncodingContainerProtoco
         try doEncodeIf(value, forKey: key)
     }
 
-    mutating func encode(_ value: Int, forKey key: Key) throws {
+    mutating func encode(_: Int, forKey _: Key) throws {
         throw ArrowError.invalid(
             "Int type is not supported (please use Int8, Int16, Int32 or Int64)")
     }
 
-    mutating func encodeIfPresent(_ value: Int?, forKey key: Key) throws {
+    mutating func encodeIfPresent(_: Int?, forKey _: Key) throws {
         throw ArrowError.invalid(
             "Int type is not supported (please use Int8, Int16, Int32 or Int64)")
     }
@@ -271,12 +271,12 @@ private struct ArrowKeyedEncoding<Key: CodingKey>: KeyedEncodingContainerProtoco
         try doEncodeIf(value, forKey: key)
     }
 
-    mutating func encode(_ value: UInt, forKey key: Key) throws {
+    mutating func encode(_: UInt, forKey _: Key) throws {
         throw ArrowError.invalid(
             "UInt type is not supported (please use UInt8, UInt16, UInt32 or UInt64)")
     }
 
-    mutating func encodeIfPresent(_ value: UInt?, forKey key: Key) throws {
+    mutating func encodeIfPresent(_: UInt?, forKey _: Key) throws {
         throw ArrowError.invalid(
             "UInt type is not supported (please use UInt8, UInt16, UInt32 or UInt64)")
     }
@@ -333,10 +333,11 @@ private struct ArrowKeyedEncoding<Key: CodingKey>: KeyedEncodingContainerProtoco
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
     mutating func nestedContainer<NestedKey: CodingKey>(
-        keyedBy keyType: NestedKey.Type,
-        forKey key: Key) -> KeyedEncodingContainer<NestedKey> {
-        self.encoder.errorMsg = "Nested decoding is currently not supported."
-        var container = ArrowKeyedEncoding<NestedKey>(self.encoder)
+        keyedBy _: NestedKey.Type,
+        forKey _: Key
+    ) -> KeyedEncodingContainer<NestedKey> {
+        encoder.errorMsg = "Nested decoding is currently not supported."
+        var container = ArrowKeyedEncoding<NestedKey>(encoder)
         container.codingPath = codingPath
         return KeyedEncodingContainer(container)
     }
@@ -344,25 +345,25 @@ private struct ArrowKeyedEncoding<Key: CodingKey>: KeyedEncodingContainerProtoco
     // nested container is currently not allowed.  This method doesn't throw
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
-    mutating func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
-        self.encoder.errorMsg = "Nested decoding is currently not supported."
-        return ArrowUnkeyedEncoding(self.encoder, codingPath: self.codingPath)
+    mutating func nestedUnkeyedContainer(forKey _: Key) -> UnkeyedEncodingContainer {
+        encoder.errorMsg = "Nested decoding is currently not supported."
+        return ArrowUnkeyedEncoding(encoder, codingPath: codingPath)
     }
 
     // super encoding is currently not allowed.  This method doesn't throw
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
     mutating func superEncoder() -> Encoder {
-        self.encoder.errorMsg = "super encoding is currently not supported."
-        return self.encoder
+        encoder.errorMsg = "super encoding is currently not supported."
+        return encoder
     }
 
     // super encoding is currently not allowed.  This method doesn't throw
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
-    mutating func superEncoder(forKey key: Key) -> Encoder {
-        self.encoder.errorMsg = "super encoding is currently not supported."
-        return self.encoder
+    mutating func superEncoder(forKey _: Key) -> Encoder {
+        encoder.errorMsg = "super encoding is currently not supported."
+        return encoder
     }
 }
 
@@ -372,13 +373,13 @@ private struct ArrowUnkeyedEncoding: UnkeyedEncodingContainer {
     var currentIndex: Int
     var count: Int = 0
 
-    init(_ encoder: ArrowEncoder, codingPath: [CodingKey], currentIndex: Int = 0) {
+    init(_ encoder: ArrowEncoder, codingPath _: [CodingKey], currentIndex: Int = 0) {
         self.encoder = encoder
         self.currentIndex = currentIndex
     }
 
     mutating func increment() {
-        self.currentIndex += 1
+        currentIndex += 1
     }
 
     // If this method is called on row 0 and the encoder is
@@ -391,14 +392,14 @@ private struct ArrowUnkeyedEncoding: UnkeyedEncodingContainer {
     // nullable types at the encode func level which is currently
     // not allowed)
     mutating func encodeNil() throws {
-        try encoder.doEncodeNil(self.currentIndex)
+        try encoder.doEncodeNil(currentIndex)
     }
 
     mutating func encode<T>(_ value: T) throws where T: Encodable {
         let type = T.self
         if ArrowArrayBuilders.isValidBuilderType(type) {
-            defer {increment()}
-            return try self.encoder.doEncode(value, keyIndex: self.currentIndex)
+            defer { increment() }
+            return try encoder.doEncode(value, keyIndex: currentIndex)
         } else {
             throw ArrowError.invalid("Type \(type) is currently not supported")
         }
@@ -407,10 +408,10 @@ private struct ArrowUnkeyedEncoding: UnkeyedEncodingContainer {
     // nested container is currently not allowed.  This method doesn't throw
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
-    mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type
+    mutating func nestedContainer<NestedKey>(keyedBy _: NestedKey.Type
     ) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
-        self.encoder.errorMsg = "Nested decoding is currently not supported."
-        var container = ArrowKeyedEncoding<NestedKey>(self.encoder)
+        encoder.errorMsg = "Nested decoding is currently not supported."
+        var container = ArrowKeyedEncoding<NestedKey>(encoder)
         container.codingPath = codingPath
         return KeyedEncodingContainer(container)
     }
@@ -419,16 +420,16 @@ private struct ArrowUnkeyedEncoding: UnkeyedEncodingContainer {
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
     mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
-        self.encoder.errorMsg = "Nested decoding is currently not supported."
-        return ArrowUnkeyedEncoding(self.encoder, codingPath: self.codingPath)
+        encoder.errorMsg = "Nested decoding is currently not supported."
+        return ArrowUnkeyedEncoding(encoder, codingPath: codingPath)
     }
 
     // super encoding is currently not allowed.  This method doesn't throw
     // so setting an error mesg that will be throw by the encoder at the next
     // method call that throws
     mutating func superEncoder() -> Encoder {
-        self.encoder.errorMsg = "super encoding is currently not supported."
-        return self.encoder
+        encoder.errorMsg = "super encoding is currently not supported."
+        return encoder
     }
 }
 
@@ -442,15 +443,16 @@ private struct ArrowSingleValueEncoding: SingleValueEncodingContainer {
     }
 
     mutating func encodeNil() throws {
-        return try self.encoder.doEncodeNil(0)
+        return try encoder.doEncodeNil(0)
     }
 
     mutating func encode<T: Encodable>(_ value: T) throws {
         if ArrowArrayBuilders.isValidBuilderType(T.self) {
-            return try self.encoder.doEncode(value, keyIndex: 0)
+            return try encoder.doEncode(value, keyIndex: 0)
         } else {
             throw ArrowError.invalid("Type \(T.self) is currently not supported")
         }
     }
 }
+
 // swiftlint:disable:this file_length

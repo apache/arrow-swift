@@ -20,8 +20,8 @@ public class FlightEndpoint {
     let ticket: FlightTicket
     let locations: [FlightLocation]
     init(_ endpoint: Arrow_Flight_Protocol_FlightEndpoint) {
-        self.ticket = FlightTicket(endpoint.ticket.ticket)
-        self.locations = endpoint.location.map {return FlightLocation($0)}
+        ticket = FlightTicket(endpoint.ticket.ticket)
+        locations = endpoint.location.map { FlightLocation($0) }
     }
 
     public init(_ ticket: FlightTicket, locations: [FlightLocation]) {
@@ -31,8 +31,8 @@ public class FlightEndpoint {
 
     func toProtocol() -> Arrow_Flight_Protocol_FlightEndpoint {
         var endpoint = Arrow_Flight_Protocol_FlightEndpoint()
-        endpoint.ticket = self.ticket.toProtocol()
-        endpoint.location = self.locations.map { $0.toProtocol() }
+        endpoint.ticket = ticket.toProtocol()
+        endpoint.location = locations.map { $0.toProtocol() }
         return endpoint
     }
 }

@@ -29,28 +29,28 @@ public class FlightDescriptor {
     public let paths: [String]
 
     init(_ descriptor: Arrow_Flight_Protocol_FlightDescriptor) {
-        self.type = descriptor.type == .cmd ? .cmd : .path
-        self.cmd = descriptor.cmd
-        self.paths = descriptor.path
+        type = descriptor.type == .cmd ? .cmd : .path
+        cmd = descriptor.cmd
+        paths = descriptor.path
     }
 
     public init(cmd: Data) {
-        self.type = .cmd
+        type = .cmd
         self.cmd = cmd
-        self.paths = [String]()
+        paths = [String]()
     }
 
     public init(paths: [String]) {
-        self.type = .path
-        self.cmd = Data()
+        type = .path
+        cmd = Data()
         self.paths = paths
     }
 
     func toProtocol() -> Arrow_Flight_Protocol_FlightDescriptor {
         var descriptor = Arrow_Flight_Protocol_FlightDescriptor()
-        descriptor.type = self.type == .cmd ? .cmd : .path
-        descriptor.cmd = self.cmd
-        descriptor.path = self.paths
+        descriptor.type = type == .cmd ? .cmd : .path
+        descriptor.cmd = cmd
+        descriptor.path = paths
         return descriptor
     }
 }

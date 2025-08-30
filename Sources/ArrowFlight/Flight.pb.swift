@@ -32,9 +32,9 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
-  struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
-  typealias Version = _2
+private struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+    struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
+    typealias Version = _2
 }
 
 ///
@@ -42,176 +42,175 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 ///
 /// This is used by CancelFlightInfoResult.status.
 enum Arrow_Flight_Protocol_CancelStatus: SwiftProtobuf.Enum {
-  typealias RawValue = Int
+    typealias RawValue = Int
 
-  /// The cancellation status is unknown. Servers should avoid using
-  /// this value (send a NOT_FOUND error if the requested query is
-  /// not known). Clients can retry the request.
-  case unspecified // = 0
+    /// The cancellation status is unknown. Servers should avoid using
+    /// this value (send a NOT_FOUND error if the requested query is
+    /// not known). Clients can retry the request.
+    case unspecified // = 0
 
-  /// The cancellation request is complete. Subsequent requests with
-  /// the same payload may return CANCELLED or a NOT_FOUND error.
-  case cancelled // = 1
+    /// The cancellation request is complete. Subsequent requests with
+    /// the same payload may return CANCELLED or a NOT_FOUND error.
+    case cancelled // = 1
 
-  /// The cancellation request is in progress. The client may retry
-  /// the cancellation request.
-  case cancelling // = 2
+    /// The cancellation request is in progress. The client may retry
+    /// the cancellation request.
+    case cancelling // = 2
 
-  /// The query is not cancellable. The client should not retry the
-  /// cancellation request.
-  case notCancellable // = 3
-  case UNRECOGNIZED(Int)
+    /// The query is not cancellable. The client should not retry the
+    /// cancellation request.
+    case notCancellable // = 3
+    case UNRECOGNIZED(Int)
 
-  init() {
-    self = .unspecified
-  }
-
-  init?(rawValue: Int) {
-    switch rawValue {
-    case 0: self = .unspecified
-    case 1: self = .cancelled
-    case 2: self = .cancelling
-    case 3: self = .notCancellable
-    default: self = .UNRECOGNIZED(rawValue)
+    init() {
+        self = .unspecified
     }
-  }
 
-  var rawValue: Int {
-    switch self {
-    case .unspecified: return 0
-    case .cancelled: return 1
-    case .cancelling: return 2
-    case .notCancellable: return 3
-    case .UNRECOGNIZED(let i): return i
+    init?(rawValue: Int) {
+        switch rawValue {
+        case 0: self = .unspecified
+        case 1: self = .cancelled
+        case 2: self = .cancelling
+        case 3: self = .notCancellable
+        default: self = .UNRECOGNIZED(rawValue)
+        }
     }
-  }
 
+    var rawValue: Int {
+        switch self {
+        case .unspecified: return 0
+        case .cancelled: return 1
+        case .cancelling: return 2
+        case .notCancellable: return 3
+        case let .UNRECOGNIZED(i): return i
+        }
+    }
 }
 
 #if swift(>=4.2)
 
 extension Arrow_Flight_Protocol_CancelStatus: CaseIterable {
-  // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static var allCases: [Arrow_Flight_Protocol_CancelStatus] = [
-    .unspecified,
-    .cancelled,
-    .cancelling,
-    .notCancellable,
-  ]
+    // The compiler won't synthesize support with the UNRECOGNIZED case.
+    static var allCases: [Arrow_Flight_Protocol_CancelStatus] = [
+        .unspecified,
+        .cancelled,
+        .cancelling,
+        .notCancellable,
+    ]
 }
 
-#endif  // swift(>=4.2)
+#endif // swift(>=4.2)
 
 ///
 /// The request that a client provides to a server on handshake.
 struct Arrow_Flight_Protocol_HandshakeRequest {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  ///
-  /// A defined protocol version
-  var protocolVersion: UInt64 = 0
+    ///
+    /// A defined protocol version
+    var protocolVersion: UInt64 = 0
 
-  ///
-  /// Arbitrary auth/handshake info.
-  var payload: Data = Data()
+    ///
+    /// Arbitrary auth/handshake info.
+    var payload: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 struct Arrow_Flight_Protocol_HandshakeResponse {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  ///
-  /// A defined protocol version
-  var protocolVersion: UInt64 = 0
+    ///
+    /// A defined protocol version
+    var protocolVersion: UInt64 = 0
 
-  ///
-  /// Arbitrary auth/handshake info.
-  var payload: Data = Data()
+    ///
+    /// Arbitrary auth/handshake info.
+    var payload: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// A message for doing simple auth.
 struct Arrow_Flight_Protocol_BasicAuth {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var username: String = String()
+    var username: String = .init()
 
-  var password: String = String()
+    var password: String = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 struct Arrow_Flight_Protocol_Empty {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// Describes an available action, including both the name used for execution
 /// along with a short description of the purpose of the action.
 struct Arrow_Flight_Protocol_ActionType {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var type: String = String()
+    var type: String = .init()
 
-  var description_p: String = String()
+    var description_p: String = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// A service specific expression that can be used to return a limited set
 /// of available Arrow Flight streams.
 struct Arrow_Flight_Protocol_Criteria {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var expression: Data = Data()
+    var expression: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// An opaque action specific for the service.
 struct Arrow_Flight_Protocol_Action {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var type: String = String()
+    var type: String = .init()
 
-  var body: Data = Data()
+    var body: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
@@ -219,24 +218,25 @@ struct Arrow_Flight_Protocol_Action {
 ///
 /// The request should be stored in Action.body.
 struct Arrow_Flight_Protocol_CancelFlightInfoRequest {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var info: Arrow_Flight_Protocol_FlightInfo {
-    get {return _info ?? Arrow_Flight_Protocol_FlightInfo()}
-    set {_info = newValue}
-  }
-  /// Returns true if `info` has been explicitly set.
-  var hasInfo: Bool {return self._info != nil}
-  /// Clears the value of `info`. Subsequent reads from it will return its default value.
-  mutating func clearInfo() {self._info = nil}
+    var info: Arrow_Flight_Protocol_FlightInfo {
+        get { return _info ?? Arrow_Flight_Protocol_FlightInfo() }
+        set { _info = newValue }
+    }
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    /// Returns true if `info` has been explicitly set.
+    var hasInfo: Bool { return _info != nil }
+    /// Clears the value of `info`. Subsequent reads from it will return its default value.
+    mutating func clearInfo() { _info = nil }
 
-  init() {}
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  fileprivate var _info: Arrow_Flight_Protocol_FlightInfo? = nil
+    init() {}
+
+    fileprivate var _info: Arrow_Flight_Protocol_FlightInfo?
 }
 
 ///
@@ -244,38 +244,39 @@ struct Arrow_Flight_Protocol_CancelFlightInfoRequest {
 ///
 /// The request should be stored in Action.body.
 struct Arrow_Flight_Protocol_RenewFlightEndpointRequest {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var endpoint: Arrow_Flight_Protocol_FlightEndpoint {
-    get {return _endpoint ?? Arrow_Flight_Protocol_FlightEndpoint()}
-    set {_endpoint = newValue}
-  }
-  /// Returns true if `endpoint` has been explicitly set.
-  var hasEndpoint: Bool {return self._endpoint != nil}
-  /// Clears the value of `endpoint`. Subsequent reads from it will return its default value.
-  mutating func clearEndpoint() {self._endpoint = nil}
+    var endpoint: Arrow_Flight_Protocol_FlightEndpoint {
+        get { return _endpoint ?? Arrow_Flight_Protocol_FlightEndpoint() }
+        set { _endpoint = newValue }
+    }
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    /// Returns true if `endpoint` has been explicitly set.
+    var hasEndpoint: Bool { return _endpoint != nil }
+    /// Clears the value of `endpoint`. Subsequent reads from it will return its default value.
+    mutating func clearEndpoint() { _endpoint = nil }
 
-  init() {}
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  fileprivate var _endpoint: Arrow_Flight_Protocol_FlightEndpoint? = nil
+    init() {}
+
+    fileprivate var _endpoint: Arrow_Flight_Protocol_FlightEndpoint?
 }
 
 ///
 /// An opaque result returned after executing an action.
 struct Arrow_Flight_Protocol_Result {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var body: Data = Data()
+    var body: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
@@ -283,251 +284,253 @@ struct Arrow_Flight_Protocol_Result {
 ///
 /// The result should be stored in Result.body.
 struct Arrow_Flight_Protocol_CancelFlightInfoResult {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var status: Arrow_Flight_Protocol_CancelStatus = .unspecified
+    var status: Arrow_Flight_Protocol_CancelStatus = .unspecified
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// Wrap the result of a getSchema call
 struct Arrow_Flight_Protocol_SchemaResult {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  /// The schema of the dataset in its IPC form:
-  ///   4 bytes - an optional IPC_CONTINUATION_TOKEN prefix
-  ///   4 bytes - the byte length of the payload
-  ///   a flatbuffer Message whose header is the Schema
-  var schema: Data = Data()
+    /// The schema of the dataset in its IPC form:
+    ///   4 bytes - an optional IPC_CONTINUATION_TOKEN prefix
+    ///   4 bytes - the byte length of the payload
+    ///   a flatbuffer Message whose header is the Schema
+    var schema: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// The name or tag for a Flight. May be used as a way to retrieve or generate
 /// a flight or be used to expose a set of previously defined flights.
 struct Arrow_Flight_Protocol_FlightDescriptor {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var type: Arrow_Flight_Protocol_FlightDescriptor.DescriptorType = .unknown
-
-  ///
-  /// Opaque value used to express a command. Should only be defined when
-  /// type = CMD.
-  var cmd: Data = Data()
-
-  ///
-  /// List of strings identifying a particular dataset. Should only be defined
-  /// when type = PATH.
-  var path: [String] = []
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  ///
-  /// Describes what type of descriptor is defined.
-  enum DescriptorType: SwiftProtobuf.Enum {
-    typealias RawValue = Int
-
-    /// Protobuf pattern, not used.
-    case unknown // = 0
+    var type: Arrow_Flight_Protocol_FlightDescriptor.DescriptorType = .unknown
 
     ///
-    /// A named path that identifies a dataset. A path is composed of a string
-    /// or list of strings describing a particular dataset. This is conceptually
-    ///  similar to a path inside a filesystem.
-    case path // = 1
+    /// Opaque value used to express a command. Should only be defined when
+    /// type = CMD.
+    var cmd: Data = .init()
 
     ///
-    /// An opaque command to generate a dataset.
-    case cmd // = 2
-    case UNRECOGNIZED(Int)
+    /// List of strings identifying a particular dataset. Should only be defined
+    /// when type = PATH.
+    var path: [String] = []
 
-    init() {
-      self = .unknown
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    ///
+    /// Describes what type of descriptor is defined.
+    enum DescriptorType: SwiftProtobuf.Enum {
+        typealias RawValue = Int
+
+        /// Protobuf pattern, not used.
+        case unknown // = 0
+
+        ///
+        /// A named path that identifies a dataset. A path is composed of a string
+        /// or list of strings describing a particular dataset. This is conceptually
+        ///  similar to a path inside a filesystem.
+        case path // = 1
+
+        ///
+        /// An opaque command to generate a dataset.
+        case cmd // = 2
+        case UNRECOGNIZED(Int)
+
+        init() {
+            self = .unknown
+        }
+
+        init?(rawValue: Int) {
+            switch rawValue {
+            case 0: self = .unknown
+            case 1: self = .path
+            case 2: self = .cmd
+            default: self = .UNRECOGNIZED(rawValue)
+            }
+        }
+
+        var rawValue: Int {
+            switch self {
+            case .unknown: return 0
+            case .path: return 1
+            case .cmd: return 2
+            case let .UNRECOGNIZED(i): return i
+            }
+        }
     }
 
-    init?(rawValue: Int) {
-      switch rawValue {
-      case 0: self = .unknown
-      case 1: self = .path
-      case 2: self = .cmd
-      default: self = .UNRECOGNIZED(rawValue)
-      }
-    }
-
-    var rawValue: Int {
-      switch self {
-      case .unknown: return 0
-      case .path: return 1
-      case .cmd: return 2
-      case .UNRECOGNIZED(let i): return i
-      }
-    }
-
-  }
-
-  init() {}
+    init() {}
 }
 
 #if swift(>=4.2)
 
 extension Arrow_Flight_Protocol_FlightDescriptor.DescriptorType: CaseIterable {
-  // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static var allCases: [Arrow_Flight_Protocol_FlightDescriptor.DescriptorType] = [
-    .unknown,
-    .path,
-    .cmd,
-  ]
+    // The compiler won't synthesize support with the UNRECOGNIZED case.
+    static var allCases: [Arrow_Flight_Protocol_FlightDescriptor.DescriptorType] = [
+        .unknown,
+        .path,
+        .cmd,
+    ]
 }
 
-#endif  // swift(>=4.2)
+#endif // swift(>=4.2)
 
 ///
 /// The access coordinates for retrieval of a dataset. With a FlightInfo, a
 /// consumer is able to determine how to retrieve a dataset.
 struct Arrow_Flight_Protocol_FlightInfo {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  /// The schema of the dataset in its IPC form:
-  ///   4 bytes - an optional IPC_CONTINUATION_TOKEN prefix
-  ///   4 bytes - the byte length of the payload
-  ///   a flatbuffer Message whose header is the Schema
-  var schema: Data = Data()
+    /// The schema of the dataset in its IPC form:
+    ///   4 bytes - an optional IPC_CONTINUATION_TOKEN prefix
+    ///   4 bytes - the byte length of the payload
+    ///   a flatbuffer Message whose header is the Schema
+    var schema: Data = .init()
 
-  ///
-  /// The descriptor associated with this info.
-  var flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor {
-    get {return _flightDescriptor ?? Arrow_Flight_Protocol_FlightDescriptor()}
-    set {_flightDescriptor = newValue}
-  }
-  /// Returns true if `flightDescriptor` has been explicitly set.
-  var hasFlightDescriptor: Bool {return self._flightDescriptor != nil}
-  /// Clears the value of `flightDescriptor`. Subsequent reads from it will return its default value.
-  mutating func clearFlightDescriptor() {self._flightDescriptor = nil}
+    ///
+    /// The descriptor associated with this info.
+    var flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor {
+        get { return _flightDescriptor ?? Arrow_Flight_Protocol_FlightDescriptor() }
+        set { _flightDescriptor = newValue }
+    }
 
-  ///
-  /// A list of endpoints associated with the flight. To consume the
-  /// whole flight, all endpoints (and hence all Tickets) must be
-  /// consumed. Endpoints can be consumed in any order.
-  ///
-  /// In other words, an application can use multiple endpoints to
-  /// represent partitioned data.
-  ///
-  /// If the returned data has an ordering, an application can use
-  /// "FlightInfo.ordered = true" or should return the all data in a
-  /// single endpoint. Otherwise, there is no ordering defined on
-  /// endpoints or the data within.
-  ///
-  /// A client can read ordered data by reading data from returned
-  /// endpoints, in order, from front to back.
-  ///
-  /// Note that a client may ignore "FlightInfo.ordered = true". If an
-  /// ordering is important for an application, an application must
-  /// choose one of them:
-  ///
-  /// * An application requires that all clients must read data in
-  ///   returned endpoints order.
-  /// * An application must return the all data in a single endpoint.
-  var endpoint: [Arrow_Flight_Protocol_FlightEndpoint] = []
+    /// Returns true if `flightDescriptor` has been explicitly set.
+    var hasFlightDescriptor: Bool { return _flightDescriptor != nil }
+    /// Clears the value of `flightDescriptor`. Subsequent reads from it will return its default value.
+    mutating func clearFlightDescriptor() { _flightDescriptor = nil }
 
-  /// Set these to -1 if unknown.
-  var totalRecords: Int64 = 0
+    ///
+    /// A list of endpoints associated with the flight. To consume the
+    /// whole flight, all endpoints (and hence all Tickets) must be
+    /// consumed. Endpoints can be consumed in any order.
+    ///
+    /// In other words, an application can use multiple endpoints to
+    /// represent partitioned data.
+    ///
+    /// If the returned data has an ordering, an application can use
+    /// "FlightInfo.ordered = true" or should return the all data in a
+    /// single endpoint. Otherwise, there is no ordering defined on
+    /// endpoints or the data within.
+    ///
+    /// A client can read ordered data by reading data from returned
+    /// endpoints, in order, from front to back.
+    ///
+    /// Note that a client may ignore "FlightInfo.ordered = true". If an
+    /// ordering is important for an application, an application must
+    /// choose one of them:
+    ///
+    /// * An application requires that all clients must read data in
+    ///   returned endpoints order.
+    /// * An application must return the all data in a single endpoint.
+    var endpoint: [Arrow_Flight_Protocol_FlightEndpoint] = []
 
-  var totalBytes: Int64 = 0
+    /// Set these to -1 if unknown.
+    var totalRecords: Int64 = 0
 
-  ///
-  /// FlightEndpoints are in the same order as the data.
-  var ordered: Bool = false
+    var totalBytes: Int64 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    ///
+    /// FlightEndpoints are in the same order as the data.
+    var ordered: Bool = false
 
-  init() {}
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor? = nil
+    init() {}
+
+    fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor?
 }
 
 ///
 /// A particular stream or split associated with a flight.
 struct Arrow_Flight_Protocol_FlightEndpoint {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  ///
-  /// Token used to retrieve this stream.
-  var ticket: Arrow_Flight_Protocol_Ticket {
-    get {return _ticket ?? Arrow_Flight_Protocol_Ticket()}
-    set {_ticket = newValue}
-  }
-  /// Returns true if `ticket` has been explicitly set.
-  var hasTicket: Bool {return self._ticket != nil}
-  /// Clears the value of `ticket`. Subsequent reads from it will return its default value.
-  mutating func clearTicket() {self._ticket = nil}
+    ///
+    /// Token used to retrieve this stream.
+    var ticket: Arrow_Flight_Protocol_Ticket {
+        get { return _ticket ?? Arrow_Flight_Protocol_Ticket() }
+        set { _ticket = newValue }
+    }
 
-  ///
-  /// A list of URIs where this ticket can be redeemed via DoGet().
-  ///
-  /// If the list is empty, the expectation is that the ticket can only
-  /// be redeemed on the current service where the ticket was
-  /// generated.
-  ///
-  /// If the list is not empty, the expectation is that the ticket can
-  /// be redeemed at any of the locations, and that the data returned
-  /// will be equivalent. In this case, the ticket may only be redeemed
-  /// at one of the given locations, and not (necessarily) on the
-  /// current service.
-  ///
-  /// In other words, an application can use multiple locations to
-  /// represent redundant and/or load balanced services.
-  var location: [Arrow_Flight_Protocol_Location] = []
+    /// Returns true if `ticket` has been explicitly set.
+    var hasTicket: Bool { return _ticket != nil }
+    /// Clears the value of `ticket`. Subsequent reads from it will return its default value.
+    mutating func clearTicket() { _ticket = nil }
 
-  ///
-  /// Expiration time of this stream. If present, clients may assume
-  /// they can retry DoGet requests. Otherwise, it is
-  /// application-defined whether DoGet requests may be retried.
-  var expirationTime: SwiftProtobuf.Google_Protobuf_Timestamp {
-    get {return _expirationTime ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
-    set {_expirationTime = newValue}
-  }
-  /// Returns true if `expirationTime` has been explicitly set.
-  var hasExpirationTime: Bool {return self._expirationTime != nil}
-  /// Clears the value of `expirationTime`. Subsequent reads from it will return its default value.
-  mutating func clearExpirationTime() {self._expirationTime = nil}
+    ///
+    /// A list of URIs where this ticket can be redeemed via DoGet().
+    ///
+    /// If the list is empty, the expectation is that the ticket can only
+    /// be redeemed on the current service where the ticket was
+    /// generated.
+    ///
+    /// If the list is not empty, the expectation is that the ticket can
+    /// be redeemed at any of the locations, and that the data returned
+    /// will be equivalent. In this case, the ticket may only be redeemed
+    /// at one of the given locations, and not (necessarily) on the
+    /// current service.
+    ///
+    /// In other words, an application can use multiple locations to
+    /// represent redundant and/or load balanced services.
+    var location: [Arrow_Flight_Protocol_Location] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    ///
+    /// Expiration time of this stream. If present, clients may assume
+    /// they can retry DoGet requests. Otherwise, it is
+    /// application-defined whether DoGet requests may be retried.
+    var expirationTime: SwiftProtobuf.Google_Protobuf_Timestamp {
+        get { return _expirationTime ?? SwiftProtobuf.Google_Protobuf_Timestamp() }
+        set { _expirationTime = newValue }
+    }
 
-  init() {}
+    /// Returns true if `expirationTime` has been explicitly set.
+    var hasExpirationTime: Bool { return _expirationTime != nil }
+    /// Clears the value of `expirationTime`. Subsequent reads from it will return its default value.
+    mutating func clearExpirationTime() { _expirationTime = nil }
 
-  fileprivate var _ticket: Arrow_Flight_Protocol_Ticket? = nil
-  fileprivate var _expirationTime: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _ticket: Arrow_Flight_Protocol_Ticket?
+    fileprivate var _expirationTime: SwiftProtobuf.Google_Protobuf_Timestamp?
 }
 
 ///
 /// A location where a Flight service will accept retrieval of a particular
 /// stream given a ticket.
 struct Arrow_Flight_Protocol_Location {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var uri: String = String()
+    var uri: String = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
@@ -537,70 +540,71 @@ struct Arrow_Flight_Protocol_Location {
 /// Tickets are meant to be single use. It is an error/application-defined
 /// behavior to reuse a ticket.
 struct Arrow_Flight_Protocol_Ticket {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var ticket: Data = Data()
+    var ticket: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 ///
 /// A batch of Arrow data as part of a stream of batches.
 struct Arrow_Flight_Protocol_FlightData {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  ///
-  /// The descriptor of the data. This is only relevant when a client is
-  /// starting a new DoPut stream.
-  var flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor {
-    get {return _flightDescriptor ?? Arrow_Flight_Protocol_FlightDescriptor()}
-    set {_flightDescriptor = newValue}
-  }
-  /// Returns true if `flightDescriptor` has been explicitly set.
-  var hasFlightDescriptor: Bool {return self._flightDescriptor != nil}
-  /// Clears the value of `flightDescriptor`. Subsequent reads from it will return its default value.
-  mutating func clearFlightDescriptor() {self._flightDescriptor = nil}
+    ///
+    /// The descriptor of the data. This is only relevant when a client is
+    /// starting a new DoPut stream.
+    var flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor {
+        get { return _flightDescriptor ?? Arrow_Flight_Protocol_FlightDescriptor() }
+        set { _flightDescriptor = newValue }
+    }
 
-  ///
-  /// Header for message data as described in Message.fbs::Message.
-  var dataHeader: Data = Data()
+    /// Returns true if `flightDescriptor` has been explicitly set.
+    var hasFlightDescriptor: Bool { return _flightDescriptor != nil }
+    /// Clears the value of `flightDescriptor`. Subsequent reads from it will return its default value.
+    mutating func clearFlightDescriptor() { _flightDescriptor = nil }
 
-  ///
-  /// Application-defined metadata.
-  var appMetadata: Data = Data()
+    ///
+    /// Header for message data as described in Message.fbs::Message.
+    var dataHeader: Data = .init()
 
-  ///
-  /// The actual batch of Arrow data. Preferably handled with minimal-copies
-  /// coming last in the definition to help with sidecar patterns (it is
-  /// expected that some implementations will fetch this field off the wire
-  /// with specialized code to avoid extra memory copies).
-  var dataBody: Data = Data()
+    ///
+    /// Application-defined metadata.
+    var appMetadata: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    ///
+    /// The actual batch of Arrow data. Preferably handled with minimal-copies
+    /// coming last in the definition to help with sidecar patterns (it is
+    /// expected that some implementations will fetch this field off the wire
+    /// with specialized code to avoid extra memory copies).
+    var dataBody: Data = .init()
 
-  init() {}
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor? = nil
+    init() {}
+
+    fileprivate var _flightDescriptor: Arrow_Flight_Protocol_FlightDescriptor?
 }
 
-///*
+/// *
 /// The response message associated with the submission of a DoPut.
 struct Arrow_Flight_Protocol_PutResult {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
 
-  var appMetadata: Data = Data()
+    var appMetadata: Data = .init()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    init() {}
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -625,742 +629,741 @@ extension Arrow_Flight_Protocol_Location: @unchecked Sendable {}
 extension Arrow_Flight_Protocol_Ticket: @unchecked Sendable {}
 extension Arrow_Flight_Protocol_FlightData: @unchecked Sendable {}
 extension Arrow_Flight_Protocol_PutResult: @unchecked Sendable {}
-#endif  // swift(>=5.5) && canImport(_Concurrency)
+#endif // swift(>=5.5) && canImport(_Concurrency)
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "arrow.flight.protocol"
+private let _protobuf_package = "arrow.flight.protocol"
 
 extension Arrow_Flight_Protocol_CancelStatus: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "CANCEL_STATUS_UNSPECIFIED"),
-    1: .same(proto: "CANCEL_STATUS_CANCELLED"),
-    2: .same(proto: "CANCEL_STATUS_CANCELLING"),
-    3: .same(proto: "CANCEL_STATUS_NOT_CANCELLABLE"),
-  ]
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        0: .same(proto: "CANCEL_STATUS_UNSPECIFIED"),
+        1: .same(proto: "CANCEL_STATUS_CANCELLED"),
+        2: .same(proto: "CANCEL_STATUS_CANCELLING"),
+        3: .same(proto: "CANCEL_STATUS_NOT_CANCELLABLE"),
+    ]
 }
 
 extension Arrow_Flight_Protocol_HandshakeRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".HandshakeRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "protocol_version"),
-    2: .same(proto: "payload"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".HandshakeRequest"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .standard(proto: "protocol_version"),
+        2: .same(proto: "payload"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt64Field(value: &self.protocolVersion) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.payload) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularUInt64Field(value: &protocolVersion)
+            case 2: try decoder.decodeSingularBytesField(value: &payload)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.protocolVersion != 0 {
-      try visitor.visitSingularUInt64Field(value: self.protocolVersion, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if protocolVersion != 0 {
+            try visitor.visitSingularUInt64Field(value: protocolVersion, fieldNumber: 1)
+        }
+        if !payload.isEmpty {
+            try visitor.visitSingularBytesField(value: payload, fieldNumber: 2)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.payload.isEmpty {
-      try visitor.visitSingularBytesField(value: self.payload, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_HandshakeRequest, rhs: Arrow_Flight_Protocol_HandshakeRequest) -> Bool {
-    if lhs.protocolVersion != rhs.protocolVersion {return false}
-    if lhs.payload != rhs.payload {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_HandshakeRequest, rhs: Arrow_Flight_Protocol_HandshakeRequest) -> Bool {
+        if lhs.protocolVersion != rhs.protocolVersion { return false }
+        if lhs.payload != rhs.payload { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".HandshakeResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "protocol_version"),
-    2: .same(proto: "payload"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".HandshakeResponse"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .standard(proto: "protocol_version"),
+        2: .same(proto: "payload"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt64Field(value: &self.protocolVersion) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.payload) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularUInt64Field(value: &protocolVersion)
+            case 2: try decoder.decodeSingularBytesField(value: &payload)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.protocolVersion != 0 {
-      try visitor.visitSingularUInt64Field(value: self.protocolVersion, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if protocolVersion != 0 {
+            try visitor.visitSingularUInt64Field(value: protocolVersion, fieldNumber: 1)
+        }
+        if !payload.isEmpty {
+            try visitor.visitSingularBytesField(value: payload, fieldNumber: 2)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.payload.isEmpty {
-      try visitor.visitSingularBytesField(value: self.payload, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_HandshakeResponse, rhs: Arrow_Flight_Protocol_HandshakeResponse) -> Bool {
-    if lhs.protocolVersion != rhs.protocolVersion {return false}
-    if lhs.payload != rhs.payload {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_HandshakeResponse, rhs: Arrow_Flight_Protocol_HandshakeResponse) -> Bool {
+        if lhs.protocolVersion != rhs.protocolVersion { return false }
+        if lhs.payload != rhs.payload { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_BasicAuth: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".BasicAuth"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    2: .same(proto: "username"),
-    3: .same(proto: "password"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".BasicAuth"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        2: .same(proto: "username"),
+        3: .same(proto: "password"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 2: try { try decoder.decodeSingularStringField(value: &self.username) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.password) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 2: try decoder.decodeSingularStringField(value: &username)
+            case 3: try decoder.decodeSingularStringField(value: &password)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.username.isEmpty {
-      try visitor.visitSingularStringField(value: self.username, fieldNumber: 2)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !username.isEmpty {
+            try visitor.visitSingularStringField(value: username, fieldNumber: 2)
+        }
+        if !password.isEmpty {
+            try visitor.visitSingularStringField(value: password, fieldNumber: 3)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.password.isEmpty {
-      try visitor.visitSingularStringField(value: self.password, fieldNumber: 3)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_BasicAuth, rhs: Arrow_Flight_Protocol_BasicAuth) -> Bool {
-    if lhs.username != rhs.username {return false}
-    if lhs.password != rhs.password {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_BasicAuth, rhs: Arrow_Flight_Protocol_BasicAuth) -> Bool {
+        if lhs.username != rhs.username { return false }
+        if lhs.password != rhs.password { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Empty: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Empty"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+    static let protoMessageName: String = _protobuf_package + ".Empty"
+    static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let _ = try decoder.nextFieldNumber() {
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let _ = try decoder.nextFieldNumber() {}
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try unknownFields.traverse(visitor: &visitor)
-  }
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        try unknownFields.traverse(visitor: &visitor)
+    }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Empty, rhs: Arrow_Flight_Protocol_Empty) -> Bool {
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Empty, rhs: Arrow_Flight_Protocol_Empty) -> Bool {
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_ActionType: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ActionType"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "type"),
-    2: .same(proto: "description"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".ActionType"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "type"),
+        2: .same(proto: "description"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.type) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.description_p) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularStringField(value: &type)
+            case 2: try decoder.decodeSingularStringField(value: &description_p)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.type.isEmpty {
-      try visitor.visitSingularStringField(value: self.type, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !type.isEmpty {
+            try visitor.visitSingularStringField(value: type, fieldNumber: 1)
+        }
+        if !description_p.isEmpty {
+            try visitor.visitSingularStringField(value: description_p, fieldNumber: 2)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.description_p.isEmpty {
-      try visitor.visitSingularStringField(value: self.description_p, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_ActionType, rhs: Arrow_Flight_Protocol_ActionType) -> Bool {
-    if lhs.type != rhs.type {return false}
-    if lhs.description_p != rhs.description_p {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_ActionType, rhs: Arrow_Flight_Protocol_ActionType) -> Bool {
+        if lhs.type != rhs.type { return false }
+        if lhs.description_p != rhs.description_p { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Criteria: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Criteria"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "expression"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".Criteria"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "expression"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.expression) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &expression)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.expression.isEmpty {
-      try visitor.visitSingularBytesField(value: self.expression, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !expression.isEmpty {
+            try visitor.visitSingularBytesField(value: expression, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Criteria, rhs: Arrow_Flight_Protocol_Criteria) -> Bool {
-    if lhs.expression != rhs.expression {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Criteria, rhs: Arrow_Flight_Protocol_Criteria) -> Bool {
+        if lhs.expression != rhs.expression { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Action: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Action"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "type"),
-    2: .same(proto: "body"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".Action"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "type"),
+        2: .same(proto: "body"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.type) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.body) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularStringField(value: &type)
+            case 2: try decoder.decodeSingularBytesField(value: &body)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.type.isEmpty {
-      try visitor.visitSingularStringField(value: self.type, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !type.isEmpty {
+            try visitor.visitSingularStringField(value: type, fieldNumber: 1)
+        }
+        if !body.isEmpty {
+            try visitor.visitSingularBytesField(value: body, fieldNumber: 2)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.body.isEmpty {
-      try visitor.visitSingularBytesField(value: self.body, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Action, rhs: Arrow_Flight_Protocol_Action) -> Bool {
-    if lhs.type != rhs.type {return false}
-    if lhs.body != rhs.body {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Action, rhs: Arrow_Flight_Protocol_Action) -> Bool {
+        if lhs.type != rhs.type { return false }
+        if lhs.body != rhs.body { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_CancelFlightInfoRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "info"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoRequest"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "info"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._info) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularMessageField(value: &_info)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._info {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every if/case branch local when no optimizations
+        // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+        // https://github.com/apple/swift-protobuf/issues/1182
+        try { if let v = self._info {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+        } }()
+        try unknownFields.traverse(visitor: &visitor)
+    }
 
-  static func ==(lhs: Arrow_Flight_Protocol_CancelFlightInfoRequest, rhs: Arrow_Flight_Protocol_CancelFlightInfoRequest) -> Bool {
-    if lhs._info != rhs._info {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_CancelFlightInfoRequest, rhs: Arrow_Flight_Protocol_CancelFlightInfoRequest) -> Bool {
+        if lhs._info != rhs._info { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_RenewFlightEndpointRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".RenewFlightEndpointRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "endpoint"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".RenewFlightEndpointRequest"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "endpoint"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._endpoint) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularMessageField(value: &_endpoint)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._endpoint {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every if/case branch local when no optimizations
+        // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+        // https://github.com/apple/swift-protobuf/issues/1182
+        try { if let v = self._endpoint {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+        } }()
+        try unknownFields.traverse(visitor: &visitor)
+    }
 
-  static func ==(lhs: Arrow_Flight_Protocol_RenewFlightEndpointRequest, rhs: Arrow_Flight_Protocol_RenewFlightEndpointRequest) -> Bool {
-    if lhs._endpoint != rhs._endpoint {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_RenewFlightEndpointRequest, rhs: Arrow_Flight_Protocol_RenewFlightEndpointRequest) -> Bool {
+        if lhs._endpoint != rhs._endpoint { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Result: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Result"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "body"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".Result"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "body"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.body) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &body)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.body.isEmpty {
-      try visitor.visitSingularBytesField(value: self.body, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !body.isEmpty {
+            try visitor.visitSingularBytesField(value: body, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Result, rhs: Arrow_Flight_Protocol_Result) -> Bool {
-    if lhs.body != rhs.body {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Result, rhs: Arrow_Flight_Protocol_Result) -> Bool {
+        if lhs.body != rhs.body { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_CancelFlightInfoResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoResult"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "status"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".CancelFlightInfoResult"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "status"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularEnumField(value: &self.status) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularEnumField(value: &status)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.status != .unspecified {
-      try visitor.visitSingularEnumField(value: self.status, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if status != .unspecified {
+            try visitor.visitSingularEnumField(value: status, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_CancelFlightInfoResult, rhs: Arrow_Flight_Protocol_CancelFlightInfoResult) -> Bool {
-    if lhs.status != rhs.status {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_CancelFlightInfoResult, rhs: Arrow_Flight_Protocol_CancelFlightInfoResult) -> Bool {
+        if lhs.status != rhs.status { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_SchemaResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".SchemaResult"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "schema"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".SchemaResult"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "schema"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.schema) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &schema)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.schema.isEmpty {
-      try visitor.visitSingularBytesField(value: self.schema, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !schema.isEmpty {
+            try visitor.visitSingularBytesField(value: schema, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_SchemaResult, rhs: Arrow_Flight_Protocol_SchemaResult) -> Bool {
-    if lhs.schema != rhs.schema {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_SchemaResult, rhs: Arrow_Flight_Protocol_SchemaResult) -> Bool {
+        if lhs.schema != rhs.schema { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_FlightDescriptor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FlightDescriptor"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "type"),
-    2: .same(proto: "cmd"),
-    3: .same(proto: "path"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".FlightDescriptor"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "type"),
+        2: .same(proto: "cmd"),
+        3: .same(proto: "path"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularEnumField(value: &self.type) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.cmd) }()
-      case 3: try { try decoder.decodeRepeatedStringField(value: &self.path) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularEnumField(value: &type)
+            case 2: try decoder.decodeSingularBytesField(value: &cmd)
+            case 3: try decoder.decodeRepeatedStringField(value: &path)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.type != .unknown {
-      try visitor.visitSingularEnumField(value: self.type, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if type != .unknown {
+            try visitor.visitSingularEnumField(value: type, fieldNumber: 1)
+        }
+        if !cmd.isEmpty {
+            try visitor.visitSingularBytesField(value: cmd, fieldNumber: 2)
+        }
+        if !path.isEmpty {
+            try visitor.visitRepeatedStringField(value: path, fieldNumber: 3)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.cmd.isEmpty {
-      try visitor.visitSingularBytesField(value: self.cmd, fieldNumber: 2)
-    }
-    if !self.path.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.path, fieldNumber: 3)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_FlightDescriptor, rhs: Arrow_Flight_Protocol_FlightDescriptor) -> Bool {
-    if lhs.type != rhs.type {return false}
-    if lhs.cmd != rhs.cmd {return false}
-    if lhs.path != rhs.path {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_FlightDescriptor, rhs: Arrow_Flight_Protocol_FlightDescriptor) -> Bool {
+        if lhs.type != rhs.type { return false }
+        if lhs.cmd != rhs.cmd { return false }
+        if lhs.path != rhs.path { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_FlightDescriptor.DescriptorType: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "UNKNOWN"),
-    1: .same(proto: "PATH"),
-    2: .same(proto: "CMD"),
-  ]
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        0: .same(proto: "UNKNOWN"),
+        1: .same(proto: "PATH"),
+        2: .same(proto: "CMD"),
+    ]
 }
 
 extension Arrow_Flight_Protocol_FlightInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FlightInfo"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "schema"),
-    2: .standard(proto: "flight_descriptor"),
-    3: .same(proto: "endpoint"),
-    4: .standard(proto: "total_records"),
-    5: .standard(proto: "total_bytes"),
-    6: .same(proto: "ordered"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".FlightInfo"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "schema"),
+        2: .standard(proto: "flight_descriptor"),
+        3: .same(proto: "endpoint"),
+        4: .standard(proto: "total_records"),
+        5: .standard(proto: "total_bytes"),
+        6: .same(proto: "ordered"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.schema) }()
-      case 2: try { try decoder.decodeSingularMessageField(value: &self._flightDescriptor) }()
-      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.endpoint) }()
-      case 4: try { try decoder.decodeSingularInt64Field(value: &self.totalRecords) }()
-      case 5: try { try decoder.decodeSingularInt64Field(value: &self.totalBytes) }()
-      case 6: try { try decoder.decodeSingularBoolField(value: &self.ordered) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &schema)
+            case 2: try decoder.decodeSingularMessageField(value: &_flightDescriptor)
+            case 3: try decoder.decodeRepeatedMessageField(value: &endpoint)
+            case 4: try decoder.decodeSingularInt64Field(value: &totalRecords)
+            case 5: try decoder.decodeSingularInt64Field(value: &totalBytes)
+            case 6: try decoder.decodeSingularBoolField(value: &ordered)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.schema.isEmpty {
-      try visitor.visitSingularBytesField(value: self.schema, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every if/case branch local when no optimizations
+        // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+        // https://github.com/apple/swift-protobuf/issues/1182
+        if !schema.isEmpty {
+            try visitor.visitSingularBytesField(value: schema, fieldNumber: 1)
+        }
+        try { if let v = self._flightDescriptor {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+        } }()
+        if !endpoint.isEmpty {
+            try visitor.visitRepeatedMessageField(value: endpoint, fieldNumber: 3)
+        }
+        if totalRecords != 0 {
+            try visitor.visitSingularInt64Field(value: totalRecords, fieldNumber: 4)
+        }
+        if totalBytes != 0 {
+            try visitor.visitSingularInt64Field(value: totalBytes, fieldNumber: 5)
+        }
+        if ordered != false {
+            try visitor.visitSingularBoolField(value: ordered, fieldNumber: 6)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try { if let v = self._flightDescriptor {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    } }()
-    if !self.endpoint.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.endpoint, fieldNumber: 3)
-    }
-    if self.totalRecords != 0 {
-      try visitor.visitSingularInt64Field(value: self.totalRecords, fieldNumber: 4)
-    }
-    if self.totalBytes != 0 {
-      try visitor.visitSingularInt64Field(value: self.totalBytes, fieldNumber: 5)
-    }
-    if self.ordered != false {
-      try visitor.visitSingularBoolField(value: self.ordered, fieldNumber: 6)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_FlightInfo, rhs: Arrow_Flight_Protocol_FlightInfo) -> Bool {
-    if lhs.schema != rhs.schema {return false}
-    if lhs._flightDescriptor != rhs._flightDescriptor {return false}
-    if lhs.endpoint != rhs.endpoint {return false}
-    if lhs.totalRecords != rhs.totalRecords {return false}
-    if lhs.totalBytes != rhs.totalBytes {return false}
-    if lhs.ordered != rhs.ordered {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_FlightInfo, rhs: Arrow_Flight_Protocol_FlightInfo) -> Bool {
+        if lhs.schema != rhs.schema { return false }
+        if lhs._flightDescriptor != rhs._flightDescriptor { return false }
+        if lhs.endpoint != rhs.endpoint { return false }
+        if lhs.totalRecords != rhs.totalRecords { return false }
+        if lhs.totalBytes != rhs.totalBytes { return false }
+        if lhs.ordered != rhs.ordered { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_FlightEndpoint: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FlightEndpoint"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ticket"),
-    2: .same(proto: "location"),
-    3: .standard(proto: "expiration_time"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".FlightEndpoint"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "ticket"),
+        2: .same(proto: "location"),
+        3: .standard(proto: "expiration_time"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._ticket) }()
-      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.location) }()
-      case 3: try { try decoder.decodeSingularMessageField(value: &self._expirationTime) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularMessageField(value: &_ticket)
+            case 2: try decoder.decodeRepeatedMessageField(value: &location)
+            case 3: try decoder.decodeSingularMessageField(value: &_expirationTime)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._ticket {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    } }()
-    if !self.location.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.location, fieldNumber: 2)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every if/case branch local when no optimizations
+        // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+        // https://github.com/apple/swift-protobuf/issues/1182
+        try { if let v = self._ticket {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+        } }()
+        if !location.isEmpty {
+            try visitor.visitRepeatedMessageField(value: location, fieldNumber: 2)
+        }
+        try { if let v = self._expirationTime {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+        } }()
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try { if let v = self._expirationTime {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_FlightEndpoint, rhs: Arrow_Flight_Protocol_FlightEndpoint) -> Bool {
-    if lhs._ticket != rhs._ticket {return false}
-    if lhs.location != rhs.location {return false}
-    if lhs._expirationTime != rhs._expirationTime {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_FlightEndpoint, rhs: Arrow_Flight_Protocol_FlightEndpoint) -> Bool {
+        if lhs._ticket != rhs._ticket { return false }
+        if lhs.location != rhs.location { return false }
+        if lhs._expirationTime != rhs._expirationTime { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Location: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Location"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "uri"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".Location"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "uri"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.uri) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularStringField(value: &uri)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.uri.isEmpty {
-      try visitor.visitSingularStringField(value: self.uri, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !uri.isEmpty {
+            try visitor.visitSingularStringField(value: uri, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Location, rhs: Arrow_Flight_Protocol_Location) -> Bool {
-    if lhs.uri != rhs.uri {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Location, rhs: Arrow_Flight_Protocol_Location) -> Bool {
+        if lhs.uri != rhs.uri { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_Ticket: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Ticket"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ticket"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".Ticket"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .same(proto: "ticket"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.ticket) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &ticket)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.ticket.isEmpty {
-      try visitor.visitSingularBytesField(value: self.ticket, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !ticket.isEmpty {
+            try visitor.visitSingularBytesField(value: ticket, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_Ticket, rhs: Arrow_Flight_Protocol_Ticket) -> Bool {
-    if lhs.ticket != rhs.ticket {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_Ticket, rhs: Arrow_Flight_Protocol_Ticket) -> Bool {
+        if lhs.ticket != rhs.ticket { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_FlightData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FlightData"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "flight_descriptor"),
-    2: .standard(proto: "data_header"),
-    3: .standard(proto: "app_metadata"),
-    1000: .standard(proto: "data_body"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".FlightData"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .standard(proto: "flight_descriptor"),
+        2: .standard(proto: "data_header"),
+        3: .standard(proto: "app_metadata"),
+        1000: .standard(proto: "data_body"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._flightDescriptor) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.dataHeader) }()
-      case 3: try { try decoder.decodeSingularBytesField(value: &self.appMetadata) }()
-      case 1000: try { try decoder.decodeSingularBytesField(value: &self.dataBody) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularMessageField(value: &_flightDescriptor)
+            case 2: try decoder.decodeSingularBytesField(value: &dataHeader)
+            case 3: try decoder.decodeSingularBytesField(value: &appMetadata)
+            case 1000: try decoder.decodeSingularBytesField(value: &dataBody)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._flightDescriptor {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    } }()
-    if !self.dataHeader.isEmpty {
-      try visitor.visitSingularBytesField(value: self.dataHeader, fieldNumber: 2)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every if/case branch local when no optimizations
+        // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+        // https://github.com/apple/swift-protobuf/issues/1182
+        try { if let v = self._flightDescriptor {
+            try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+        } }()
+        if !dataHeader.isEmpty {
+            try visitor.visitSingularBytesField(value: dataHeader, fieldNumber: 2)
+        }
+        if !appMetadata.isEmpty {
+            try visitor.visitSingularBytesField(value: appMetadata, fieldNumber: 3)
+        }
+        if !dataBody.isEmpty {
+            try visitor.visitSingularBytesField(value: dataBody, fieldNumber: 1000)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    if !self.appMetadata.isEmpty {
-      try visitor.visitSingularBytesField(value: self.appMetadata, fieldNumber: 3)
-    }
-    if !self.dataBody.isEmpty {
-      try visitor.visitSingularBytesField(value: self.dataBody, fieldNumber: 1000)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_FlightData, rhs: Arrow_Flight_Protocol_FlightData) -> Bool {
-    if lhs._flightDescriptor != rhs._flightDescriptor {return false}
-    if lhs.dataHeader != rhs.dataHeader {return false}
-    if lhs.appMetadata != rhs.appMetadata {return false}
-    if lhs.dataBody != rhs.dataBody {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_FlightData, rhs: Arrow_Flight_Protocol_FlightData) -> Bool {
+        if lhs._flightDescriptor != rhs._flightDescriptor { return false }
+        if lhs.dataHeader != rhs.dataHeader { return false }
+        if lhs.appMetadata != rhs.appMetadata { return false }
+        if lhs.dataBody != rhs.dataBody { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }
 
 extension Arrow_Flight_Protocol_PutResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".PutResult"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "app_metadata"),
-  ]
+    static let protoMessageName: String = _protobuf_package + ".PutResult"
+    static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+        1: .standard(proto: "app_metadata"),
+    ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.appMetadata) }()
-      default: break
-      }
+    mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+        while let fieldNumber = try decoder.nextFieldNumber() {
+            // The use of inline closures is to circumvent an issue where the compiler
+            // allocates stack space for every case branch when no optimizations are
+            // enabled. https://github.com/apple/swift-protobuf/issues/1034
+            switch fieldNumber {
+            case 1: try decoder.decodeSingularBytesField(value: &appMetadata)
+            default: break
+            }
+        }
     }
-  }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.appMetadata.isEmpty {
-      try visitor.visitSingularBytesField(value: self.appMetadata, fieldNumber: 1)
+    func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+        if !appMetadata.isEmpty {
+            try visitor.visitSingularBytesField(value: appMetadata, fieldNumber: 1)
+        }
+        try unknownFields.traverse(visitor: &visitor)
     }
-    try unknownFields.traverse(visitor: &visitor)
-  }
 
-  static func ==(lhs: Arrow_Flight_Protocol_PutResult, rhs: Arrow_Flight_Protocol_PutResult) -> Bool {
-    if lhs.appMetadata != rhs.appMetadata {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
+    static func == (lhs: Arrow_Flight_Protocol_PutResult, rhs: Arrow_Flight_Protocol_PutResult) -> Bool {
+        if lhs.appMetadata != rhs.appMetadata { return false }
+        if lhs.unknownFields != rhs.unknownFields { return false }
+        return true
+    }
 }

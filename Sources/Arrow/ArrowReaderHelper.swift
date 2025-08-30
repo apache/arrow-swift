@@ -23,7 +23,7 @@ private func makeBinaryHolder(_ buffers: [ArrowBuffer],
     do {
         let arrowType = ArrowType(ArrowType.ArrowBinary)
         let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-        return .success(ArrowArrayHolderImpl(try BinaryArray(arrowData)))
+        return try .success(ArrowArrayHolderImpl(BinaryArray(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -36,7 +36,7 @@ private func makeStringHolder(_ buffers: [ArrowBuffer],
     do {
         let arrowType = ArrowType(ArrowType.ArrowString)
         let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-        return .success(ArrowArrayHolderImpl(try StringArray(arrowData)))
+        return try .success(ArrowArrayHolderImpl(StringArray(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -46,16 +46,15 @@ private func makeStringHolder(_ buffers: [ArrowBuffer],
 
 private func makeDateHolder(_ field: ArrowField,
                             buffers: [ArrowBuffer],
-                            nullCount: UInt
-) -> Result<ArrowArrayHolder, ArrowError> {
+                            nullCount: UInt) -> Result<ArrowArrayHolder, ArrowError> {
     do {
         if field.type.id == .date32 {
             let arrowData = try ArrowData(field.type, buffers: buffers, nullCount: nullCount)
-            return .success(ArrowArrayHolderImpl(try Date32Array(arrowData)))
+            return try .success(ArrowArrayHolderImpl(Date32Array(arrowData)))
         }
 
         let arrowData = try ArrowData(field.type, buffers: buffers, nullCount: nullCount)
-        return .success(ArrowArrayHolderImpl(try Date64Array(arrowData)))
+        return try .success(ArrowArrayHolderImpl(Date64Array(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -65,13 +64,12 @@ private func makeDateHolder(_ field: ArrowField,
 
 private func makeTimeHolder(_ field: ArrowField,
                             buffers: [ArrowBuffer],
-                            nullCount: UInt
-) -> Result<ArrowArrayHolder, ArrowError> {
+                            nullCount: UInt) -> Result<ArrowArrayHolder, ArrowError> {
     do {
         if field.type.id == .time32 {
             if let arrowType = field.type as? ArrowTypeTime32 {
                 let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-                return .success(ArrowArrayHolderImpl(try FixedArray<Time32>(arrowData)))
+                return try .success(ArrowArrayHolderImpl(FixedArray<Time32>(arrowData)))
             } else {
                 return .failure(.invalid("Incorrect field type for time: \(field.type)"))
             }
@@ -79,7 +77,7 @@ private func makeTimeHolder(_ field: ArrowField,
 
         if let arrowType = field.type as? ArrowTypeTime64 {
             let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-            return .success(ArrowArrayHolderImpl(try FixedArray<Time64>(arrowData)))
+            return try .success(ArrowArrayHolderImpl(FixedArray<Time64>(arrowData)))
         } else {
             return .failure(.invalid("Incorrect field type for time: \(field.type)"))
         }
@@ -92,12 +90,11 @@ private func makeTimeHolder(_ field: ArrowField,
 
 private func makeTimestampHolder(_ field: ArrowField,
                                  buffers: [ArrowBuffer],
-                                 nullCount: UInt
-) -> Result<ArrowArrayHolder, ArrowError> {
+                                 nullCount: UInt) -> Result<ArrowArrayHolder, ArrowError> {
     do {
         if let arrowType = field.type as? ArrowTypeTimestamp {
             let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-            return .success(ArrowArrayHolderImpl(try TimestampArray(arrowData)))
+            return try .success(ArrowArrayHolderImpl(TimestampArray(arrowData)))
         } else {
             return .failure(.invalid("Incorrect field type for timestamp: \(field.type)"))
         }
@@ -113,7 +110,7 @@ private func makeBoolHolder(_ buffers: [ArrowBuffer],
     do {
         let arrowType = ArrowType(ArrowType.ArrowBool)
         let arrowData = try ArrowData(arrowType, buffers: buffers, nullCount: nullCount)
-        return .success(ArrowArrayHolderImpl(try BoolArray(arrowData)))
+        return try .success(ArrowArrayHolderImpl(BoolArray(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -127,7 +124,7 @@ private func makeFixedHolder<T>(
 ) -> Result<ArrowArrayHolder, ArrowError> {
     do {
         let arrowData = try ArrowData(field.type, buffers: buffers, nullCount: nullCount)
-        return .success(ArrowArrayHolderImpl(try FixedArray<T>(arrowData)))
+        return try .success(ArrowArrayHolderImpl(FixedArray<T>(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -146,7 +143,7 @@ func makeStructHolder(
         let arrowData = try ArrowData(field.type,
                                       buffers: buffers, children: children,
                                       nullCount: nullCount, length: rbLength)
-        return .success(ArrowArrayHolderImpl(try StructArray(arrowData)))
+        return try .success(ArrowArrayHolderImpl(StructArray(arrowData)))
     } catch let error as ArrowError {
         return .failure(error)
     } catch {
@@ -240,7 +237,8 @@ func isNestedType(_ type: org_apache_arrow_flatbuf_Type_) -> Bool {
 }
 
 func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_body_length
-    _ field: org_apache_arrow_flatbuf_Field) -> ArrowType {
+    _ field: org_apache_arrow_flatbuf_Field
+) -> ArrowType {
     let type = field.typeType
     switch type {
     case .int:
@@ -300,7 +298,7 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
     case .struct_:
         _ = field.type(type: org_apache_arrow_flatbuf_Struct_.self)!
         var fields = [ArrowField]()
-        for index in 0..<field.childrenCount {
+        for index in 0 ..< field.childrenCount {
             let childField = field.children(at: index)!
             let childType = findArrowType(childField)
             fields.append(

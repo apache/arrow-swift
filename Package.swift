@@ -67,7 +67,7 @@ let package = Package(
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
         ),
-        .library(
+        .target(
             name: "go-swift",
             dependencies: [
                 .target(name: "Arrow"),

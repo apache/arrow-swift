@@ -34,7 +34,7 @@ class BitUtility {
     static func clearBit(_ bit: UInt, buffer: ArrowBuffer) {
         let byteIndex = UInt(bit / 8)
         var theByte = buffer.rawPointer.load(fromByteOffset: Int(byteIndex), as: UInt8.self)
-        theByte &= ~(UInt8(1 << (bit % 8)))
+        theByte &= ~UInt8(1 << (bit % 8))
         buffer.rawPointer.storeBytes(of: theByte, toByteOffset: Int(byteIndex), as: UInt8.self)
     }
 }

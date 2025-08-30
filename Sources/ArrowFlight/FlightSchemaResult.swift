@@ -15,18 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import Arrow
+import Foundation
 
 public class FlightSchemaResult {
     let schemaResult: Arrow_Flight_Protocol_SchemaResult
 
     public var schema: ArrowSchema? {
-        return schemaFromMessage(self.schemaResult.schema)
+        return schemaFromMessage(schemaResult.schema)
     }
 
     public init(_ schema: Data) {
-        self.schemaResult = Arrow_Flight_Protocol_SchemaResult.with {
+        schemaResult = Arrow_Flight_Protocol_SchemaResult.with {
             $0.schema = schema
         }
     }

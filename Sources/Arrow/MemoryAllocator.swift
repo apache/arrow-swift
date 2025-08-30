@@ -26,6 +26,7 @@ public class MemoryAllocator {
     func allocateArray(_ byteCount: Int) -> UnsafeMutableRawPointer {
         return UnsafeMutableRawPointer.allocate(
             byteCount: byteCount,
-            alignment: self.alignment)
+            alignment: alignment
+        )
     }
 }

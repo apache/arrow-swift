@@ -15,19 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import ArrowC
+import Foundation
 
 public class ImportArrayHolder: ArrowArrayHolder {
     let cArrayPtr: UnsafePointer<ArrowC.ArrowArray>
-    public var type: ArrowType {self.holder.type}
-    public var length: UInt {self.holder.length}
-    public var nullCount: UInt {self.holder.nullCount}
-    public var array: AnyArray {self.holder.array}
-    public var data: ArrowData {self.holder.data}
-    public var getBufferData: () -> [Data] {self.holder.getBufferData}
-    public var getBufferDataSizes: () -> [Int] {self.holder.getBufferDataSizes}
-    public var getArrowColumn: (ArrowField, [ArrowArrayHolder]) throws -> ArrowColumn {self.holder.getArrowColumn}
+    public var type: ArrowType { holder.type }
+    public var length: UInt { holder.length }
+    public var nullCount: UInt { holder.nullCount }
+    public var array: AnyArray { holder.array }
+    public var data: ArrowData { holder.data }
+    public var getBufferData: () -> [Data] { holder.getBufferData }
+    public var getBufferDataSizes: () -> [Int] { holder.getBufferDataSizes }
+    public var getArrowColumn: (ArrowField, [ArrowArrayHolder]) throws -> ArrowColumn { self.holder.getArrowColumn }
     private let holder: ArrowArrayHolder
     init(_ holder: ArrowArrayHolder, cArrayPtr: UnsafePointer<ArrowC.ArrowArray>) {
         self.cArrayPtr = cArrayPtr
@@ -45,7 +45,8 @@ public class ArrowCImporter {
     private func appendToBuffer(
         _ cBuffer: UnsafeRawPointer?,
         arrowBuffers: inout [ArrowBuffer],
-        length: UInt) {
+        length: UInt
+    ) {
         if cBuffer == nil {
             arrowBuffers.append(ArrowBuffer.createEmptyBuffer())
             return
@@ -59,7 +60,7 @@ public class ArrowCImporter {
     public init() {}
 
     public func importType(_ cArrow: String, name: String = "") ->
-    Result<ArrowField, ArrowError> {
+        Result<ArrowField, ArrowError> {
         do {
             let type = try ArrowType.fromCDataFormatId(cArrow)
             return .success(ArrowField(name, type: ArrowType(type.info), isNullable: true))
@@ -69,7 +70,7 @@ public class ArrowCImporter {
     }
 
     public func importField(_ cSchema: ArrowC.ArrowSchema) ->
-    Result<ArrowField, ArrowError> {
+        Result<ArrowField, ArrowError> {
         if cSchema.n_children > 0 {
             ArrowCImporter.release(cSchema)
             return .failure(.invalid("Children currently not supported"))
@@ -79,11 +80,12 @@ public class ArrowCImporter {
         }
 
         switch importType(
-            String(cString: cSchema.format), name: String(cString: cSchema.name)) {
-        case .success(let field):
+            String(cString: cSchema.format), name: String(cString: cSchema.name)
+        ) {
+        case let .success(field):
             ArrowCImporter.release(cSchema)
             return .success(field)
-        case .failure(let err):
+        case let .failure(err):
             ArrowCImporter.release(cSchema)
             return .failure(err)
         }
@@ -155,9 +157,9 @@ public class ArrowCImporter {
 
         switch makeArrayHolder(arrowField, buffers: arrowBuffers,
                                nullCount: nullCount, children: nil, rbLength: 0) {
-        case .success(let holder):
+        case let .success(holder):
             return .success(ImportArrayHolder(holder, cArrayPtr: cArrayPtr))
-        case .failure(let err):
+        case let .failure(err):
             ArrowCImporter.release(cArrayPtr)
             return .failure(err)
         }

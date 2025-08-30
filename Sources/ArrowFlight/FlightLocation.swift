@@ -21,7 +21,7 @@ public class FlightLocation {
     public let uri: String
 
     init(_ location: Arrow_Flight_Protocol_Location) {
-        self.uri = location.uri
+        uri = location.uri
     }
 
     public init(_ uri: String) {

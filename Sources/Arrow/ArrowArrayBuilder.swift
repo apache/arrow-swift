@@ -25,49 +25,49 @@ public protocol ArrowArrayHolderBuilder {
 public class ArrowArrayBuilder<T: ArrowBufferBuilder, U: ArrowArray<T.ItemType>>: ArrowArrayHolderBuilder {
     let type: ArrowType
     let bufferBuilder: T
-    public var length: UInt {return self.bufferBuilder.length}
-    public var capacity: UInt {return self.bufferBuilder.capacity}
-    public var nullCount: UInt {return self.bufferBuilder.nullCount}
-    public var offset: UInt {return self.bufferBuilder.offset}
+    public var length: UInt { return bufferBuilder.length }
+    public var capacity: UInt { return bufferBuilder.capacity }
+    public var nullCount: UInt { return bufferBuilder.nullCount }
+    public var offset: UInt { return bufferBuilder.offset }
 
     fileprivate init(_ type: ArrowType) throws {
         self.type = type
-        self.bufferBuilder = try T()
+        bufferBuilder = try T()
     }
 
     public func append(_ vals: T.ItemType?...) {
         for val in vals {
-            self.bufferBuilder.append(val)
+            bufferBuilder.append(val)
         }
     }
 
     public func append(_ vals: [T.ItemType?]) {
         for val in vals {
-            self.bufferBuilder.append(val)
+            bufferBuilder.append(val)
         }
     }
 
     public func append(_ val: T.ItemType?) {
-        self.bufferBuilder.append(val)
+        bufferBuilder.append(val)
     }
 
     public func appendAny(_ val: Any?) {
-        self.bufferBuilder.append(val as? T.ItemType)
+        bufferBuilder.append(val as? T.ItemType)
     }
 
     public func finish() throws -> ArrowArray<T.ItemType> {
-        let buffers = self.bufferBuilder.finish()
-        let arrowData = try ArrowData(self.type, buffers: buffers, nullCount: self.nullCount)
+        let buffers = bufferBuilder.finish()
+        let arrowData = try ArrowData(type, buffers: buffers, nullCount: nullCount)
         let array = try U(arrowData)
         return array
     }
 
     public func getStride() -> Int {
-        return self.type.getStride()
+        return type.getStride()
     }
 
     public func toHolder() throws -> ArrowArrayHolder {
-        return try ArrowArrayHolderImpl(self.finish())
+        return try ArrowArrayHolderImpl(finish())
     }
 }
 
@@ -132,43 +132,43 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructAr
         self.fields = fields
         self.builders = builders
         try super.init(ArrowNestedType(ArrowType.ArrowStruct, fields: fields))
-        self.bufferBuilder.initializeTypeInfo(fields)
+        bufferBuilder.initializeTypeInfo(fields)
     }
 
     public init(_ fields: [ArrowField]) throws {
         self.fields = fields
         var builders = [any ArrowArrayHolderBuilder]()
         for field in fields {
-            builders.append(try ArrowArrayBuilders.loadBuilder(arrowType: field.type))
+            try builders.append(ArrowArrayBuilders.loadBuilder(arrowType: field.type))
         }
 
         self.builders = builders
         try super.init(ArrowNestedType(ArrowType.ArrowStruct, fields: fields))
     }
 
-    public override func append(_ values: [Any?]?) {
-        self.bufferBuilder.append(values)
+    override public func append(_ values: [Any?]?) {
+        bufferBuilder.append(values)
         if let anyValues = values {
-            for index in 0..<builders.count {
-                self.builders[index].appendAny(anyValues[index])
+            for index in 0 ..< builders.count {
+                builders[index].appendAny(anyValues[index])
             }
         } else {
-            for index in 0..<builders.count {
-                self.builders[index].appendAny(nil)
+            for index in 0 ..< builders.count {
+                builders[index].appendAny(nil)
             }
         }
     }
 
-    public override func finish() throws -> StructArray {
-        let buffers = self.bufferBuilder.finish()
+    override public func finish() throws -> StructArray {
+        let buffers = bufferBuilder.finish()
         var childData = [ArrowData]()
-        for builder in self.builders {
-            childData.append(try builder.toHolder().array.arrowData)
+        for builder in builders {
+            try childData.append(builder.toHolder().array.arrowData)
         }
 
-        let arrowData = try ArrowData(self.type, buffers: buffers,
-                                      children: childData, nullCount: self.nullCount,
-                                      length: self.length)
+        let arrowData = try ArrowData(type, buffers: buffers,
+                                      children: childData, nullCount: nullCount,
+                                      length: length)
         let structArray = try StructArray(arrowData)
         return structArray
     }
@@ -176,7 +176,8 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, StructAr
 
 public class ArrowArrayBuilders {
     public static func loadBuilder( // swiftlint:disable:this cyclomatic_complexity
-        _ builderType: Any.Type) throws -> ArrowArrayHolderBuilder {
+        _ builderType: Any.Type
+    ) throws -> ArrowArrayHolderBuilder {
         if builderType == Int8.self || builderType == Int8?.self {
             return try ArrowArrayBuilders.loadNumberArrayBuilder() as NumberArrayBuilder<Int8>
         } else if builderType == Int16.self || builderType == Int16?.self {
@@ -236,14 +237,15 @@ public class ArrowArrayBuilders {
             let builderType = type(of: value)
             let arrowType = ArrowType(ArrowType.infoForType(builderType))
             fields.append(ArrowField(propertyName, type: arrowType, isNullable: true))
-            builders.append(try loadBuilder(arrowType: arrowType))
+            try builders.append(loadBuilder(arrowType: arrowType))
         }
 
         return try StructArrayBuilder(fields, builders: builders)
     }
 
     public static func loadBuilder( // swiftlint:disable:this cyclomatic_complexity
-        arrowType: ArrowType) throws -> ArrowArrayHolderBuilder {
+        arrowType: ArrowType
+    ) throws -> ArrowArrayHolderBuilder {
         switch arrowType.id {
         case .uint8:
             return try loadNumberArrayBuilder() as NumberArrayBuilder<UInt8>

@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import Arrow
+import Foundation
 
 public class FlightInfo {
     let flightInfo: Arrow_Flight_Protocol_FlightInfo
@@ -25,10 +25,11 @@ public class FlightInfo {
     }
 
     public var endpoints: [FlightEndpoint] {
-        return self.flightInfo.endpoint.map { FlightEndpoint($0) }
+        return flightInfo.endpoint.map { FlightEndpoint($0) }
     }
+
     public var schema: ArrowSchema? {
-        return schemaFromMessage(self.flightInfo.schema)
+        return schemaFromMessage(flightInfo.schema)
     }
 
     var endpoint: [Arrow_Flight_Protocol_FlightEndpoint] = []
@@ -38,13 +39,13 @@ public class FlightInfo {
 
     public init(_ schema: Data, endpoints: [FlightEndpoint] = [FlightEndpoint](), descriptor: FlightDescriptor? = nil) {
         if let localDescriptor = descriptor {
-            self.flightInfo = Arrow_Flight_Protocol_FlightInfo.with {
+            flightInfo = Arrow_Flight_Protocol_FlightInfo.with {
                 $0.schema = schema
                 $0.flightDescriptor = localDescriptor.toProtocol()
                 $0.endpoint = endpoints.map { $0.toProtocol() }
             }
         } else {
-            self.flightInfo = Arrow_Flight_Protocol_FlightInfo.with {
+            flightInfo = Arrow_Flight_Protocol_FlightInfo.with {
                 $0.schema = schema
                 $0.endpoint = endpoints.map { $0.toProtocol() }
             }
@@ -52,6 +53,6 @@ public class FlightInfo {
     }
 
     func toProtocol() -> Arrow_Flight_Protocol_FlightInfo {
-        return self.flightInfo
+        return flightInfo
     }
 }

@@ -39,7 +39,7 @@ public class ArrowBuffer {
     }
 
     func append(to data: inout Data) {
-        let ptr  = UnsafePointer(rawPointer.assumingMemoryBound(to: UInt8.self))
+        let ptr = UnsafePointer(rawPointer.assumingMemoryBound(to: UInt8.self))
         data.append(ptr, count: Int(capacity))
     }
 
@@ -47,7 +47,8 @@ public class ArrowBuffer {
         return ArrowBuffer(
             length: 0,
             capacity: 0,
-            rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))
+            rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)
+        )
     }
 
     static func createBuffer(_ data: [UInt8], length: UInt) -> ArrowBuffer {

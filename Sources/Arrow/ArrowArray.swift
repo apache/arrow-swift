@@ -18,14 +18,14 @@
 import Foundation
 
 public protocol ArrowArrayHolder {
-    var type: ArrowType {get}
-    var length: UInt {get}
-    var nullCount: UInt {get}
-    var array: AnyArray {get}
-    var data: ArrowData {get}
-    var getBufferData: () -> [Data] {get}
-    var getBufferDataSizes: () -> [Int] {get}
-    var getArrowColumn: (ArrowField, [ArrowArrayHolder]) throws -> ArrowColumn {get}
+    var type: ArrowType { get }
+    var length: UInt { get }
+    var nullCount: UInt { get }
+    var array: AnyArray { get }
+    var data: ArrowData { get }
+    var getBufferData: () -> [Data] { get }
+    var getBufferDataSizes: () -> [Int] { get }
+    var getArrowColumn: (ArrowField, [ArrowArrayHolder]) throws -> ArrowColumn { get }
 }
 
 public class ArrowArrayHolderImpl: ArrowArrayHolder {
@@ -38,12 +38,12 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
     public let getBufferDataSizes: () -> [Int]
     public let getArrowColumn: (ArrowField, [ArrowArrayHolder]) throws -> ArrowColumn
     public init<T>(_ arrowArray: ArrowArray<T>) {
-        self.array = arrowArray
-        self.data = arrowArray.arrowData
-        self.length = arrowArray.length
-        self.type = arrowArray.arrowData.type
-        self.nullCount = arrowArray.nullCount
-        self.getBufferData = {() -> [Data] in
+        array = arrowArray
+        data = arrowArray.arrowData
+        length = arrowArray.length
+        type = arrowArray.arrowData.type
+        nullCount = arrowArray.nullCount
+        getBufferData = { () -> [Data] in
             var bufferData = [Data]()
             for buffer in arrowArray.arrowData.buffers {
                 bufferData.append(Data())
@@ -53,7 +53,7 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
             return bufferData
         }
 
-        self.getBufferDataSizes = {() -> [Int] in
+        getBufferDataSizes = { () -> [Int] in
             var bufferDataSizes = [Int]()
             for buffer in arrowArray.arrowData.buffers {
                 bufferDataSizes.append(Int(buffer.capacity))
@@ -62,7 +62,7 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
             return bufferDataSizes
         }
 
-        self.getArrowColumn = {(field: ArrowField, arrayHolders: [ArrowArrayHolder]) throws -> ArrowColumn in
+        getArrowColumn = { (field: ArrowField, arrayHolders: [ArrowArrayHolder]) throws -> ArrowColumn in
             var arrays = [ArrowArray<T>]()
             for arrayHolder in arrayHolders {
                 if let array = arrayHolder.array as? ArrowArray<T> {
@@ -70,12 +70,13 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
                 }
             }
 
-            return ArrowColumn(field, chunked: ChunkedArrayHolder(try ChunkedArray<T>(arrays)))
+            return try ArrowColumn(field, chunked: ChunkedArrayHolder(ChunkedArray<T>(arrays)))
         }
     }
 
     public static func loadArray( // swiftlint:disable:this cyclomatic_complexity
-        _ arrowType: ArrowType, with: ArrowData) throws -> ArrowArrayHolder {
+        _ arrowType: ArrowType, with: ArrowData
+    ) throws -> ArrowArrayHolder {
         switch arrowType.id {
         case .int8:
             return try ArrowArrayHolderImpl(FixedArray<Int8>(with))
@@ -124,22 +125,22 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
 public class ArrowArray<T>: AsString, AnyArray {
     public typealias ItemType = T
     public let arrowData: ArrowData
-    public var nullCount: UInt {return self.arrowData.nullCount}
-    public var length: UInt {return self.arrowData.length}
+    public var nullCount: UInt { return arrowData.nullCount }
+    public var length: UInt { return arrowData.length }
 
     public required init(_ arrowData: ArrowData) throws {
         self.arrowData = arrowData
     }
 
     public func isNull(_ at: UInt) throws -> Bool {
-        if at >= self.length {
+        if at >= length {
             throw ArrowError.outOfBounds(index: Int64(at))
         }
 
-        return self.arrowData.isNull(at)
+        return arrowData.isNull(at)
     }
 
-    public subscript(_ index: UInt) -> T? {
+    public subscript(_: UInt) -> T? {
         fatalError("subscript() has not been implemented")
     }
 
@@ -161,35 +162,35 @@ public class ArrowArray<T>: AsString, AnyArray {
 }
 
 public class FixedArray<T>: ArrowArray<T> {
-    public override subscript(_ index: UInt) -> T? {
-        if self.arrowData.isNull(index) {
+    override public subscript(_ index: UInt) -> T? {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let byteOffset = self.arrowData.stride * Int(index)
-        return self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: T.self)
+        let byteOffset = arrowData.stride * Int(index)
+        return arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: T.self)
     }
 }
 
 public class StringArray: ArrowArray<String> {
-    public override subscript(_ index: UInt) -> String? {
+    override public subscript(_ index: UInt) -> String? {
         let offsetIndex = MemoryLayout<Int32>.stride * Int(index)
-        if self.arrowData.isNull(index) {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let offsets = self.arrowData.buffers[1]
-        let values = self.arrowData.buffers[2]
+        let offsets = arrowData.buffers[1]
+        let values = arrowData.buffers[2]
 
         var startIndex: Int32 = 0
         if index > 0 {
             startIndex = offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
         }
 
-        let endIndex = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride )
+        let endIndex = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride)
             .load(as: Int32.self)
         let arrayLength = Int(endIndex - startIndex)
-        let rawPointer =  values.rawPointer.advanced(by: Int(startIndex))
+        let rawPointer = values.rawPointer.advanced(by: Int(startIndex))
             .bindMemory(to: UInt8.self, capacity: arrayLength)
         let buffer = UnsafeBufferPointer<UInt8>(start: rawPointer, count: arrayLength)
         let byteArray = Array(buffer)
@@ -198,36 +199,36 @@ public class StringArray: ArrowArray<String> {
 }
 
 public class BoolArray: ArrowArray<Bool> {
-    public override subscript(_ index: UInt) -> Bool? {
-        if self.arrowData.isNull(index) {
+    override public subscript(_ index: UInt) -> Bool? {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let valueBuffer = self.arrowData.buffers[1]
+        let valueBuffer = arrowData.buffers[1]
         return BitUtility.isSet(index, buffer: valueBuffer)
     }
 }
 
 public class Date32Array: ArrowArray<Date> {
-    public override subscript(_ index: UInt) -> Date? {
-        if self.arrowData.isNull(index) {
+    override public subscript(_ index: UInt) -> Date? {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let byteOffset = self.arrowData.stride * Int(index)
-        let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt32.self)
+        let byteOffset = arrowData.stride * Int(index)
+        let milliseconds = arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt32.self)
         return Date(timeIntervalSince1970: TimeInterval(milliseconds * 86400))
     }
 }
 
 public class Date64Array: ArrowArray<Date> {
-    public override subscript(_ index: UInt) -> Date? {
-        if self.arrowData.isNull(index) {
+    override public subscript(_ index: UInt) -> Date? {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let byteOffset = self.arrowData.stride * Int(index)
-        let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt64.self)
+        let byteOffset = arrowData.stride * Int(index)
+        let milliseconds = arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt64.self)
         return Date(timeIntervalSince1970: TimeInterval(milliseconds / 1000))
     }
 }
@@ -236,7 +237,6 @@ public class Time32Array: FixedArray<Time32> {}
 public class Time64Array: FixedArray<Time64> {}
 
 public class TimestampArray: FixedArray<Timestamp> {
-
     public struct FormattingOptions: Equatable {
         public var dateFormat: String = "yyyy-MM-dd HH:mm:ss.SSS"
         public var locale: Locale = .current
@@ -267,7 +267,7 @@ public class TimestampArray: FixedArray<Timestamp> {
     public func formattedDate(at index: UInt, options: FormattingOptions = FormattingOptions()) -> String? {
         guard let timestamp = self[index] else { return nil }
 
-        guard let timestampType = self.arrowData.type as? ArrowTypeTimestamp else {
+        guard let timestampType = arrowData.type as? ArrowTypeTimestamp else {
             return options.fallbackToRaw ? "\(timestamp)" : nil
         }
 
@@ -294,7 +294,7 @@ public class TimestampArray: FixedArray<Timestamp> {
         case .seconds:
             timeInterval = TimeInterval(timestamp)
         case .milliseconds:
-            timeInterval = TimeInterval(timestamp) / 1_000
+            timeInterval = TimeInterval(timestamp) / 1000
         case .microseconds:
             timeInterval = TimeInterval(timestamp) / 1_000_000
         case .nanoseconds:
@@ -304,7 +304,7 @@ public class TimestampArray: FixedArray<Timestamp> {
         return Date(timeIntervalSince1970: timeInterval)
     }
 
-    public override func asString(_ index: UInt) -> String {
+    override public func asString(_ index: UInt) -> String {
         if let formatted = formattedDate(at: index) {
             return formatted
         }
@@ -321,31 +321,31 @@ public class BinaryArray: ArrowArray<Data> {
 
     public var options = Options()
 
-    public override subscript(_ index: UInt) -> Data? {
+    override public subscript(_ index: UInt) -> Data? {
         let offsetIndex = MemoryLayout<Int32>.stride * Int(index)
-        if self.arrowData.isNull(index) {
+        if arrowData.isNull(index) {
             return nil
         }
 
-        let offsets = self.arrowData.buffers[1]
-        let values = self.arrowData.buffers[2]
+        let offsets = arrowData.buffers[1]
+        let values = arrowData.buffers[2]
         var startIndex: Int32 = 0
         if index > 0 {
             startIndex = offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
         }
 
-        let endIndex = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride )
+        let endIndex = offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride)
             .load(as: Int32.self)
         let arrayLength = Int(endIndex - startIndex)
-        let rawPointer =  values.rawPointer.advanced(by: Int(startIndex))
+        let rawPointer = values.rawPointer.advanced(by: Int(startIndex))
             .bindMemory(to: UInt8.self, capacity: arrayLength)
         let buffer = UnsafeBufferPointer<UInt8>(start: rawPointer, count: arrayLength)
         let byteArray = Array(buffer)
         return Data(byteArray)
     }
 
-    public override func asString(_ index: UInt) -> String {
-        if self[index] == nil {return ""}
+    override public func asString(_ index: UInt) -> String {
+        if self[index] == nil { return "" }
         let data = self[index]!
         if options.printAsHex {
             return data.hexEncodedString()
@@ -361,14 +361,14 @@ public class StructArray: ArrowArray<[Any?]> {
         try super.init(arrowData)
         var fields = [ArrowArrayHolder]()
         for child in arrowData.children {
-            fields.append(try ArrowArrayHolderImpl.loadArray(child.type, with: child))
+            try fields.append(ArrowArrayHolderImpl.loadArray(child.type, with: child))
         }
 
-        self.arrowFields = fields
+        arrowFields = fields
     }
 
-    public override subscript(_ index: UInt) -> [Any?]? {
-        if self.arrowData.isNull(index) {
+    override public subscript(_ index: UInt) -> [Any?]? {
+        if arrowData.isNull(index) {
             return nil
         }
 
@@ -384,14 +384,14 @@ public class StructArray: ArrowArray<[Any?]> {
         return nil
     }
 
-    public override func asString(_ index: UInt) -> String {
-        if self.arrowData.isNull(index) {
+    override public func asString(_ index: UInt) -> String {
+        if arrowData.isNull(index) {
             return ""
         }
 
         var output = "{"
         if let fields = arrowFields {
-            for fieldIndex in 0..<fields.count {
+            for fieldIndex in 0 ..< fields.count {
                 let asStr = fields[fieldIndex].array as? AsString
                 if fieldIndex == 0 {
                     output.append("\(asStr!.asString(index))")

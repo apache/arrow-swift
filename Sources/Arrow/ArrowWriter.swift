@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import FlatBuffers
+import Foundation
 
 public protocol DataWriter {
-    var count: Int {get}
+    var count: Int { get }
     func append(_ data: Data)
 }
 
@@ -30,6 +30,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         public init(_ data: Data) {
             self.data = data
         }
+
         convenience init() {
             self.init(Data())
         }
@@ -48,8 +49,8 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         }
 
         public func append(_ data: Data) {
-            self.handle.write(data)
-            self.currentSize += data.count
+            handle.write(data)
+            currentSize += data.count
         }
     }
 
@@ -76,9 +77,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
             var offsets = [Offset]()
             for field in nestedField.fields {
                 switch writeField(&fbb, field: field) {
-                case .success(let offset):
+                case let .success(offset):
                     offsets.append(offset)
-                case .failure(let error):
+                case let .failure(error):
                     return .failure(error)
                 }
             }
@@ -96,17 +97,17 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         }
 
         switch toFBTypeEnum(field.type) {
-        case .success(let type):
+        case let .success(type):
             org_apache_arrow_flatbuf_Field.add(typeType: type, &fbb)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
         switch fieldTypeOffsetResult {
-        case .success(let offset):
+        case let .success(offset):
             org_apache_arrow_flatbuf_Field.add(type: offset, &fbb)
             return .success(org_apache_arrow_flatbuf_Field.endField(&fbb, start: startOffset))
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
     }
@@ -115,9 +116,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         var fieldOffsets = [Offset]()
         for field in schema.fields {
             switch writeField(&fbb, field: field) {
-            case .success(let offset):
+            case let .success(offset):
                 fieldOffsets.append(offset)
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
         }
@@ -128,7 +129,6 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                                                          endianness: .little,
                                                          fieldsVectorOffset: fieldsOffset)
         return .success(schemaOffset)
-
     }
 
     private func writeRecordBatches(
@@ -140,9 +140,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         for batch in batches {
             let startIndex = writer.count
             switch writeRecordBatch(batch: batch) {
-            case .success(let rbResult):
-                withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
-                withUnsafeBytes(of: rbResult.1.o.littleEndian) {writer.append(Data($0))}
+            case let .success(rbResult):
+                withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) { writer.append(Data($0)) }
+                withUnsafeBytes(of: rbResult.1.o.littleEndian) { writer.append(Data($0)) }
                 writer.append(rbResult.0)
                 switch writeRecordBatchData(&writer, fields: batch.schema.fields, columns: batch.columns) {
                 case .success:
@@ -150,10 +150,10 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                         org_apache_arrow_flatbuf_Block(offset: Int64(startIndex),
                                                        metaDataLength: Int32(0),
                                                        bodyLength: Int64(rbResult.1.o)))
-                case .failure(let error):
+                case let .failure(error):
                     return .failure(error)
                 }
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
         }
@@ -238,8 +238,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
 
     private func writeRecordBatchData(
         _ writer: inout DataWriter, fields: [ArrowField],
-        columns: [ArrowArrayHolder])
-    -> Result<Bool, ArrowError> {
+        columns: [ArrowArrayHolder]
+    )
+        -> Result<Bool, ArrowError> {
         for index in 0 ..< fields.count {
             let column = columns[index]
             let colBufferData = column.getBufferData()
@@ -254,7 +255,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                     switch writeRecordBatchData(&writer, fields: nestedType.fields, columns: structArray.arrowFields!) {
                     case .success:
                         continue
-                    case .failure(let error):
+                    case let .failure(error):
                         return .failure(error)
                     }
                 }
@@ -265,11 +266,10 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
     }
 
     private func writeFooter(schema: ArrowSchema,
-                             rbBlocks: [org_apache_arrow_flatbuf_Block]
-    ) -> Result<Data, ArrowError> {
-        var fbb: FlatBufferBuilder = FlatBufferBuilder()
+                             rbBlocks: [org_apache_arrow_flatbuf_Block]) -> Result<Data, ArrowError> {
+        var fbb = FlatBufferBuilder()
         switch writeSchema(&fbb, schema: schema) {
-        case .success(let schemaOffset):
+        case let .success(schemaOffset):
             fbb.startVector(rbBlocks.count, elementSize: MemoryLayout<org_apache_arrow_flatbuf_Block>.size)
             for blkInfo in rbBlocks.reversed() {
                 fbb.create(struct: blkInfo)
@@ -282,25 +282,25 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
             let footerOffset = org_apache_arrow_flatbuf_Footer.endFooter(&fbb, start: footerStartOffset)
             fbb.finish(offset: footerOffset)
             return .success(fbb.data)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
     }
 
     private func writeFile(_ writer: inout DataWriter, info: ArrowWriter.Info) -> Result<Bool, ArrowError> {
-        var fbb: FlatBufferBuilder = FlatBufferBuilder()
+        var fbb = FlatBufferBuilder()
         switch writeSchema(&fbb, schema: info.schema) {
-        case .success(let schemaOffset):
+        case let .success(schemaOffset):
             fbb.finish(offset: schemaOffset)
             writer.append(fbb.data)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
         switch writeRecordBatches(&writer, batches: info.batches) {
-        case .success(let rbBlocks):
+        case let .success(rbBlocks):
             switch writeFooter(schema: info.schema, rbBlocks: rbBlocks) {
-            case .success(let footerData):
+            case let .success(footerData):
                 fbb.finish(offset: Offset(offset: fbb.buffer.size))
                 let footerOffset = writer.count
                 writer.append(footerData)
@@ -309,10 +309,10 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 withUnsafeBytes(of: Int32(0).littleEndian) { writer.append(Data($0)) }
                 let footerDiff = (UInt32(writer.count) - UInt32(footerOffset))
                 withUnsafeBytes(of: footerDiff.littleEndian) { writer.append(Data($0)) }
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
@@ -322,28 +322,28 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
     public func writeStreaming(_ info: ArrowWriter.Info) -> Result<Data, ArrowError> {
         let writer: any DataWriter = InMemDataWriter()
         switch toMessage(info.schema) {
-        case .success(let schemaData):
-            withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
-            withUnsafeBytes(of: UInt32(schemaData.count).littleEndian) {writer.append(Data($0))}
+        case let .success(schemaData):
+            withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) { writer.append(Data($0)) }
+            withUnsafeBytes(of: UInt32(schemaData.count).littleEndian) { writer.append(Data($0)) }
             writer.append(schemaData)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
         for batch in info.batches {
             switch toMessage(batch) {
-            case .success(let batchData):
-                withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
-                withUnsafeBytes(of: UInt32(batchData[0].count).littleEndian) {writer.append(Data($0))}
+            case let .success(batchData):
+                withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) { writer.append(Data($0)) }
+                withUnsafeBytes(of: UInt32(batchData[0].count).littleEndian) { writer.append(Data($0)) }
                 writer.append(batchData[0])
                 writer.append(batchData[1])
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
         }
 
-        withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
-        withUnsafeBytes(of: UInt32(0).littleEndian) {writer.append(Data($0))}
+        withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) { writer.append(Data($0)) }
+        withUnsafeBytes(of: UInt32(0).littleEndian) { writer.append(Data($0)) }
         if let memWriter = writer as? InMemDataWriter {
             return .success(memWriter.data)
         } else {
@@ -360,7 +360,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
             } else {
                 return .failure(.invalid("Unable to cast writer"))
             }
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
     }
@@ -383,7 +383,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         switch writeFile(&writer, info: info) {
         case .success:
             writer.append(FILEMARKER.data(using: .utf8)!)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
@@ -393,7 +393,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
     public func toMessage(_ batch: RecordBatch) -> Result<[Data], ArrowError> {
         var writer: any DataWriter = InMemDataWriter()
         switch writeRecordBatch(batch: batch) {
-        case .success(let message):
+        case let .success(message):
             writer.append(message.0)
             addPadForAlignment(&writer)
             var dataWriter: any DataWriter = InMemDataWriter()
@@ -401,12 +401,12 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
             case .success:
                 return .success([
                     (writer as! InMemDataWriter).data, // swiftlint:disable:this force_cast
-                    (dataWriter as! InMemDataWriter).data // swiftlint:disable:this force_cast
+                    (dataWriter as! InMemDataWriter).data, // swiftlint:disable:this force_cast
                 ])
-            case .failure(let error):
+            case let .failure(error):
                 return .failure(error)
             }
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
     }
@@ -415,9 +415,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         var schemaSize: Int32 = 0
         var fbb = FlatBufferBuilder()
         switch writeSchema(&fbb, schema: schema) {
-        case .success(let schemaOffset):
+        case let .success(schemaOffset):
             schemaSize = Int32(schemaOffset.o)
-        case .failure(let error):
+        case let .failure(error):
             return .failure(error)
         }
 
@@ -431,4 +431,5 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         return .success(fbb.data)
     }
 }
+
 // swiftlint:disable:this file_length

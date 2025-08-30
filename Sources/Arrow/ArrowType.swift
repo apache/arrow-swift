@@ -93,9 +93,9 @@ public class ArrowTypeTime32: ArrowType {
         super.init(ArrowType.ArrowTime32)
     }
 
-    public override var cDataFormatId: String {
+    override public var cDataFormatId: String {
         get throws {
-            switch self.unit {
+            switch unit {
             case .milliseconds:
                 return "ttm"
             case .seconds:
@@ -112,9 +112,9 @@ public class ArrowTypeTime64: ArrowType {
         super.init(ArrowType.ArrowTime64)
     }
 
-    public override var cDataFormatId: String {
+    override public var cDataFormatId: String {
         get throws {
-            switch self.unit {
+            switch unit {
             case .microseconds:
                 return "ttu"
             case .nanoseconds:
@@ -142,21 +142,21 @@ public class ArrowTypeTimestamp: ArrowType {
         super.init(ArrowType.ArrowTimestamp)
     }
 
-    public convenience init(type: ArrowTypeId) {
+    public convenience init(type _: ArrowTypeId) {
         self.init(.milliseconds, timezone: nil)
     }
 
-    public override var cDataFormatId: String {
+    override public var cDataFormatId: String {
         get throws {
             let unitChar: String
-            switch self.unit {
+            switch unit {
             case .seconds: unitChar = "s"
             case .milliseconds: unitChar = "m"
             case .microseconds: unitChar = "u"
             case .nanoseconds: unitChar = "n"
             }
 
-            if let timezone = self.timezone {
+            if let timezone = timezone {
                 return "ts\(unitChar):\(timezone)"
             } else {
                 return "ts\(unitChar)"
@@ -201,14 +201,14 @@ public class ArrowType {
     }
 
     public var id: ArrowTypeId {
-        switch self.info {
-        case .primitiveInfo(let id):
+        switch info {
+        case let .primitiveInfo(id):
             return id
-        case .timeInfo(let id):
+        case let .timeInfo(id):
             return id
-        case .variableInfo(let id):
+        case let .variableInfo(id):
             return id
-        case .complexInfo(let id):
+        case let .complexInfo(id):
             return id
         }
     }
@@ -221,7 +221,8 @@ public class ArrowType {
     }
 
     public static func infoForType( // swiftlint:disable:this cyclomatic_complexity
-        _ type: Any.Type) -> ArrowType.Info {
+        _ type: Any.Type
+    ) -> ArrowType.Info {
         if type == String.self {
             return ArrowType.ArrowString
         } else if type == Date.self {
@@ -283,7 +284,7 @@ public class ArrowType {
 
     public func getStride( // swiftlint:disable:this cyclomatic_complexity
     ) -> Int {
-        switch self.id {
+        switch id {
         case .int8:
             return MemoryLayout<Int8>.stride
         case .int16:
@@ -329,7 +330,7 @@ public class ArrowType {
 
     public var cDataFormatId: String {
         get throws {
-            switch self.id {
+            switch id {
             case ArrowTypeId.int8:
                 return "c"
             case ArrowTypeId.int16:
@@ -382,40 +383,41 @@ public class ArrowType {
     }
 
     public static func fromCDataFormatId( // swiftlint:disable:this cyclomatic_complexity
-        _ from: String) throws -> ArrowType {
+        _ from: String
+    ) throws -> ArrowType {
         if from == "c" {
             return ArrowType(ArrowType.ArrowInt8)
         } else if from == "s" {
             return ArrowType(ArrowType.ArrowInt16)
         } else if from == "i" {
             return ArrowType(ArrowType.ArrowInt32)
-        } else if  from == "l" {
+        } else if from == "l" {
             return ArrowType(ArrowType.ArrowInt64)
-        } else if  from == "C" {
+        } else if from == "C" {
             return ArrowType(ArrowType.ArrowUInt8)
-        } else if  from == "S" {
+        } else if from == "S" {
             return ArrowType(ArrowType.ArrowUInt16)
-        } else if  from == "I" {
+        } else if from == "I" {
             return ArrowType(ArrowType.ArrowUInt32)
-        } else if  from == "L" {
+        } else if from == "L" {
             return ArrowType(ArrowType.ArrowUInt64)
-        } else if  from == "f" {
+        } else if from == "f" {
             return ArrowType(ArrowType.ArrowFloat)
-        } else if  from == "g" {
+        } else if from == "g" {
             return ArrowType(ArrowType.ArrowDouble)
-        } else if  from == "b" {
+        } else if from == "b" {
             return ArrowType(ArrowType.ArrowBool)
-        } else if  from == "tdD" {
+        } else if from == "tdD" {
             return ArrowType(ArrowType.ArrowDate32)
-        } else if  from == "tdm" {
+        } else if from == "tdm" {
             return ArrowType(ArrowType.ArrowDate64)
-        } else if  from == "tts" {
+        } else if from == "tts" {
             return ArrowTypeTime32(.seconds)
-        } else if  from == "ttm" {
+        } else if from == "ttm" {
             return ArrowTypeTime32(.milliseconds)
-        } else if  from == "ttu" {
+        } else if from == "ttu" {
             return ArrowTypeTime64(.microseconds)
-        } else if  from == "ttn" {
+        } else if from == "ttn" {
             return ArrowTypeTime64(.nanoseconds)
         } else if from.starts(with: "ts") {
             let components = from.split(separator: ":", maxSplits: 1)
@@ -435,9 +437,9 @@ public class ArrowType {
 
             let timezone = components.count > 1 ? String(components[1]) : nil
             return ArrowTypeTimestamp(unit, timezone: timezone)
-        } else if  from == "z" {
+        } else if from == "z" {
             return ArrowType(ArrowType.ArrowBinary)
-        } else if  from == "u" {
+        } else if from == "u" {
             return ArrowType(ArrowType.ArrowString)
         }
 
@@ -447,14 +449,14 @@ public class ArrowType {
 
 extension ArrowType.Info: Equatable {
     public static func == (lhs: ArrowType.Info, rhs: ArrowType.Info) -> Bool {
-        switch(lhs, rhs) {
-        case (.primitiveInfo(let lhsId), .primitiveInfo(let rhsId)):
+        switch (lhs, rhs) {
+        case let (.primitiveInfo(lhsId), .primitiveInfo(rhsId)):
             return lhsId == rhsId
-        case (.variableInfo(let lhsId), .variableInfo(let rhsId)):
+        case let (.variableInfo(lhsId), .variableInfo(rhsId)):
             return lhsId == rhsId
-        case (.timeInfo(let lhsId), .timeInfo(let rhsId)):
+        case let (.timeInfo(lhsId), .timeInfo(rhsId)):
             return lhsId == rhsId
-        case (.complexInfo(let lhsId), .complexInfo(let rhsId)):
+        case let (.complexInfo(lhsId), .complexInfo(rhsId)):
             return lhsId == rhsId
         default:
             return false
@@ -471,4 +473,5 @@ func getBytesFor<T>(_ data: T) -> Data? {
         return nil
     }
 }
+
 // swiftlint:disable:this file_length

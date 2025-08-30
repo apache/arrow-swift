@@ -42,11 +42,11 @@ public class ArrowSchema {
     }
 
     public func field(_ index: Int) -> ArrowField {
-        return self.fields[index]
+        return fields[index]
     }
 
     public func fieldIndex(_ name: String) -> Int? {
-        return self.fieldLookup[name]
+        return fieldLookup[name]
     }
 
     public class Builder {

@@ -52,7 +52,7 @@ public class ArrowData {
             }
         }
 
-        self.type = arrowType
+        type = arrowType
         self.buffers = buffers
         self.children = children
         self.nullCount = nullCount

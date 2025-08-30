@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import ArrowC
 import Atomics
+import Foundation
 
 // The memory used by UnsafeAtomic is not automatically
 // reclaimed. Since this value is initialized once
@@ -44,9 +44,9 @@ public class ArrowCExporter {
             self.arrowType = arrowType
             // keeping the name str to ensure the cstring buffer remains valid
             self.name = name
-            self.arrowTypeName = try arrowType.cDataFormatId
-            self.nameCstr = (self.name as NSString).utf8String!
-            self.arrowTypeNameCstr = (self.arrowTypeName as NSString).utf8String!
+            arrowTypeName = try arrowType.cDataFormatId
+            nameCstr = (self.name as NSString).utf8String!
+            arrowTypeNameCstr = (arrowTypeName as NSString).utf8String!
             super.init()
         }
     }
@@ -61,11 +61,11 @@ public class ArrowCExporter {
             // deallocated
             self.arrowData = arrowData
             for arrowBuffer in arrowData.buffers {
-                self.data.append(arrowBuffer.rawPointer)
+                data.append(arrowBuffer.rawPointer)
             }
 
-            self.buffers = UnsafeMutablePointer<UnsafeRawPointer?>.allocate(capacity: self.data.count)
-            self.buffers.initialize(from: &self.data, count: self.data.count)
+            buffers = UnsafeMutablePointer<UnsafeRawPointer?>.allocate(capacity: data.count)
+            buffers.initialize(from: &data, count: data.count)
             super.init()
         }
 
@@ -79,14 +79,14 @@ public class ArrowCExporter {
     public init() {}
 
     public func exportType(_ cSchema: inout ArrowC.ArrowSchema, arrowType: ArrowType, name: String = "") ->
-    Result<Bool, ArrowError> {
+        Result<Bool, ArrowError> {
         do {
             let exportSchema = try ExportSchema(arrowType, name: name)
             cSchema.format = exportSchema.arrowTypeNameCstr
             cSchema.name = exportSchema.nameCstr
             cSchema.private_data =
                 UnsafeMutableRawPointer(mutating: UnsafeRawPointer(bitPattern: exportSchema.id))
-            cSchema.release = {(data: UnsafeMutablePointer<ArrowC.ArrowSchema>?) in
+            cSchema.release = { (data: UnsafeMutablePointer<ArrowC.ArrowSchema>?) in
                 let arraySchema = data!.pointee
                 let exportId = Int(bitPattern: arraySchema.private_data)
                 guard ArrowCExporter.exportedData[exportId] != nil else {
@@ -106,7 +106,7 @@ public class ArrowCExporter {
     }
 
     public func exportField(_ schema: inout ArrowC.ArrowSchema, field: ArrowField) ->
-    Result<Bool, ArrowError> {
+        Result<Bool, ArrowError> {
         return exportType(&schema, arrowType: field.type, name: field.name)
     }
 
@@ -123,7 +123,7 @@ public class ArrowCExporter {
         cArray.dictionary = nil
         cArray.private_data =
             UnsafeMutableRawPointer(mutating: UnsafeRawPointer(bitPattern: exportArray.id))
-        cArray.release = {(data: UnsafeMutablePointer<ArrowC.ArrowArray>?) in
+        cArray.release = { (data: UnsafeMutablePointer<ArrowC.ArrowArray>?) in
             let arrayData = data!.pointee
             let exportId = Int(bitPattern: arrayData.private_data)
             guard ArrowCExporter.exportedData[exportId] != nil else {

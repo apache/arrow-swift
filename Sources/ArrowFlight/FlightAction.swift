@@ -21,8 +21,8 @@ public class FlightAction {
     public let type: String
     public let body: Data
     init(_ action: Arrow_Flight_Protocol_Action) {
-        self.type = action.type
-        self.body = action.body
+        type = action.type
+        body = action.body
     }
 
     public init(_ type: String, body: Data = Data()) {
@@ -32,8 +32,8 @@ public class FlightAction {
 
     func toProtocol() -> Arrow_Flight_Protocol_Action {
         var flightAction = Arrow_Flight_Protocol_Action()
-        flightAction.type = self.type
-        flightAction.body = self.body
+        flightAction.type = type
+        flightAction.body = body
         return flightAction
     }
 }

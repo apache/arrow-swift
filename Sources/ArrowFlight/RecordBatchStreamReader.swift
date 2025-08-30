@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import Foundation
 import Arrow
+import Foundation
 import GRPC
 
 public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
@@ -32,7 +32,7 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
     init(_ stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>,
          useUnalignedBuffers: Bool = false) {
         self.stream = stream
-        self.streamIterator = self.stream.makeAsyncIterator()
+        streamIterator = self.stream.makeAsyncIterator()
         self.useUnalignedBuffers = useUnalignedBuffers
     }
 
@@ -49,7 +49,7 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
 
         let result = ArrowReader.makeArrowReaderResult()
         while true {
-            let streamData = try await self.streamIterator.next()
+            let streamData = try await streamIterator.next()
             if streamData == nil {
                 return nil
             }
@@ -62,14 +62,15 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
                 dataHeader,
                 dataBody: dataBody,
                 result: result,
-                useUnalignedBuffers: useUnalignedBuffers) {
+                useUnalignedBuffers: useUnalignedBuffers
+            ) {
             case .success(()):
                 if result.batches.count > 0 {
                     batches = result.batches
                     batchIndex = 1
                     return (batches[0], descriptor)
                 }
-            case .failure(let error):
+            case let .failure(error):
                 throw error
             }
         }

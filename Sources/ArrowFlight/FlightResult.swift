@@ -20,7 +20,7 @@ import Foundation
 public class FlightResult {
     public let body: Data
     init(_ result: Arrow_Flight_Protocol_Result) {
-        self.body = result.body
+        body = result.body
     }
 
     public init(_ body: Data) {
@@ -29,7 +29,7 @@ public class FlightResult {
 
     func toProtocol() -> Arrow_Flight_Protocol_Result {
         var result = Arrow_Flight_Protocol_Result()
-        result.body = self.body
+        result.body = body
         return result
     }
 }
