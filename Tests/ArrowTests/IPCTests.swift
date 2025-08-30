@@ -264,7 +264,7 @@ final class IPCStreamReaderTests: XCTestCase {
 
 final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body_length
     func testFileReader_double() throws {
-        let fileURL = currentDirectory().appendingPathComponent("../../testdata_double.arrow")
+        let fileURL = currentDirectory().appendingPathComponent("../testdata_double.arrow")
         let arrowReader = ArrowReader()
         let result = arrowReader.fromFile(fileURL)
         let recordBatches: [RecordBatch]
@@ -298,14 +298,14 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
     }
 
     func testFileReader_bool() throws {
-        let fileURL = currentDirectory().appendingPathComponent("../../testdata_bool.arrow")
+        let fileURL = currentDirectory().appendingPathComponent("../testdata_bool.arrow")
         let arrowReader = ArrowReader()
         try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
     }
 
     func testFileWriter_bool() throws {
         // read existing file
-        let fileURL = currentDirectory().appendingPathComponent("../../testdata_bool.arrow")
+        let fileURL = currentDirectory().appendingPathComponent("../testdata_bool.arrow")
         let arrowReader = ArrowReader()
         let fileRBs = try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
         let arrowWriter = ArrowWriter()
@@ -319,7 +319,7 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
         // write file record batches to another file
-        let outputUrl = currentDirectory().appendingPathComponent("../../testfilewriter_bool.arrow")
+        let outputUrl = currentDirectory().appendingPathComponent("../testfilewriter_bool.arrow")
         switch arrowWriter.toFile(outputUrl, info: writerInfo) {
         case .success:
             try checkBoolRecordBatch(arrowReader.fromFile(outputUrl))
@@ -336,7 +336,7 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
 
     func testFileWriter_struct() throws {
         // read existing file
-        let fileURL = currentDirectory().appendingPathComponent("../../testdata_struct.arrow")
+        let fileURL = currentDirectory().appendingPathComponent("../testdata_struct.arrow")
         let arrowReader = ArrowReader()
         let fileRBs = try checkStructRecordBatch(arrowReader.fromFile(fileURL))
         let arrowWriter = ArrowWriter()
@@ -350,7 +350,7 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
         // write file record batches to another file
-        let outputUrl = currentDirectory().appendingPathComponent("../../testfilewriter_struct.arrow")
+        let outputUrl = currentDirectory().appendingPathComponent("../testfilewriter_struct.arrow")
         switch arrowWriter.toFile(outputUrl, info: writerInfo) {
         case .success:
             try checkStructRecordBatch(arrowReader.fromFile(outputUrl))
