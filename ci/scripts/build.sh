@@ -43,20 +43,6 @@ if [ -d /cache ]; then
 fi
 github_actions_group_end
 
-github_actions_group_begin "Generate data"
-data_gen_dir="${build_dir}/source/data-generator/swift-datagen"
-if [ -d /cache ]; then
-  export GOCACHE="/cache/go-build"
-  export GOMODCACHE="/cache/go-mod"
-fi
-export GOPATH="${build_dir}"
-pushd "${data_gen_dir}"
-go get -d ./...
-go run .
-cp *.arrow ../Arrow
-popd
-github_actions_group_end
-
 github_actions_group_begin "Use -warnings-as-errors"
 for package in . Arrow ArrowFlight; do
   pushd "${build_dir}/source/${package}"

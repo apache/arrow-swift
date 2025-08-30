@@ -76,6 +76,11 @@ let package = Package(
         .testTarget(
             name: "ArrowTests",
             dependencies: ["Arrow", "ArrowC"],
+            resources: [
+                .process("Resources/testdata_double.arrow"),
+                .process("Resources/testdata_bool.arrow"),
+                .process("Resources/testdata_struct.arrow"),
+            ],
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
