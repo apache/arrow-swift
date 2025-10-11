@@ -23,7 +23,7 @@ import PackageDescription
 let package = Package(
     name: "Arrow",
     platforms: [
-        .macOS(.v10_14)
+        .macOS(.v10_15)
     ],
     products: [
         .library(
@@ -31,7 +31,7 @@ let package = Package(
             targets: ["Arrow"])
     ],
     dependencies: [
-        .package(url: "https://github.com/google/flatbuffers.git", from: "25.2.10"),
+        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.2.10"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
     ],
     targets: [
