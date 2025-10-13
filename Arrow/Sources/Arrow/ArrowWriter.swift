@@ -138,18 +138,26 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         var rbBlocks = [org_apache_arrow_flatbuf_Block]()
 
         for batch in batches {
+            addPadForAlignment(&writer)
             let startIndex = writer.count
             switch writeRecordBatch(batch: batch) {
             case .success(let rbResult):
                 withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
                 withUnsafeBytes(of: rbResult.1.o.littleEndian) {writer.append(Data($0))}
                 writer.append(rbResult.0)
+                addPadForAlignment(&writer)
+                let metadataEnd = writer.count
+                let metadataLength = metadataEnd - startIndex
                 switch writeRecordBatchData(&writer, fields: batch.schema.fields, columns: batch.columns) {
                 case .success:
+                    addPadForAlignment(&writer)
                     rbBlocks.append(
-                        org_apache_arrow_flatbuf_Block(offset: Int64(startIndex),
-                                                       metaDataLength: Int32(0),
-                                                       bodyLength: Int64(rbResult.1.o)))
+                        org_apache_arrow_flatbuf_Block(
+                            offset: Int64(startIndex),
+                            metaDataLength: Int32(metadataLength),
+                            bodyLength: Int64(rbResult.1.o)
+                        )
+                    )
                 case .failure(let error):
                     return .failure(error)
                 }
@@ -379,7 +387,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         addPadForAlignment(&markerData)
 
         var writer: any DataWriter = FileDataWriter(fileHandle)
-        writer.append(FILEMARKER.data(using: .utf8)!)
+        writer.append(markerData)
         switch writeFile(&writer, info: info) {
         case .success:
             writer.append(FILEMARKER.data(using: .utf8)!)
