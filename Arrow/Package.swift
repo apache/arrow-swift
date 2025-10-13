@@ -31,7 +31,7 @@ let package = Package(
             targets: ["Arrow"])
     ],
     dependencies: [
-        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.2.10"),
+        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.9.23"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
     ],
     targets: [
