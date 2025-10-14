@@ -144,12 +144,25 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
                 withUnsafeBytes(of: rbResult.1.o.littleEndian) {writer.append(Data($0))}
                 writer.append(rbResult.0)
+                addPadForAlignment(&writer)
+                let metadataLength = writer.count - startIndex
+                let bodyStart = writer.count
                 switch writeRecordBatchData(&writer, fields: batch.schema.fields, columns: batch.columns) {
                 case .success:
+                    let bodyLength = writer.count - bodyStart
+                    let expectedSize = startIndex + metadataLength + bodyLength
+                    guard expectedSize == writer.count else {
+                        return .failure(.invalid(
+                            "Invalid Block. Expected \(expectedSize), got \(writer.count)"
+                        ))
+                    }
                     rbBlocks.append(
-                        org_apache_arrow_flatbuf_Block(offset: Int64(startIndex),
-                                                       metaDataLength: Int32(0),
-                                                       bodyLength: Int64(rbResult.1.o)))
+                        org_apache_arrow_flatbuf_Block(
+                            offset: Int64(startIndex),
+                            metaDataLength: Int32(metadataLength),
+                            bodyLength: Int64(bodyLength)
+                        )
+                    )
                 case .failure(let error):
                     return .failure(error)
                 }
@@ -293,6 +306,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         case .success(let schemaOffset):
             fbb.finish(offset: schemaOffset)
             writer.append(fbb.data)
+            addPadForAlignment(&writer)
         case .failure(let error):
             return .failure(error)
         }
@@ -379,7 +393,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         addPadForAlignment(&markerData)
 
         var writer: any DataWriter = FileDataWriter(fileHandle)
-        writer.append(FILEMARKER.data(using: .utf8)!)
+        writer.append(markerData)
         switch writeFile(&writer, info: info) {
         case .success:
             writer.append(FILEMARKER.data(using: .utf8)!)
