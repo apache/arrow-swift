@@ -138,7 +138,6 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         var rbBlocks = [org_apache_arrow_flatbuf_Block]()
 
         for batch in batches {
-            addPadForAlignment(&writer)
             let startIndex = writer.count
             switch writeRecordBatch(batch: batch) {
             case .success(let rbResult):
@@ -146,16 +145,22 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 withUnsafeBytes(of: rbResult.1.o.littleEndian) {writer.append(Data($0))}
                 writer.append(rbResult.0)
                 addPadForAlignment(&writer)
-                let metadataEnd = writer.count
-                let metadataLength = metadataEnd - startIndex
+                let metadataLength = writer.count - startIndex
+                let bodyStart = writer.count
                 switch writeRecordBatchData(&writer, fields: batch.schema.fields, columns: batch.columns) {
                 case .success:
-                    addPadForAlignment(&writer)
+                    let bodyLength = writer.count - bodyStart
+                    let expectedSize = startIndex + metadataLength + bodyLength
+                    guard expectedSize == writer.count else {
+                        return .failure(.invalid(
+                            "Invalid Block. Expected \(expectedSize), got \(writer.count)"
+                        ))
+                    }
                     rbBlocks.append(
                         org_apache_arrow_flatbuf_Block(
                             offset: Int64(startIndex),
                             metaDataLength: Int32(metadataLength),
-                            bodyLength: Int64(rbResult.1.o)
+                            bodyLength: Int64(bodyLength)
                         )
                     )
                 case .failure(let error):
@@ -301,6 +306,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         case .success(let schemaOffset):
             fbb.finish(offset: schemaOffset)
             writer.append(fbb.data)
+            addPadForAlignment(&writer)
         case .failure(let error):
             return .failure(error)
         }
