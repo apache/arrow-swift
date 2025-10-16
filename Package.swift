@@ -39,11 +39,9 @@ let package = Package(
     targets: [
         .target(
             name: "ArrowC",
-            path: "Arrow/Sources/ArrowC",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
-
         ),
         .target(
             name: "Arrow",
