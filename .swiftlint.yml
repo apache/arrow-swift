@@ -25,11 +25,11 @@ included:
   - CDataWGo/Package.swift
   - CDataWGo/Sources/go-swift
 excluded:
-  - Arrow/Sources/Arrow/File_generated.swift
-  - Arrow/Sources/Arrow/Message_generated.swift
-  - Arrow/Sources/Arrow/Schema_generated.swift
-  - Arrow/Sources/Arrow/SparseTensor_generated.swift
-  - Arrow/Sources/Arrow/Tensor_generated.swift
+  - Sources/Arrow/File_generated.swift
+  - Sources/Arrow/Message_generated.swift
+  - Sources/Arrow/Schema_generated.swift
+  - Sources/Arrow/SparseTensor_generated.swift
+  - Sources/Arrow/Tensor_generated.swift
   - ArrowFlight/Sources/ArrowFlight/Flight.grpc.swift
   - ArrowFlight/Sources/ArrowFlight/Flight.pb.swift
   - ArrowFlight/Sources/ArrowFlight/FlightSql.pb.swift
