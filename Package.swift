@@ -49,7 +49,6 @@ let package = Package(
                            .product(name: "FlatBuffers", package: "flatbuffers"),
                            .product(name: "Atomics", package: "swift-atomics")
             ],
-            path: "Arrow/Sources/Arrow",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
