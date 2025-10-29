@@ -310,7 +310,8 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
             return ArrowType(ArrowType.ArrowUnknown)
         }
         let childType = findArrowType(childField)
-        return ArrowTypeList(childType)
+        let childFieldName = childField.name ?? "item"
+        return ArrowTypeList(ArrowField(childFieldName, type: childType, isNullable: childField.nullable))
     default:
         return ArrowType(ArrowType.ArrowUnknown)
     }

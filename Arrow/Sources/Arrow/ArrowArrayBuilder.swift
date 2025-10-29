@@ -179,7 +179,7 @@ public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, NestedArray>
 
     public override init(_ elementType: ArrowType) throws {
         self.valueBuilder = try ArrowArrayBuilders.loadBuilder(arrowType: elementType)
-        try super.init(ArrowTypeList(elementType))
+        try super.init(ArrowTypeList(ArrowField("item", type: elementType, isNullable: true)))
     }
 
     public override func append(_ values: [Any?]?) {
@@ -324,7 +324,7 @@ public class ArrowArrayBuilders {
             guard let listType = arrowType as? ArrowTypeList else {
                 throw ArrowError.invalid("Expected ArrowTypeList for \(arrowType.id)")
             }
-            return try ListArrayBuilder(listType.elementType)
+            return try ListArrayBuilder(listType.elementField.type)
         default:
             throw ArrowError.unknownType("Builder not found for arrow type: \(arrowType.id)")
         }

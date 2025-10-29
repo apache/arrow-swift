@@ -474,7 +474,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
     }
 
     func testListArrayNested() throws {
-        let innerListType = ArrowTypeList(ArrowType(ArrowType.ArrowInt32))
+        let innerListType = ArrowTypeList(ArrowField("item", type: ArrowType(ArrowType.ArrowInt32), isNullable: true))
         let outerListBuilder = try ListArrayBuilder(innerListType)
 
         guard let innerListBuilder = outerListBuilder.valueBuilder as? ListArrayBuilder else {

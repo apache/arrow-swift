@@ -94,7 +94,7 @@ func fromProto( // swiftlint:disable:this cyclomatic_complexity function_body_le
             break
         }
         let childArrowField = fromProto(field: childField)
-        arrowType = ArrowTypeList(childArrowField.type)
+        arrowType = ArrowTypeList(childArrowField)
     default:
         arrowType = ArrowType(ArrowType.ArrowUnknown)
     }

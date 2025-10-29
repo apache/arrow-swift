@@ -174,11 +174,15 @@ public class ArrowTypeStruct: ArrowType {
 }
 
 public class ArrowTypeList: ArrowType {
-    let elementType: ArrowType
+    public let elementField: ArrowField
 
-    public init(_ elementType: ArrowType) {
-        self.elementType = elementType
+    public init(_ elementField: ArrowField) {
+        self.elementField = elementField
         super.init(ArrowType.ArrowList)
+    }
+
+    public convenience init(_ elementType: ArrowType, nullable: Bool = true) {
+        self.init(ArrowField("item", type: elementType, isNullable: nullable))
     }
 }
 
@@ -396,7 +400,7 @@ public class ArrowType {
                 throw ArrowError.invalid("Invalid struct type")
             case ArrowTypeId.list:
                 if let listType = self as? ArrowTypeList {
-                    return "+l" + (try listType.elementType.cDataFormatId)
+                    return "+l" + (try listType.elementField.type.cDataFormatId)
                 }
                 throw ArrowError.invalid("Invalid list type")
             default:
