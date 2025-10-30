@@ -177,9 +177,13 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, NestedAr
 public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, NestedArray> {
     let valueBuilder: any ArrowArrayHolderBuilder
 
-    public override init(_ elementType: ArrowType) throws {
-        self.valueBuilder = try ArrowArrayBuilders.loadBuilder(arrowType: elementType)
-        try super.init(ArrowTypeList(ArrowField("item", type: elementType, isNullable: true)))
+    public override init(_ arrowType: ArrowType) throws {
+        guard let listType = arrowType as? ArrowTypeList else {
+            throw ArrowError.invalid("Expected ArrowTypeList")
+        }
+        let arrowField = listType.elementField
+        self.valueBuilder = try ArrowArrayBuilders.loadBuilder(arrowType: arrowField.type)
+        try super.init(arrowType)
     }
 
     public override func append(_ values: [Any?]?) {
@@ -324,7 +328,7 @@ public class ArrowArrayBuilders {
             guard let listType = arrowType as? ArrowTypeList else {
                 throw ArrowError.invalid("Expected ArrowTypeList for \(arrowType.id)")
             }
-            return try ListArrayBuilder(listType.elementField.type)
+            return try ListArrayBuilder(listType)
         default:
             throw ArrowError.unknownType("Builder not found for arrow type: \(arrowType.id)")
         }
@@ -393,7 +397,7 @@ public class ArrowArrayBuilders {
         return try StructArrayBuilder(fields)
     }
 
-    public static func loadListArrayBuilder(_ elementType: ArrowType) throws -> ListArrayBuilder {
-        return try ListArrayBuilder(elementType)
+    public static func loadListArrayBuilder(_ listType: ArrowTypeList) throws -> ListArrayBuilder {
+        return try ListArrayBuilder(listType)
     }
 }

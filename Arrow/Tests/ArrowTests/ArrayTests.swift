@@ -440,7 +440,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
     }
 
     func testListArrayPrimitive() throws {
-        let listBuilder = try ListArrayBuilder(ArrowType(ArrowType.ArrowInt32))
+        let listBuilder = try ListArrayBuilder(ArrowTypeList(ArrowType(ArrowType.ArrowInt32)))
 
         listBuilder.append([Int32(1), Int32(2), Int32(3)])
         listBuilder.append([Int32(4), Int32(5)])
@@ -475,7 +475,8 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
     func testListArrayNested() throws {
         let innerListType = ArrowTypeList(ArrowField("item", type: ArrowType(ArrowType.ArrowInt32), isNullable: true))
-        let outerListBuilder = try ListArrayBuilder(innerListType)
+        let outerListType = ArrowTypeList(ArrowField("item", type: innerListType, isNullable: true))
+        let outerListBuilder = try ListArrayBuilder(outerListType)
 
         guard let innerListBuilder = outerListBuilder.valueBuilder as? ListArrayBuilder else {
             XCTFail("Failed to cast valueBuilder to ListArrayBuilder")
