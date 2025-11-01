@@ -320,8 +320,8 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let structArray = try structBuilder.finish()
         XCTAssertEqual(structArray.length, 3)
         XCTAssertNil(structArray[1])
-        XCTAssertEqual(structArray.arrowFields![0].length, 3)
-        XCTAssertNil(structArray.arrowFields![0].array.asAny(1))
+        XCTAssertEqual(structArray.fields![0].length, 3)
+        XCTAssertNil(structArray.fields![0].array.asAny(1))
         XCTAssertEqual(structArray[0]![STIndex.bool.rawValue] as? Bool, true)
         XCTAssertEqual(structArray[0]![STIndex.int8.rawValue] as? Int8, 1)
         XCTAssertEqual(structArray[0]![STIndex.int16.rawValue] as? Int16, 2)
@@ -437,5 +437,91 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let boolBuilder = try ArrowArrayBuilders.loadBoolArrayBuilder()
         boolBuilder.append([true, false, true, false])
         XCTAssertEqual(try boolBuilder.finish()[2], true)
+    }
+
+    func testListArrayPrimitive() throws {
+        let listBuilder = try ListArrayBuilder(ArrowTypeList(ArrowType(ArrowType.ArrowInt32)))
+
+        listBuilder.append([Int32(1), Int32(2), Int32(3)])
+        listBuilder.append([Int32(4), Int32(5)])
+        listBuilder.append(nil)
+        listBuilder.append([Int32(6), Int32(7), Int32(8), Int32(9)])
+
+        XCTAssertEqual(listBuilder.length, 4)
+        XCTAssertEqual(listBuilder.nullCount, 1)
+
+        let listArray = try listBuilder.finish()
+        XCTAssertEqual(listArray.length, 4)
+
+        let firstList = listArray[0]
+        XCTAssertNotNil(firstList, "First list should not be nil")
+        XCTAssertEqual(firstList!.count, 3, "First list should have 3 elements")
+        XCTAssertEqual(firstList![0] as? Int32, 1)
+        XCTAssertEqual(firstList![1] as? Int32, 2)
+        XCTAssertEqual(firstList![2] as? Int32, 3)
+
+        let secondList = listArray[1]
+        XCTAssertEqual(secondList!.count, 2)
+        XCTAssertEqual(secondList![0] as? Int32, 4)
+        XCTAssertEqual(secondList![1] as? Int32, 5)
+
+        XCTAssertNil(listArray[2])
+
+        let fourthList = listArray[3]
+        XCTAssertEqual(fourthList!.count, 4)
+        XCTAssertEqual(fourthList![0] as? Int32, 6)
+        XCTAssertEqual(fourthList![3] as? Int32, 9)
+    }
+
+    func testListArrayNested() throws {
+        let innerListType = ArrowTypeList(ArrowField("item", type: ArrowType(ArrowType.ArrowInt32), isNullable: true))
+        let outerListType = ArrowTypeList(ArrowField("item", type: innerListType, isNullable: true))
+        let outerListBuilder = try ListArrayBuilder(outerListType)
+
+        guard let innerListBuilder = outerListBuilder.valueBuilder as? ListArrayBuilder else {
+            XCTFail("Failed to cast valueBuilder to ListArrayBuilder")
+            return
+        }
+
+        outerListBuilder.bufferBuilder.append(2)
+        innerListBuilder.append([Int32(1), Int32(2)])
+        innerListBuilder.append([Int32(3), Int32(4), Int32(5)])
+
+        outerListBuilder.bufferBuilder.append(1)
+        innerListBuilder.append([Int32(6)])
+
+        outerListBuilder.bufferBuilder.append(nil)
+
+        outerListBuilder.bufferBuilder.append([])
+
+        let nestedArray = try outerListBuilder.finish()
+        XCTAssertEqual(nestedArray.length, 4)
+        XCTAssertEqual(nestedArray.nullCount, 1)
+
+        let firstOuterList = nestedArray[0]!
+        XCTAssertEqual(firstOuterList.count, 2)
+
+        let firstInnerList = firstOuterList[0] as! [Any?]
+        XCTAssertEqual(firstInnerList.count, 2)
+        XCTAssertEqual(firstInnerList[0] as? Int32, 1)
+        XCTAssertEqual(firstInnerList[1] as? Int32, 2)
+
+        let secondInnerList = firstOuterList[1] as! [Any?]
+        XCTAssertEqual(secondInnerList.count, 3)
+        XCTAssertEqual(secondInnerList[0] as? Int32, 3)
+        XCTAssertEqual(secondInnerList[1] as? Int32, 4)
+        XCTAssertEqual(secondInnerList[2] as? Int32, 5)
+
+        let secondOuterList = nestedArray[1]!
+        XCTAssertEqual(secondOuterList.count, 1)
+
+        let thirdInnerList = secondOuterList[0] as! [Any?]
+        XCTAssertEqual(thirdInnerList.count, 1)
+        XCTAssertEqual(thirdInnerList[0] as? Int32, 6)
+
+        XCTAssertNil(nestedArray[2])
+
+        let emptyList = nestedArray[3]!
+        XCTAssertEqual(emptyList.count, 0)
     }
 }

@@ -72,7 +72,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
 
     private func writeField(_ fbb: inout FlatBufferBuilder, field: ArrowField) -> Result<Offset, ArrowError> {
         var fieldsOffset: Offset?
-        if let nestedField = field.type as? ArrowNestedType {
+        if let nestedField = field.type as? ArrowTypeStruct {
             var offsets = [Offset]()
             for field in nestedField.fields {
                 switch writeField(&fbb, field: field) {
@@ -182,9 +182,11 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 org_apache_arrow_flatbuf_FieldNode(length: Int64(column.length),
                                                    nullCount: Int64(column.nullCount))
             offsets.append(fbb.create(struct: fieldNode))
-            if let nestedType = column.type as? ArrowNestedType {
-                let structArray = column.array as? StructArray
-                writeFieldNodes(nestedType.fields, columns: structArray!.arrowFields!, offsets: &offsets, fbb: &fbb)
+            if let nestedType = column.type as? ArrowTypeStruct {
+                let nestedArray = column.array as? NestedArray
+                if let nestedFields = nestedArray?.fields {
+                    writeFieldNodes(nestedType.fields, columns: nestedFields, offsets: &offsets, fbb: &fbb)
+                }
             }
         }
     }
@@ -202,10 +204,12 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 let buffer = org_apache_arrow_flatbuf_Buffer(offset: Int64(bufferOffset), length: Int64(bufferDataSize))
                 buffers.append(buffer)
                 bufferOffset += bufferDataSize
-                if let nestedType = column.type as? ArrowNestedType {
-                    let structArray = column.array as? StructArray
-                    writeBufferInfo(nestedType.fields, columns: structArray!.arrowFields!,
-                                    bufferOffset: &bufferOffset, buffers: &buffers, fbb: &fbb)
+                if let nestedType = column.type as? ArrowTypeStruct {
+                    let nestedArray = column.array as? NestedArray
+                    if let nestedFields = nestedArray?.fields {
+                        writeBufferInfo(nestedType.fields, columns: nestedFields,
+                                        bufferOffset: &bufferOffset, buffers: &buffers, fbb: &fbb)
+                    }
                 }
             }
         }
@@ -251,20 +255,21 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
 
     private func writeRecordBatchData(
         _ writer: inout DataWriter, fields: [ArrowField],
-        columns: [ArrowArrayHolder])
-    -> Result<Bool, ArrowError> {
+        columns: [ArrowArrayHolder]
+    ) -> Result<Bool, ArrowError> {
         for index in 0 ..< fields.count {
             let column = columns[index]
             let colBufferData = column.getBufferData()
             for var bufferData in colBufferData {
                 addPadForAlignment(&bufferData)
                 writer.append(bufferData)
-                if let nestedType = column.type as? ArrowNestedType {
-                    guard let structArray = column.array as? StructArray else {
+                if let nestedType = column.type as? ArrowTypeStruct {
+                    guard let nestedArray = column.array as? NestedArray,
+                          let nestedFields = nestedArray.fields else {
                         return .failure(.invalid("Struct type array expected for nested type"))
                     }
 
-                    switch writeRecordBatchData(&writer, fields: nestedType.fields, columns: structArray.arrowFields!) {
+                    switch writeRecordBatchData(&writer, fields: nestedType.fields, columns: nestedFields) {
                     case .success:
                         continue
                     case .failure(let error):
