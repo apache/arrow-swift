@@ -23,11 +23,13 @@
 
 ## Install
 
-TODO: We should update this after we register this package to Swift Package Index.
+[![Swift Package Index](https://swiftpackageindex.com/apache/arrow-swift/badge.swift)](https://swiftpackageindex.com/apache/arrow-swift)
+
+You can add Apache Arrow Swift to your project using Swift Package Manager. For complete installation instructions and version selection, see the [Swift Package Index page](https://swiftpackageindex.com/apache/arrow-swift/).
 
 ## Getting Started
 
-TODO: We should refer auto generated documentation on Swift Package Index after we register this package to Swift Package Index.
+You can browse API documentation and usage examples at our [Swift Package Index documentation page](https://swiftpackageindex.com/apache/arrow-swift/documentation). Once added, import Arrow in your code and get started!
 
 ## Getting involved
 
@@ -47,3 +49,5 @@ If you'd like to report a bug but don't have time to fix it, you can still post 
 ## License
 
 [Apache 2.0](https://github.com/apache/arrow-swift/blob/main/LICENSE.txt)
+
+
