@@ -53,7 +53,7 @@ export GOPATH="${build_dir}"
 pushd "${data_gen_dir}"
 go get -d ./...
 go run .
-cp *.arrow ../../Arrow
+cp *.arrow ../../Tests/ArrowTests
 popd
 github_actions_group_end
 
