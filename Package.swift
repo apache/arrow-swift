@@ -68,7 +68,6 @@ let package = Package(
         .testTarget(
             name: "ArrowTests",
             dependencies: ["Arrow", "ArrowC"],
-            path: "Arrow/Tests",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]

@@ -53,12 +53,12 @@ export GOPATH="${build_dir}"
 pushd "${data_gen_dir}"
 go get -d ./...
 go run .
-cp *.arrow ../../Arrow
+cp *.arrow ../../Tests/ArrowTests
 popd
 github_actions_group_end
 
 github_actions_group_begin "Use -warnings-as-errors"
-for package in . Arrow ArrowFlight; do
+for package in . ArrowFlight; do
   pushd "${build_dir}/source/${package}"
   sed 's/\/\/ build://g' Package.swift > Package.swift.build
   mv Package.swift.build Package.swift
