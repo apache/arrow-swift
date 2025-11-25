@@ -60,7 +60,6 @@ let package = Package(
                 .product(name: "GRPC", package: "grpc-swift"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf")
             ],
-            path: "ArrowFlight/Sources/ArrowFlight",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
@@ -75,7 +74,6 @@ let package = Package(
         .testTarget(
             name: "ArrowFlightTests",
             dependencies: ["ArrowFlight"],
-            path: "ArrowFlight/Tests",
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
