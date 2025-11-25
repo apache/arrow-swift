@@ -16,12 +16,6 @@
 # under the License.
 
 included:
-  - Arrow/Package.swift
-  - Arrow/Sources
-  - Arrow/Tests
-  - ArrowFlight/Package.swift
-  - ArrowFlight/Sources
-  - ArrowFlight/Tests
   - CDataWGo/Package.swift
   - CDataWGo/Sources/go-swift
 excluded:
@@ -30,9 +24,9 @@ excluded:
   - Sources/Arrow/Schema_generated.swift
   - Sources/Arrow/SparseTensor_generated.swift
   - Sources/Arrow/Tensor_generated.swift
-  - ArrowFlight/Sources/ArrowFlight/Flight.grpc.swift
-  - ArrowFlight/Sources/ArrowFlight/Flight.pb.swift
-  - ArrowFlight/Sources/ArrowFlight/FlightSql.pb.swift
+  - Sources/ArrowFlight/Flight.grpc.swift
+  - Sources/ArrowFlight/Flight.pb.swift
+  - Sources/ArrowFlight/FlightSql.pb.swift
 identifier_name:
   min_length: 2 # only warning
 allow_zero_lintable_files: false
