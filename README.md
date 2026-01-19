@@ -21,9 +21,32 @@
 
 [Apache Arrow](https://arrow.apache.org/) is a universal columnar format and multi-language toolbox for fast data interchange and in-memory analytics. It contains a set of technologies that enable data systems to efficiently store, process, and move data.
 
-## Install
+## Installation
 
-TODO: We should update this after we register this package to Swift Package Index.
+### Swift Package Manager
+
+Add Arrow as a dependency in your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/apache/arrow-swift.git", from: "21.0.0")
+]
+```
+
+Then add `Arrow` to your target's dependencies:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: ["Arrow"]
+)
+```
+
+### Xcode
+
+1. Go to **File > Add Package Dependencies...**
+2. Enter the repository URL: `https://github.com/apache/arrow-swift.git`
+3. Select your desired version rules and click **Add Package**
 
 ## Getting Started
 
