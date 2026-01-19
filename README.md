@@ -27,7 +27,7 @@ TODO: We should update this after we register this package to Swift Package Inde
 
 ## Getting Started
 
-TODO: We should refer auto generated documentation on Swift Package Index after we register this package to Swift Package Index.
+For API documentation and usage examples, see the [documentation on Swift Package Index](https://swiftpackageindex.com/apache/arrow-swift/documentation).
 
 ## Getting involved
 
