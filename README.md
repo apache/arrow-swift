@@ -50,7 +50,7 @@ Then add `Arrow` to your target's dependencies:
 
 ## Getting Started
 
-TODO: We should refer auto generated documentation on Swift Package Index after we register this package to Swift Package Index.
+For API documentation and usage examples, see the [documentation on Swift Package Index](https://swiftpackageindex.com/apache/arrow-swift/documentation).
 
 ## Getting involved
 
