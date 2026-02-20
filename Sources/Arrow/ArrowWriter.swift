@@ -243,11 +243,28 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         org_apache_arrow_flatbuf_RecordBatch.add(length: Int64(batch.length), &fbb)
         let recordBatchOffset = org_apache_arrow_flatbuf_RecordBatch.endRecordBatch(&fbb, start: startRb)
         let bodySize = Int64(bufferOffset)
+
+        var customMetadataOffset = Offset()
+        if !batch.customMetadata.isEmpty {
+            var kvOffsets = [Offset]()
+            for (key, value) in batch.customMetadata {
+                let keyOffset = fbb.create(string: key)
+                let valueOffset = fbb.create(string: value)
+                kvOffsets.append(
+                    org_apache_arrow_flatbuf_KeyValue.createKeyValue(
+                        &fbb, keyOffset: keyOffset, valueOffset: valueOffset))
+            }
+            customMetadataOffset = fbb.createVector(ofOffsets: kvOffsets)
+        }
+
         let startMessage = org_apache_arrow_flatbuf_Message.startMessage(&fbb)
         org_apache_arrow_flatbuf_Message.add(version: .max, &fbb)
         org_apache_arrow_flatbuf_Message.add(bodyLength: Int64(bodySize), &fbb)
         org_apache_arrow_flatbuf_Message.add(headerType: .recordbatch, &fbb)
         org_apache_arrow_flatbuf_Message.add(header: recordBatchOffset, &fbb)
+        if !batch.customMetadata.isEmpty {
+            org_apache_arrow_flatbuf_Message.addVectorOf(customMetadata: customMetadataOffset, &fbb)
+        }
         let messageOffset = org_apache_arrow_flatbuf_Message.endMessage(&fbb, start: startMessage)
         fbb.finish(offset: messageOffset)
         return .success((fbb.data, Offset(offset: UInt32(fbb.data.count))))

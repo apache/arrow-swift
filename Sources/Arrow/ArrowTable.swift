@@ -138,15 +138,19 @@ public class RecordBatch {
     public var columnCount: UInt {return UInt(self.columns.count)}
     public let columns: [ArrowArrayHolder]
     public let length: UInt
-    public init(_ schema: ArrowSchema, columns: [ArrowArrayHolder]) {
+    public let customMetadata: [String: String]
+    public init(_ schema: ArrowSchema, columns: [ArrowArrayHolder],
+                customMetadata: [String: String] = [:]) {
         self.schema = schema
         self.columns = columns
         self.length = columns[0].length
+        self.customMetadata = customMetadata
     }
 
     public class Builder {
         let schemaBuilder = ArrowSchema.Builder()
         var columns = [ArrowArrayHolder]()
+        var customMetadata: [String: String] = [:]
 
         public init() {}
 
@@ -165,6 +169,18 @@ public class RecordBatch {
             return self
         }
 
+        @discardableResult
+        public func addMetadata(_ key: String, value: String) -> Builder {
+            self.customMetadata[key] = value
+            return self
+        }
+
+        @discardableResult
+        public func addMetadata(_ metadata: [String: String]) -> Builder {
+            self.customMetadata.merge(metadata) { _, new in new }
+            return self
+        }
+
         public func finish() -> Result<RecordBatch, ArrowError> {
             if columns.count > 0 {
                 let columnLength = columns[0].length
@@ -174,7 +190,8 @@ public class RecordBatch {
                     }
                 }
             }
-            return .success(RecordBatch(self.schemaBuilder.finish(), columns: self.columns))
+            return .success(RecordBatch(self.schemaBuilder.finish(), columns: self.columns,
+                                        customMetadata: self.customMetadata))
         }
     }
 
