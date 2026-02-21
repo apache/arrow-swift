@@ -247,7 +247,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         var customMetadataOffset = Offset()
         if !batch.customMetadata.isEmpty {
             var kvOffsets = [Offset]()
-            for (key, value) in batch.customMetadata {
+            for (key, value) in batch.customMetadata.sorted(by: { $0.key < $1.key }) {
                 let keyOffset = fbb.create(string: key)
                 let valueOffset = fbb.create(string: value)
                 kvOffsets.append(

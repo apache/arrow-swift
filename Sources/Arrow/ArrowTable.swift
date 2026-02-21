@@ -182,12 +182,13 @@ public class RecordBatch {
         }
 
         public func finish() -> Result<RecordBatch, ArrowError> {
-            if columns.count > 0 {
-                let columnLength = columns[0].length
-                for column in columns {
-                    if column.length != columnLength { // swiftlint:disable:this for_where
-                        return .failure(.runtimeError("Columns have different sizes"))
-                    }
+            if columns.isEmpty {
+                return .failure(.arrayHasNoElements)
+            }
+            let columnLength = columns[0].length
+            for column in columns {
+                if column.length != columnLength { // swiftlint:disable:this for_where
+                    return .failure(.runtimeError("Columns have different sizes"))
                 }
             }
             return .success(RecordBatch(self.schemaBuilder.finish(), columns: self.columns,
