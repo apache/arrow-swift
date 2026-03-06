@@ -615,5 +615,142 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
     }
+
+    func testCustomMetadata_roundTripStreaming() throws {
+        let schema = makeSchema()
+        let recordBatch = try makeRecordBatch()
+        let metadata = ["batch_id": "42", "source": "swift-test"]
+        let batchWithMetadata = RecordBatch(schema, columns: recordBatch.columns,
+                                            customMetadata: metadata)
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [batchWithMetadata])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                XCTAssertEqual(result.batches.count, 1)
+                let rb = result.batches[0]
+                XCTAssertEqual(rb.customMetadata["batch_id"], "42")
+                XCTAssertEqual(rb.customMetadata["source"], "swift-test")
+                XCTAssertEqual(rb.customMetadata.count, 2)
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testCustomMetadata_roundTripFile() throws {
+        let schema = makeSchema()
+        let recordBatch = try makeRecordBatch()
+        let metadata = ["batch_id": "99", "format": "arrow"]
+        let batchWithMetadata = RecordBatch(schema, columns: recordBatch.columns,
+                                            customMetadata: metadata)
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [batchWithMetadata])
+        switch arrowWriter.writeFile(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readFile(writeData) {
+            case .success(let result):
+                XCTAssertEqual(result.batches.count, 1)
+                let rb = result.batches[0]
+                XCTAssertEqual(rb.customMetadata["batch_id"], "99")
+                XCTAssertEqual(rb.customMetadata["format"], "arrow")
+                XCTAssertEqual(rb.customMetadata.count, 2)
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testCustomMetadata_emptyByDefault() throws {
+        let schema = makeSchema()
+        let recordBatch = try makeRecordBatch()
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                XCTAssertEqual(result.batches.count, 1)
+                XCTAssertTrue(result.batches[0].customMetadata.isEmpty)
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testCustomMetadata_builderAPI() throws {
+        let uint8Builder: NumberArrayBuilder<UInt8> = try ArrowArrayBuilders.loadNumberArrayBuilder()
+        uint8Builder.append(1)
+        uint8Builder.append(2)
+        let holder = ArrowArrayHolderImpl(try uint8Builder.finish())
+        let result = RecordBatch.Builder()
+            .addColumn("col1", arrowArray: holder)
+            .addMetadata("key1", value: "value1")
+            .addMetadata(["key2": "value2", "key3": "value3"])
+            .finish()
+        switch result {
+        case .success(let rb):
+            XCTAssertEqual(rb.customMetadata.count, 3)
+            XCTAssertEqual(rb.customMetadata["key1"], "value1")
+            XCTAssertEqual(rb.customMetadata["key2"], "value2")
+            XCTAssertEqual(rb.customMetadata["key3"], "value3")
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testCustomMetadata_crossLanguageRead() throws {
+        let fileURL = currentDirectory().appendingPathComponent("testdata_custom_metadata.arrow")
+        let arrowReader = ArrowReader()
+        switch arrowReader.fromFile(fileURL) {
+        case .success(let result):
+            XCTAssertEqual(result.batches.count, 1)
+            let rb = result.batches[0]
+            XCTAssertEqual(rb.length, 3)
+            XCTAssertEqual(rb.customMetadata["batch_id"], "42")
+            XCTAssertEqual(rb.customMetadata["source"], "test-generator")
+            XCTAssertEqual(rb.customMetadata.count, 2)
+            XCTAssertEqual(rb.schema.fields[0].name, "id")
+            XCTAssertEqual(rb.schema.fields[1].name, "name")
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testCustomMetadata_multipleBatches() throws {
+        let schema = makeSchema()
+        let recordBatch1 = try makeRecordBatch()
+        let recordBatch2 = try makeRecordBatch()
+        let batch1 = RecordBatch(schema, columns: recordBatch1.columns,
+                                 customMetadata: ["batch": "first"])
+        let batch2 = RecordBatch(schema, columns: recordBatch2.columns,
+                                 customMetadata: ["batch": "second"])
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [batch1, batch2])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                XCTAssertEqual(result.batches.count, 2)
+                XCTAssertEqual(result.batches[0].customMetadata["batch"], "first")
+                XCTAssertEqual(result.batches[1].customMetadata["batch"], "second")
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
 }
 // swiftlint:disable:this file_length
