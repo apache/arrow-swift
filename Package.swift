@@ -28,7 +28,10 @@ let package = Package(
     products: [
         .library(
             name: "Arrow",
-            targets: ["Arrow"])
+            targets: ["Arrow"]),
+        .library(
+            name: "ArrowFlight",
+            targets: ["ArrowFlight"])
     ],
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", from: "25.2.10"),
