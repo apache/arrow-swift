@@ -31,7 +31,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(arrayBuilder.nullCount, 0)
         arrayBuilder.append(nil)
         XCTAssertEqual(arrayBuilder.length, 101)
-        XCTAssertEqual(arrayBuilder.capacity, 136)
+        XCTAssertEqual(arrayBuilder.capacity, 128)
         XCTAssertEqual(arrayBuilder.nullCount, 1)
         let array = try arrayBuilder.finish()
         XCTAssertEqual(array.length, 101)
@@ -44,7 +44,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         doubleBuilder.append(40.4)
         XCTAssertEqual(doubleBuilder.nullCount, 0)
         XCTAssertEqual(doubleBuilder.length, 2)
-        XCTAssertEqual(doubleBuilder.capacity, 264)
+        XCTAssertEqual(doubleBuilder.capacity, 256)
         let doubleArray = try doubleBuilder.finish()
         XCTAssertEqual(doubleArray.length, 2)
         XCTAssertEqual(doubleArray[0]!, 14)
@@ -63,7 +63,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         XCTAssertEqual(stringBuilder.nullCount, 10)
         XCTAssertEqual(stringBuilder.length, 100)
-        XCTAssertEqual(stringBuilder.capacity, 648)
+        XCTAssertEqual(stringBuilder.capacity, 640)
         let stringArray = try stringBuilder.finish()
         XCTAssertEqual(stringArray.length, 100)
         for index in 0..<stringArray.length {
@@ -86,7 +86,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         boolBuilder.append(false)
         XCTAssertEqual(boolBuilder.nullCount, 1)
         XCTAssertEqual(boolBuilder.length, 4)
-        XCTAssertEqual(boolBuilder.capacity, 72)
+        XCTAssertEqual(boolBuilder.capacity, 64)
         let boolArray = try boolBuilder.finish()
         XCTAssertEqual(boolArray.length, 4)
         XCTAssertEqual(boolArray[1], nil)
@@ -103,7 +103,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         date32Builder.append(nil)
         XCTAssertEqual(date32Builder.nullCount, 1)
         XCTAssertEqual(date32Builder.length, 3)
-        XCTAssertEqual(date32Builder.capacity, 136)
+        XCTAssertEqual(date32Builder.capacity, 128)
         let date32Array = try date32Builder.finish()
         XCTAssertEqual(date32Array.length, 3)
         XCTAssertEqual(date32Array[1], date2)
@@ -120,7 +120,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         date64Builder.append(nil)
         XCTAssertEqual(date64Builder.nullCount, 1)
         XCTAssertEqual(date64Builder.length, 3)
-        XCTAssertEqual(date64Builder.capacity, 264)
+        XCTAssertEqual(date64Builder.capacity, 256)
         let date64Array = try date64Builder.finish()
         XCTAssertEqual(date64Array.length, 3)
         XCTAssertEqual(date64Array[1], date2)
@@ -139,7 +139,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         XCTAssertEqual(binaryBuilder.nullCount, 10)
         XCTAssertEqual(binaryBuilder.length, 100)
-        XCTAssertEqual(binaryBuilder.capacity, 648)
+        XCTAssertEqual(binaryBuilder.capacity, 640)
         let binaryArray = try binaryBuilder.finish()
         XCTAssertEqual(binaryArray.length, 100)
         for index in 0..<binaryArray.length {
@@ -159,7 +159,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         milliBuilder.append(nil)
         XCTAssertEqual(milliBuilder.nullCount, 1)
         XCTAssertEqual(milliBuilder.length, 3)
-        XCTAssertEqual(milliBuilder.capacity, 136)
+        XCTAssertEqual(milliBuilder.capacity, 128)
         let milliArray = try milliBuilder.finish()
         let milliType = milliArray.arrowData.type as! ArrowTypeTime32 // swiftlint:disable:this force_cast
         XCTAssertEqual(milliType.unit, .milliseconds)
@@ -173,7 +173,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         secBuilder.append(2000011)
         XCTAssertEqual(secBuilder.nullCount, 1)
         XCTAssertEqual(secBuilder.length, 3)
-        XCTAssertEqual(secBuilder.capacity, 136)
+        XCTAssertEqual(secBuilder.capacity, 128)
         let secArray = try secBuilder.finish()
         let secType = secArray.arrowData.type as! ArrowTypeTime32 // swiftlint:disable:this force_cast
         XCTAssertEqual(secType.unit, .seconds)
@@ -189,7 +189,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         nanoBuilder.append(123456789)
         XCTAssertEqual(nanoBuilder.nullCount, 1)
         XCTAssertEqual(nanoBuilder.length, 3)
-        XCTAssertEqual(nanoBuilder.capacity, 264)
+        XCTAssertEqual(nanoBuilder.capacity, 256)
         let nanoArray = try nanoBuilder.finish()
         let nanoType = nanoArray.arrowData.type as! ArrowTypeTime64 // swiftlint:disable:this force_cast
         XCTAssertEqual(nanoType.unit, .nanoseconds)
@@ -203,7 +203,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         microBuilder.append(987654321)
         XCTAssertEqual(microBuilder.nullCount, 1)
         XCTAssertEqual(microBuilder.length, 3)
-        XCTAssertEqual(microBuilder.capacity, 264)
+        XCTAssertEqual(microBuilder.capacity, 256)
         let microArray = try microBuilder.finish()
         let microType = microArray.arrowData.type as! ArrowTypeTime64 // swiftlint:disable:this force_cast
         XCTAssertEqual(microType.unit, .microseconds)
@@ -220,7 +220,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         secBuilder.append(nil)
         XCTAssertEqual(secBuilder.nullCount, 1)
         XCTAssertEqual(secBuilder.length, 3)
-        XCTAssertEqual(secBuilder.capacity, 264)
+        XCTAssertEqual(secBuilder.capacity, 256)
         let secArray = try secBuilder.finish()
         let secType = secArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
         XCTAssertEqual(secType.unit, .seconds)
@@ -237,7 +237,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         msBuilder.append(1609545600000) // 2021-01-02 00:00:00.000
         XCTAssertEqual(msBuilder.nullCount, 1)
         XCTAssertEqual(msBuilder.length, 3)
-        XCTAssertEqual(msBuilder.capacity, 264)
+        XCTAssertEqual(msBuilder.capacity, 256)
         let msArray = try msBuilder.finish()
         let msType = msArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
         XCTAssertEqual(msType.unit, .milliseconds)
@@ -254,7 +254,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         usBuilder.append(1609632000000000) // 2021-01-03 00:00:00.000000
         XCTAssertEqual(usBuilder.nullCount, 0)
         XCTAssertEqual(usBuilder.length, 3)
-        XCTAssertEqual(usBuilder.capacity, 264)
+        XCTAssertEqual(usBuilder.capacity, 256)
         let usArray = try usBuilder.finish()
         let usType = usArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
         XCTAssertEqual(usType.unit, .microseconds)
@@ -271,7 +271,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         nsBuilder.append(1609545600000000000) // 2021-01-02 00:00:00.000000000
         XCTAssertEqual(nsBuilder.nullCount, 1)
         XCTAssertEqual(nsBuilder.length, 3)
-        XCTAssertEqual(nsBuilder.capacity, 264)
+        XCTAssertEqual(nsBuilder.capacity, 256)
         let nsArray = try nsBuilder.finish()
         let nsType = nsArray.arrowData.type as! ArrowTypeTimestamp // swiftlint:disable:this force_cast
         XCTAssertEqual(nsType.unit, .nanoseconds)
