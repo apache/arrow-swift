@@ -107,6 +107,7 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
         return .failure(.invalid("Unable to case to Time64"))
     case .timestamp:
         if let timestampType = arrowType as? ArrowTypeTimestamp {
+            let timezoneOffset = timestampType.timezone.map { fbb.create(string: $0) }
             let startOffset = org_apache_arrow_flatbuf_Timestamp.startTimestamp(&fbb)
 
             let fbUnit: org_apache_arrow_flatbuf_TimeUnit
@@ -122,9 +123,8 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
             }
             org_apache_arrow_flatbuf_Timestamp.add(unit: fbUnit, &fbb)
 
-            if let timezone = timestampType.timezone {
-                let timezoneOffset = fbb.create(string: timezone)
-                org_apache_arrow_flatbuf_Timestamp.add(timezone: timezoneOffset, &fbb)
+            if let offset = timezoneOffset {
+                org_apache_arrow_flatbuf_Timestamp.add(timezone: offset, &fbb)
             }
 
             return .success(org_apache_arrow_flatbuf_Timestamp.endTimestamp(&fbb, start: startOffset))
