@@ -372,7 +372,8 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
     public func writeStreaming(_ info: ArrowWriter.Info) -> Result<Data, ArrowError> {
         let writer: any DataWriter = InMemDataWriter()
         switch toMessage(info.schema) {
-        case .success(let schemaData):
+        case .success(var schemaData):
+            addPadForAlignment(&schemaData)
             withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
             withUnsafeBytes(of: UInt32(schemaData.count).littleEndian) {writer.append(Data($0))}
             writer.append(schemaData)
