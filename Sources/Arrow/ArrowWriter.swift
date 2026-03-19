@@ -185,10 +185,9 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                                  fbb: inout FlatBufferBuilder) {
         for index in (0 ..< fields.count).reversed() {
             let column = columns[index]
-            let fieldNode =
-                org_apache_arrow_flatbuf_FieldNode(length: Int64(column.length),
-                                                   nullCount: Int64(column.nullCount))
-            offsets.append(fbb.create(struct: fieldNode))
+            // FlatBuffer vectors use prepend semantics: last-written element becomes
+            // the first when read. Arrow IPC requires depth-first pre-order (parent
+            // before children), so children must be written before their parent here.
             if let nestedType = column.type as? ArrowTypeStruct {
                 let nestedArray = column.array as? NestedArray
                 if let nestedFields = nestedArray?.fields {
@@ -199,6 +198,10 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                     writeFieldNodes([listType.elementField], columns: [valuesHolder], offsets: &offsets, fbb: &fbb)
                 }
             }
+            let fieldNode =
+                org_apache_arrow_flatbuf_FieldNode(length: Int64(column.length),
+                                                   nullCount: Int64(column.nullCount))
+            offsets.append(fbb.create(struct: fieldNode))
         }
     }
 
