@@ -45,6 +45,8 @@ func toFBTypeEnum(_ arrowType: ArrowType) -> Result<org_apache_arrow_flatbuf_Typ
         return .success(org_apache_arrow_flatbuf_Type_.timestamp)
     case .strct:
         return .success(org_apache_arrow_flatbuf_Type_.struct_)
+    case .list:
+        return .success(org_apache_arrow_flatbuf_Type_.list)
     default:
         return .failure(.unknownType("Unable to find flatbuf type for Arrow type: \(typeId)"))
     }
@@ -134,6 +136,9 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
     case .strct:
         let startOffset = org_apache_arrow_flatbuf_Struct_.startStruct_(&fbb)
         return .success(org_apache_arrow_flatbuf_Struct_.endStruct_(&fbb, start: startOffset))
+    case .list:
+        let startOffset = org_apache_arrow_flatbuf_List.startList(&fbb)
+        return .success(org_apache_arrow_flatbuf_List.endList(&fbb, start: startOffset))
     default:
         return .failure(.unknownType("Unable to add flatbuf type for Arrow type: \(infoType)"))
     }
