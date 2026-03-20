@@ -615,5 +615,61 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
     }
+
+    func makeTimestampWithTimezoneDataset() throws -> (ArrowSchema, RecordBatch) {
+        let schema = ArrowSchema.Builder()
+            .addField("ts_utc", type: ArrowTypeTimestamp(.microseconds, timezone: "UTC"), isNullable: true)
+            .finish()
+
+        let tsBuilder = try ArrowArrayBuilders.loadTimestampArrayBuilder(.microseconds, timezone: "UTC")
+        tsBuilder.append(1609459200000000) // 2021-01-01 00:00:00.000000 UTC
+        tsBuilder.append(nil)
+        tsBuilder.append(1609545600000000) // 2021-01-02 00:00:00.000000 UTC
+
+        let tsHolder = ArrowArrayHolderImpl(try tsBuilder.finish())
+        let result = RecordBatch.Builder()
+            .addColumn("ts_utc", arrowArray: tsHolder)
+            .finish()
+        switch result {
+        case .success(let recordBatch):
+            return (schema, recordBatch)
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testTimestampWithTimezoneInMemoryToFromStream() throws {
+        let dataset = try makeTimestampWithTimezoneDataset()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: dataset.0, batches: [dataset.1])
+        let arrowWriter = ArrowWriter()
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                XCTAssertNotNil(result.schema)
+                let schema = result.schema!
+                XCTAssertEqual(schema.fields.count, 1)
+                XCTAssertEqual(schema.fields[0].name, "ts_utc")
+                XCTAssertEqual(schema.fields[0].type.info, ArrowType.ArrowTimestamp)
+                let tsType = schema.fields[0].type as? ArrowTypeTimestamp
+                XCTAssertNotNil(tsType)
+                XCTAssertEqual(tsType!.unit, .microseconds)
+                XCTAssertEqual(tsType!.timezone, "UTC")
+                XCTAssertEqual(result.batches.count, 1)
+                let recordBatch = result.batches[0]
+                XCTAssertEqual(recordBatch.length, 3)
+                let columns = recordBatch.columns
+                XCTAssertEqual(columns[0].nullCount, 1)
+                let tsVal =
+                    "\((columns[0].array as! AsString).asString(0))" // swiftlint:disable:this force_cast
+                XCTAssertEqual(tsVal, "2021-01-01 00:00:00.000")
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
 }
 // swiftlint:disable:this file_length
