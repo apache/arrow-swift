@@ -221,12 +221,26 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         }
     }
 
+    private func extractCustomMetadata(
+        from message: org_apache_arrow_flatbuf_Message
+    ) -> [String: String] {
+        var metadata: [String: String] = [:]
+        for index in 0..<message.customMetadataCount {
+            if let kv = message.customMetadata(at: index),
+               let key = kv.key {
+                metadata[key] = kv.value ?? ""
+            }
+        }
+        return metadata
+    }
+
     private func loadRecordBatch(
         _ recordBatch: org_apache_arrow_flatbuf_RecordBatch,
         schema: org_apache_arrow_flatbuf_Schema,
         arrowSchema: ArrowSchema,
         data: Data,
-        messageEndOffset: Int64
+        messageEndOffset: Int64,
+        customMetadata: [String: String] = [:]
     ) -> Result<RecordBatch, ArrowError> {
         var columns: [ArrowArrayHolder] = []
         let batchData = RecordBatchData(recordBatch, schema: schema)
@@ -247,7 +261,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             }
         }
 
-        return .success(RecordBatch(arrowSchema, columns: columns))
+        return .success(RecordBatch(arrowSchema, columns: columns, customMetadata: customMetadata))
     }
 
     /*
@@ -283,12 +297,14 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             switch message.headerType {
             case .recordbatch:
                 let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+                let metadata = extractCustomMetadata(from: message)
                 let recordBatchResult = loadRecordBatch(
                     rbMessage,
                     schema: schemaMessage!,
                     arrowSchema: result.schema!,
                     data: input,
-                    messageEndOffset: (Int64(offset) + Int64(length)))
+                    messageEndOffset: (Int64(offset) + Int64(length)),
+                    customMetadata: metadata)
                 switch recordBatchResult {
                 case .success(let recordBatch):
                     result.batches.append(recordBatch)
@@ -369,12 +385,14 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             switch message.headerType {
             case .recordbatch:
                 let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+                let metadata = extractCustomMetadata(from: message)
                 let recordBatchResult = loadRecordBatch(
                     rbMessage,
                     schema: footer.schema!,
                     arrowSchema: result.schema!,
                     data: fileData,
-                    messageEndOffset: messageEndOffset)
+                    messageEndOffset: messageEndOffset,
+                    customMetadata: metadata)
                 switch recordBatchResult {
                 case .success(let recordBatch):
                     result.batches.append(recordBatch)
@@ -432,9 +450,10 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             }
         case .recordbatch:
             let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+            let metadata = extractCustomMetadata(from: message)
             let recordBatchResult = loadRecordBatch(
                 rbMessage, schema: result.messageSchema!, arrowSchema: result.schema!,
-                data: dataBody, messageEndOffset: 0)
+                data: dataBody, messageEndOffset: 0, customMetadata: metadata)
             switch recordBatchResult {
             case .success(let recordBatch):
                 result.batches.append(recordBatch)
