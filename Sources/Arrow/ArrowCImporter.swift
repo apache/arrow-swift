@@ -136,7 +136,7 @@ public class ArrowCImporter {
                         .invalid("Variable buffer count expected 3 but found \(cArray.n_buffers)"))
                 }
 
-                appendToBuffer(cArray.buffers[0], arrowBuffers: &arrowBuffers, length: UInt(ceil(Double(length) / 8)))
+                appendToBuffer(cArray.buffers[0], arrowBuffers: &arrowBuffers, length: (length + 7) / 8)
                 appendToBuffer(cArray.buffers[1], arrowBuffers: &arrowBuffers, length: length)
                 let lastOffsetLength = cArray.buffers[1]!
                     .advanced(by: Int(length) * MemoryLayout<Int32>.stride)
@@ -148,7 +148,7 @@ public class ArrowCImporter {
                     return .failure(.invalid("Expected buffer count 2 but found \(cArray.n_buffers)"))
                 }
 
-                appendToBuffer(cArray.buffers[0], arrowBuffers: &arrowBuffers, length: UInt(ceil(Double(length) / 8)))
+                appendToBuffer(cArray.buffers[0], arrowBuffers: &arrowBuffers, length: (length + 7) / 8)
                 appendToBuffer(cArray.buffers[1], arrowBuffers: &arrowBuffers, length: length)
             }
         }
