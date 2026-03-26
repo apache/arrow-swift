@@ -262,6 +262,185 @@ final class IPCStreamReaderTests: XCTestCase {
             throw error
         }
     }
+
+    func testListInt32RBInMemoryToFromStream() throws {
+        let listType = ArrowTypeList(ArrowType(ArrowType.ArrowInt32))
+        let schema = ArrowSchema.Builder()
+            .addField("list_col", type: listType, isNullable: true)
+            .finish()
+
+        let listBuilder = try ListArrayBuilder(ArrowTypeList(ArrowType(ArrowType.ArrowInt32)))
+        listBuilder.append([Int32(1), Int32(2), Int32(3)])
+        listBuilder.append([Int32(4), Int32(5)])
+        listBuilder.append(nil)
+        let listHolder = ArrowArrayHolderImpl(try listBuilder.finish())
+        let result = RecordBatch.Builder()
+            .addColumn("list_col", arrowArray: listHolder)
+            .finish()
+        let recordBatch: RecordBatch
+        switch result {
+        case .success(let rb):
+            recordBatch = rb
+        case .failure(let error):
+            throw error
+        }
+
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                let recordBatches = result.batches
+                XCTAssertEqual(recordBatches.count, 1)
+                let rb = recordBatches[0]
+                XCTAssertEqual(rb.length, 3)
+                XCTAssertEqual(rb.columns.count, 1)
+                XCTAssertEqual(rb.schema.fields.count, 1)
+                XCTAssertEqual(rb.schema.fields[0].name, "list_col")
+                XCTAssertEqual(rb.schema.fields[0].type.id, .list)
+                XCTAssertTrue(rb.schema.fields[0].type is ArrowTypeList)
+
+                let nestedArray = rb.columns[0].array as? NestedArray
+                XCTAssertNotNil(nestedArray)
+                XCTAssertEqual(nestedArray!.length, 3)
+                XCTAssertEqual(rb.columns[0].nullCount, 1)
+
+                let row0 = nestedArray![0]
+                XCTAssertNotNil(row0)
+                XCTAssertEqual(row0!.count, 3)
+                XCTAssertEqual(row0![0] as? Int32, 1)
+                XCTAssertEqual(row0![1] as? Int32, 2)
+                XCTAssertEqual(row0![2] as? Int32, 3)
+
+                let row1 = nestedArray![1]
+                XCTAssertNotNil(row1)
+                XCTAssertEqual(row1!.count, 2)
+                XCTAssertEqual(row1![0] as? Int32, 4)
+                XCTAssertEqual(row1![1] as? Int32, 5)
+
+                XCTAssertNil(nestedArray![2])
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testListStructRBInMemoryToFromStream() throws {
+        let structFields = [
+            ArrowField("name", type: ArrowType(ArrowType.ArrowString), isNullable: false),
+            ArrowField("value", type: ArrowType(ArrowType.ArrowFloat), isNullable: false)
+        ]
+        let structType = ArrowTypeStruct(ArrowType.ArrowStruct, fields: structFields)
+        let listType = ArrowTypeList(ArrowField("item", type: structType, isNullable: true))
+        let schema = ArrowSchema.Builder()
+            .addField("list_struct_col", type: listType, isNullable: true)
+            .finish()
+
+        let listBuilder = try ListArrayBuilder(listType)
+        let row0: [Any?] = [["Alice", Float(1.5)] as [Any?], ["Bob", Float(2.5)] as [Any?]]
+        let row1: [Any?] = [["Charlie", Float(3.5)] as [Any?]]
+        listBuilder.append(row0)
+        listBuilder.append(row1)
+        listBuilder.append(nil)
+        let listHolder = ArrowArrayHolderImpl(try listBuilder.finish())
+        let result = RecordBatch.Builder()
+            .addColumn("list_struct_col", arrowArray: listHolder)
+            .finish()
+        let recordBatch: RecordBatch
+        switch result {
+        case .success(let rb):
+            recordBatch = rb
+        case .failure(let error):
+            throw error
+        }
+
+        XCTAssertEqual(recordBatch.length, 3)
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(writeData) {
+            case .success(let result):
+                let recordBatches = result.batches
+                XCTAssertEqual(recordBatches.count, 1)
+                let rb = recordBatches[0]
+                XCTAssertEqual(rb.length, 3)
+                XCTAssertEqual(rb.columns.count, 1)
+                XCTAssertEqual(rb.schema.fields.count, 1)
+                XCTAssertEqual(rb.schema.fields[0].name, "list_struct_col")
+                XCTAssertEqual(rb.schema.fields[0].type.id, .list)
+                XCTAssertTrue(rb.schema.fields[0].type is ArrowTypeList)
+
+                let readListType = (rb.schema.fields[0].type as? ArrowTypeList)!
+                XCTAssertTrue(readListType.elementField.type is ArrowTypeStruct)
+                let readStructType = (readListType.elementField.type as? ArrowTypeStruct)!
+                XCTAssertEqual(readStructType.fields.count, 2)
+                XCTAssertEqual(readStructType.fields[0].name, "name")
+                XCTAssertEqual(readStructType.fields[0].type.id, .string)
+                XCTAssertEqual(readStructType.fields[1].name, "value")
+                XCTAssertEqual(readStructType.fields[1].type.id, .float)
+
+                let nestedArray = rb.columns[0].array as? NestedArray
+                XCTAssertNotNil(nestedArray)
+                XCTAssertEqual(nestedArray!.length, 3)
+                XCTAssertEqual(rb.columns[0].nullCount, 1)
+
+                let row0Read = nestedArray![0]
+                XCTAssertNotNil(row0Read)
+                XCTAssertEqual(row0Read!.count, 2)
+                let struct0 = row0Read![0] as? [Any?]
+                XCTAssertNotNil(struct0)
+                XCTAssertEqual(struct0![0] as? String, "Alice")
+                XCTAssertEqual(struct0![1] as? Float, 1.5)
+                let struct1 = row0Read![1] as? [Any?]
+                XCTAssertNotNil(struct1)
+                XCTAssertEqual(struct1![0] as? String, "Bob")
+                XCTAssertEqual(struct1![1] as? Float, 2.5)
+
+                let row1Read = nestedArray![1]
+                XCTAssertNotNil(row1Read)
+                XCTAssertEqual(row1Read!.count, 1)
+                let struct2 = row1Read![0] as? [Any?]
+                XCTAssertNotNil(struct2)
+                XCTAssertEqual(struct2![0] as? String, "Charlie")
+                XCTAssertEqual(struct2![1] as? Float, 3.5)
+
+                XCTAssertNil(nestedArray![2])
+            case .failure(let error):
+                throw error
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    func testStreamingSchemaMetadataPadding() throws {
+        let schema = makeSchema()
+        let recordBatch = try makeRecordBatch()
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            let markerSize = MemoryLayout<UInt32>.size
+            let schemaLength = writeData.withUnsafeBytes { rawBuffer in
+                UInt32(littleEndian: rawBuffer.loadUnaligned(
+                    fromByteOffset: markerSize, as: UInt32.self))
+            }
+            XCTAssertTrue(schemaLength > 0)
+            XCTAssertEqual(schemaLength % 8, 0,
+                "Schema metadata length (\(schemaLength)) must be padded to 8-byte multiple")
+            let firstBatchOffset = markerSize + MemoryLayout<UInt32>.size + Int(schemaLength)
+            XCTAssertEqual(firstBatchOffset % 8, 0,
+                "First record batch must start at 8-byte aligned offset (\(firstBatchOffset))")
+        case .failure(let error):
+            throw error
+        }
+    }
 }
 
 final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body_length
