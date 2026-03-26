@@ -429,14 +429,14 @@ final class IPCStreamReaderTests: XCTestCase {
             let markerSize = MemoryLayout<UInt32>.size
             let schemaLength = writeData.withUnsafeBytes { rawBuffer in
                 UInt32(littleEndian: rawBuffer.loadUnaligned(
-                    fromByteOffset: markerSize, as: UInt32.self))
+                        fromByteOffset: markerSize, as: UInt32.self))
             }
             XCTAssertTrue(schemaLength > 0)
             XCTAssertEqual(schemaLength % 8, 0,
-                "Schema metadata length (\(schemaLength)) must be padded to 8-byte multiple")
+                           "Schema metadata length (\(schemaLength)) must be padded to 8-byte multiple")
             let firstBatchOffset = markerSize + MemoryLayout<UInt32>.size + Int(schemaLength)
             XCTAssertEqual(firstBatchOffset % 8, 0,
-                "First record batch must start at 8-byte aligned offset (\(firstBatchOffset))")
+                           "First record batch must start at 8-byte aligned offset (\(firstBatchOffset))")
         case .failure(let error):
             throw error
         }
