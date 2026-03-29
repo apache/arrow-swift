@@ -38,3 +38,4 @@ xcuserdata/
 
 # Generated test data
 Tests/ArrowTests/*.arrow
+data-generator/swift-datagen/*.arrow

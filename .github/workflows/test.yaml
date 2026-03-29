@@ -113,3 +113,37 @@ jobs:
           github.ref_name == 'main'
         run: |
           docker compose push ubuntu
+
+  ios:
+    name: iOS
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: "stable"
+      - name: Generate test data
+        run: |
+          cd data-generator/swift-datagen
+          go run .
+          cp *.arrow ../../Tests/ArrowTests/
+      - name: Select iOS Simulator
+        run: |
+          SIMULATOR_ID=$(xcrun simctl list devices available 2>/dev/null | \
+            awk '/-- iOS/{os=$3} /iPhone/{print os, $0}' | \
+            sort -t. -k1,1nr -k2,2nr | head -1 | \
+            grep -oE '[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}')
+          if [ -z "$SIMULATOR_ID" ]; then
+            echo "Error: no iPhone simulator found"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "SIMULATOR_ID=$SIMULATOR_ID" >> "$GITHUB_ENV"
+          echo "Selected simulator: $SIMULATOR_ID"
+      - name: Test on iOS Simulator
+        run: |
+          xcodebuild test \
+            -scheme Arrow-Package \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
+            -only-testing ArrowTests
