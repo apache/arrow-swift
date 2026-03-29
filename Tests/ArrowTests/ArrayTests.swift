@@ -18,6 +18,13 @@
 import XCTest
 @testable import Arrow
 
+private func int32Values(in buffer: ArrowBuffer, count: Int) -> [Int32] {
+    (0..<count).map { index in
+        let offset = index * MemoryLayout<Int32>.stride
+        return buffer.rawPointer.advanced(by: offset).load(as: Int32.self)
+    }
+}
+
 final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
     func testPrimitiveArray() throws {
         // This is an example of a functional test case.
@@ -150,6 +157,51 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
                 XCTAssertEqual(stringData, "test" + String(index))
             }
         }
+    }
+
+    func testStringArrayTracksLogicalValueLengthAfterFirstAppend() throws {
+        let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+        let firstValue = String(repeating: "a", count: 40)
+
+        stringBuilder.append(firstValue)
+
+        let stringArray = try stringBuilder.finish()
+        XCTAssertEqual(stringArray.length, 1)
+        XCTAssertEqual(stringArray[0], firstValue)
+        XCTAssertEqual(stringArray.arrowData.buffers[2].length, UInt(firstValue.utf8.count))
+        XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 2), [0, 40])
+    }
+
+    func testStringArrayNullDoesNotAdvanceOffsets() throws {
+        let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+
+        stringBuilder.append("a")
+        stringBuilder.append(nil)
+        stringBuilder.append("bbb")
+
+        let stringArray = try stringBuilder.finish()
+        XCTAssertEqual(stringArray.length, 3)
+        XCTAssertEqual(stringArray[0], "a")
+        XCTAssertNil(stringArray[1])
+        XCTAssertEqual(stringArray[2], "bbb")
+        XCTAssertEqual(stringArray.arrowData.buffers[2].length, 4)
+        XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 4), [0, 1, 1, 4])
+    }
+
+    func testBinaryArrayNullDoesNotAdvanceOffsets() throws {
+        let binaryBuilder = try ArrowArrayBuilders.loadBinaryArrayBuilder()
+
+        binaryBuilder.append(Data("a".utf8))
+        binaryBuilder.append(nil)
+        binaryBuilder.append(Data("bbb".utf8))
+
+        let binaryArray = try binaryBuilder.finish()
+        XCTAssertEqual(binaryArray.length, 3)
+        XCTAssertEqual(binaryArray[0], Data("a".utf8))
+        XCTAssertNil(binaryArray[1])
+        XCTAssertEqual(binaryArray[2], Data("bbb".utf8))
+        XCTAssertEqual(binaryArray.arrowData.buffers[2].length, 4)
+        XCTAssertEqual(int32Values(in: binaryArray.arrowData.buffers[1], count: 4), [0, 1, 1, 4])
     }
 
     func testTime32Array() throws {
