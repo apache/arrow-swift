@@ -26,9 +26,17 @@ public class ArrowData {
     public let stride: Int
 
     convenience init(_ arrowType: ArrowType, buffers: [ArrowBuffer], nullCount: UInt) throws {
+        let arrayLength: UInt
+        switch arrowType.info {
+        case .variableInfo:
+            arrayLength = max(buffers[1].length, 1) - 1
+        default:
+            arrayLength = buffers[1].length
+        }
+
         try self.init(arrowType, buffers: buffers,
                       children: [ArrowData](), nullCount: nullCount,
-                      length: buffers[1].length)
+                      length: arrayLength)
     }
 
     init(_ arrowType: ArrowType, buffers: [ArrowBuffer], children: [ArrowData], nullCount: UInt, length: UInt) throws {

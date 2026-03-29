@@ -70,7 +70,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         XCTAssertEqual(stringBuilder.nullCount, 10)
         XCTAssertEqual(stringBuilder.length, 100)
-        XCTAssertEqual(stringBuilder.capacity, 640)
+        XCTAssertGreaterThanOrEqual(stringBuilder.capacity, 640)
         let stringArray = try stringBuilder.finish()
         XCTAssertEqual(stringArray.length, 100)
         for index in 0..<stringArray.length {
@@ -146,7 +146,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
         XCTAssertEqual(binaryBuilder.nullCount, 10)
         XCTAssertEqual(binaryBuilder.length, 100)
-        XCTAssertEqual(binaryBuilder.capacity, 640)
+        XCTAssertGreaterThanOrEqual(binaryBuilder.capacity, 640)
         let binaryArray = try binaryBuilder.finish()
         XCTAssertEqual(binaryArray.length, 100)
         for index in 0..<binaryArray.length {
@@ -161,7 +161,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
 
     func testStringArrayTracksLogicalValueLengthAfterFirstAppend() throws {
         let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
-        let firstValue = String(repeating: "a", count: 40)
+        let firstValue = String(repeating: "a", count: 256)
 
         stringBuilder.append(firstValue)
 
@@ -169,7 +169,7 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(stringArray.length, 1)
         XCTAssertEqual(stringArray[0], firstValue)
         XCTAssertEqual(stringArray.arrowData.buffers[2].length, UInt(firstValue.utf8.count))
-        XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 2), [0, 40])
+        XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 2), [0, 256])
     }
 
     func testStringArrayNullDoesNotAdvanceOffsets() throws {

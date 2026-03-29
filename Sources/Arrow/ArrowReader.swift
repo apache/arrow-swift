@@ -195,9 +195,12 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let arrowNullBuffer = makeBuffer(nullBuffer, fileData: loadInfo.fileData,
                                          length: nullLength, messageOffset: loadInfo.messageOffset)
         let arrowOffsetBuffer = makeBuffer(offsetBuffer, fileData: loadInfo.fileData,
-                                           length: UInt(node.length), messageOffset: loadInfo.messageOffset)
+                                           length: UInt(node.length + 1), messageOffset: loadInfo.messageOffset)
+        let lastOffset = arrowOffsetBuffer.rawPointer
+            .advanced(by: Int(node.length) * MemoryLayout<Int32>.stride)
+            .load(as: Int32.self)
         let arrowValueBuffer = makeBuffer(valueBuffer, fileData: loadInfo.fileData,
-                                          length: UInt(node.length), messageOffset: loadInfo.messageOffset)
+                                          length: UInt(lastOffset), messageOffset: loadInfo.messageOffset)
         return makeArrayHolder(field, buffers: [arrowNullBuffer, arrowOffsetBuffer, arrowValueBuffer],
                                nullCount: UInt(node.nullCount), children: nil,
                                rbLength: UInt(loadInfo.batchData.recordBatch.length))

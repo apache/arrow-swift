@@ -205,71 +205,68 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
     public required init() throws {
         let values = ArrowBuffer.createBuffer(0, size: UInt(binaryStride))
         let nulls = ArrowBuffer.createBuffer(0, size: UInt(binaryStride))
-        self.offsets = ArrowBuffer.createBuffer(0, size: UInt(MemoryLayout<Int32>.stride))
+        self.offsets = ArrowBuffer.createBuffer(1, size: UInt(MemoryLayout<Int32>.stride))
+        self.offsets.rawPointer.storeBytes(of: Int32(0), as: Int32.self)
         super.init(values: values, nulls: nulls, stride: binaryStride)
     }
 
     public func append(_ newValue: ItemType?) {
         let index = UInt(self.length)
-        self.length += 1
         let offsetIndex = MemoryLayout<Int32>.stride * Int(index)
-        if self.length >= self.offsets.length {
-            self.resize(UInt( self.offsets.length + 1))
-        }
-        var binData: Data
-        var isNull = false
+        let nextLength = index + 1
+        self.resize(nextLength)
+
+        let currentOffset = self.offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
+        var nextOffset = currentOffset
+
         if let val = newValue {
-            binData = getBytesFor(val)!
-        } else {
-            var nullVal = 0
-            isNull = true
-            binData = Data(bytes: &nullVal, count: MemoryLayout<UInt32>.size)
-        }
-
-        var currentIndex: Int32 = 0
-        var currentOffset: Int32 = Int32(binData.count)
-        if index > 0 {
-            currentIndex = self.offsets.rawPointer.advanced(by: offsetIndex).load(as: Int32.self)
-            currentOffset += currentIndex
-            if currentOffset > self.values.length {
-                self.value_resize(UInt(currentOffset))
+            let binData = getBytesFor(val)!
+            nextOffset += Int32(binData.count)
+            self.value_resize(UInt(nextOffset))
+            binData.withUnsafeBytes { bufferPointer in
+                let rawPointer = bufferPointer.baseAddress!
+                self.values.rawPointer.advanced(by: Int(currentOffset))
+                    .copyMemory(from: rawPointer, byteCount: binData.count)
             }
-        }
-
-        if isNull {
+            BitUtility.setBit(index + self.offset, buffer: self.nulls)
+        } else {
             self.nullCount += 1
             BitUtility.clearBit(index + self.offset, buffer: self.nulls)
-        } else {
-            BitUtility.setBit(index + self.offset, buffer: self.nulls)
         }
 
-        binData.withUnsafeBytes { bufferPointer in
-            let rawPointer = bufferPointer.baseAddress!
-            self.values.rawPointer.advanced(by: Int(currentIndex))
-                .copyMemory(from: rawPointer, byteCount: binData.count)
-        }
-
-        self.offsets.rawPointer.advanced(by: (offsetIndex + MemoryLayout<Int32>.stride))
-            .storeBytes(of: currentOffset, as: Int32.self)
+        self.offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride)
+            .storeBytes(of: nextOffset, as: Int32.self)
+        self.length = nextLength
+        self.offsets.updateLength(nextLength + 1)
+        self.values.updateLength(UInt(nextOffset))
     }
 
     public func value_resize(_ length: UInt) {
-        if length > self.values.length {
+        if length > self.values.capacity {
             let resizeLength = resizeLength(self.values, len: length)
             var values = ArrowBuffer.createBuffer(resizeLength, size: UInt(MemoryLayout<UInt8>.size))
             ArrowBuffer.copyCurrent(self.values, to: &values, len: self.values.capacity)
+            values.updateLength(self.values.length)
             self.values = values
         }
     }
 
     public func resize(_ length: UInt) {
-        if length > self.offsets.length {
-            let resizeLength = resizeLength(self.offsets, len: length)
-            var nulls = ArrowBuffer.createBuffer(resizeLength/8 + 1, size: UInt(MemoryLayout<UInt8>.size))
-            var offsets = ArrowBuffer.createBuffer(resizeLength, size: UInt(MemoryLayout<Int32>.size))
+        let nullByteLength = length / 8 + 1
+        if nullByteLength > self.nulls.capacity {
+            let resizeLength = resizeLength(self.nulls, len: nullByteLength)
+            var nulls = ArrowBuffer.createBuffer(resizeLength, size: UInt(MemoryLayout<UInt8>.size))
             ArrowBuffer.copyCurrent(self.nulls, to: &nulls, len: self.nulls.capacity)
-            ArrowBuffer.copyCurrent(self.offsets, to: &offsets, len: self.offsets.capacity)
             self.nulls = nulls
+        }
+
+        let requiredOffsetCount = length + 1
+        let requiredOffsetByteCount = requiredOffsetCount * UInt(MemoryLayout<Int32>.size)
+        if requiredOffsetByteCount > self.offsets.capacity {
+            let resizeLength = resizeLength(self.offsets, len: requiredOffsetCount)
+            var offsets = ArrowBuffer.createBuffer(resizeLength, size: UInt(MemoryLayout<Int32>.size))
+            ArrowBuffer.copyCurrent(self.offsets, to: &offsets, len: self.offsets.capacity)
+            offsets.updateLength(self.offsets.length)
             self.offsets = offsets
         }
     }
@@ -277,8 +274,8 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
     public func finish() -> [ArrowBuffer] {
         let length = self.length
         var values = ArrowBuffer.createBuffer(self.values.length, size: UInt(MemoryLayout<UInt8>.size))
-        var nulls = ArrowBuffer.createBuffer(length/8 + 1, size: UInt(MemoryLayout<UInt8>.size))
-        var offsets = ArrowBuffer.createBuffer(length, size: UInt(MemoryLayout<Int32>.size))
+        var nulls = ArrowBuffer.createBuffer(length / 8 + 1, size: UInt(MemoryLayout<UInt8>.size))
+        var offsets = ArrowBuffer.createBuffer(length + 1, size: UInt(MemoryLayout<Int32>.size))
         ArrowBuffer.copyCurrent(self.values, to: &values, len: values.capacity)
         ArrowBuffer.copyCurrent(self.nulls, to: &nulls, len: nulls.capacity)
         ArrowBuffer.copyCurrent(self.offsets, to: &offsets, len: offsets.capacity)
