@@ -237,6 +237,7 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
         self.offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride)
             .storeBytes(of: nextOffset, as: Int32.self)
         self.length = nextLength
+        self.nulls.updateLength(nextLength / 8 + 1)
         self.offsets.updateLength(nextLength + 1)
         self.values.updateLength(UInt(nextOffset))
     }
@@ -257,6 +258,7 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
             let resizeLength = resizeLength(self.nulls, len: nullByteLength)
             var nulls = ArrowBuffer.createBuffer(resizeLength, size: UInt(MemoryLayout<UInt8>.size))
             ArrowBuffer.copyCurrent(self.nulls, to: &nulls, len: self.nulls.capacity)
+            nulls.updateLength(self.nulls.length)
             self.nulls = nulls
         }
 

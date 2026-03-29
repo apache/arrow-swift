@@ -188,6 +188,21 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 4), [0, 1, 1, 4])
     }
 
+    func testStringArrayNullFirstThenLongValue() throws {
+        let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+        let longValue = String(repeating: "z", count: 512)
+
+        stringBuilder.append(nil)
+        stringBuilder.append(longValue)
+
+        let stringArray = try stringBuilder.finish()
+        XCTAssertEqual(stringArray.length, 2)
+        XCTAssertNil(stringArray[0])
+        XCTAssertEqual(stringArray[1], longValue)
+        XCTAssertEqual(stringArray.arrowData.buffers[2].length, UInt(longValue.utf8.count))
+        XCTAssertEqual(int32Values(in: stringArray.arrowData.buffers[1], count: 3), [0, 0, 512])
+    }
+
     func testBinaryArrayNullDoesNotAdvanceOffsets() throws {
         let binaryBuilder = try ArrowArrayBuilders.loadBinaryArrayBuilder()
 
