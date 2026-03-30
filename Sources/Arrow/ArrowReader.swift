@@ -204,7 +204,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         }
         guard lastOffset <= valueBuffer.length else {
             return .failure(.invalid(
-                "Last offset (\(lastOffset)) exceeds value buffer length (\(valueBuffer.length))"))
+                                "Last offset (\(lastOffset)) exceeds value buffer length (\(valueBuffer.length))"))
         }
         let arrowValueBuffer = makeBuffer(valueBuffer, fileData: loadInfo.fileData,
                                           length: UInt(lastOffset), messageOffset: loadInfo.messageOffset)
