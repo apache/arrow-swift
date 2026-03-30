@@ -221,10 +221,13 @@ public class VariableBufferBuilder<T>: ValuesBufferBuilder<T>, ArrowBufferBuilde
 
         if let val = newValue {
             let binData = getBytesFor(val)!
+            precondition(
+                binData.count <= Int(Int32.max),
+                "VariableBufferBuilder.append: element size exceeds Int32.max")
             let proposedOffset = Int64(currentOffset) + Int64(binData.count)
             precondition(
                 proposedOffset <= Int64(Int32.max),
-                "Total variable-width buffer size exceeds Int32.max (\(proposedOffset) bytes)")
+                "VariableBufferBuilder.append: total buffer size exceeds Int32.max")
             nextOffset = Int32(proposedOffset)
             self.value_resize(UInt(nextOffset))
             binData.withUnsafeBytes { bufferPointer in
