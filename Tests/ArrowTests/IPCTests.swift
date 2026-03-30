@@ -106,10 +106,12 @@ func checkStructRecordBatch(_ result: Result<ArrowReader.ArrowReaderResult, Arro
     return recordBatches
 }
 
-func testDataURL(_ filename: String) -> URL {
+func testDataURL(_ filename: String) throws -> URL {
     guard let url = Bundle.module.url(forResource: filename, withExtension: "arrow") else {
-        fatalError("Test data file \(filename).arrow not found in bundle. "
-                    + "Run the Go data generator first.")
+        throw ArrowError.ioError(
+            "Test data file \(filename).arrow not found in bundle. "
+                + "Run the Go data generator first."
+        )
     }
     return url
 }
@@ -270,7 +272,7 @@ final class IPCStreamReaderTests: XCTestCase {
 
 final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body_length
     func testFileReader_double() throws {
-        let fileURL = testDataURL("testdata_double")
+        let fileURL = try testDataURL("testdata_double")
         let arrowReader = ArrowReader()
         let result = arrowReader.fromFile(fileURL)
         let recordBatches: [RecordBatch]
@@ -304,14 +306,14 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
     }
 
     func testFileReader_bool() throws {
-        let fileURL = testDataURL("testdata_bool")
+        let fileURL = try testDataURL("testdata_bool")
         let arrowReader = ArrowReader()
         try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
     }
 
     func testFileWriter_bool() throws {
         // read existing file
-        let fileURL = testDataURL("testdata_bool")
+        let fileURL = try testDataURL("testdata_bool")
         let arrowReader = ArrowReader()
         let fileRBs = try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
         let arrowWriter = ArrowWriter()
@@ -335,14 +337,14 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
     }
 
     func testFileReader_struct() throws {
-        let fileURL = testDataURL("testdata_struct")
+        let fileURL = try testDataURL("testdata_struct")
         let arrowReader = ArrowReader()
         try checkStructRecordBatch(arrowReader.fromFile(fileURL))
     }
 
     func testFileWriter_struct() throws {
         // read existing file
-        let fileURL = testDataURL("testdata_struct")
+        let fileURL = try testDataURL("testdata_struct")
         let arrowReader = ArrowReader()
         let fileRBs = try checkStructRecordBatch(arrowReader.fromFile(fileURL))
         let arrowWriter = ArrowWriter()

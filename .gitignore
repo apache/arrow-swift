@@ -36,6 +36,5 @@ xcuserdata/
 /apache-arrow-swift-*.tar.gz*
 /dev/release/.env
 
-# Generated test data
-Tests/ArrowTests/*.arrow
-data-generator/swift-datagen/*.arrow
+# Generated test data (intermediate output from Go generator)
+/data-generator/swift-datagen/*.arrow

@@ -130,6 +130,39 @@ jobs:
           cp *.arrow ../../Tests/ArrowTests/
       - name: Select iOS Simulator
         run: |
+          # Pick the first iPhone on the newest available iOS.
+          #
+          # Example pipeline on macos-15 runner
+          #
+          # xcrun simctl list devices available (filtered to iPhone):
+          #   -- iOS 18.5 --
+          #       iPhone 16 Pro (E8B81AE5-...) (Shutdown)
+          #       iPhone 16 (394B9336-...) (Shutdown)
+          #   -- iOS 18.6 --
+          #       iPhone 16 Pro (37C8BF13-...) (Shutdown)
+          #       iPhone 16 (E040B4E8-...) (Shutdown)
+          #   -- iOS 26.2 --
+          #       iPhone 17 Pro (20A8DB5D-...) (Shutdown)
+          #       iPhone 16 (02BBE218-...) (Shutdown)
+          #
+          # -> awk: prefix each iPhone line with its iOS version
+          #   18.5 iPhone 16 Pro (E8B81AE5-...) (Shutdown)
+          #   18.5 iPhone 16 (394B9336-...) (Shutdown)
+          #   18.6 iPhone 16 Pro (37C8BF13-...) (Shutdown)
+          #   26.2 iPhone 17 Pro (20A8DB5D-...) (Shutdown)
+          #   26.2 iPhone 16 (02BBE218-...) (Shutdown)
+          #
+          # -> sort -t. -k1,1nr -k2,2nr: sort by iOS version descending
+          #   26.2 iPhone 17 Pro (20A8DB5D-...) (Shutdown)
+          #   26.2 iPhone 16 (02BBE218-...) (Shutdown)
+          #   18.6 iPhone 16 Pro (37C8BF13-...) (Shutdown)
+          #   18.5 iPhone 16 Pro (E8B81AE5-...) (Shutdown)
+          #
+          # -> head -1: take the first line (newest iOS)
+          #   26.2 iPhone 17 Pro (20A8DB5D-...) (Shutdown)
+          #
+          # -> grep -oE: extract the simulator UDID
+          #   20A8DB5D-3B2A-48CF-BA79-07E054563A31
           SIMULATOR_ID=$(xcrun simctl list devices available 2>/dev/null | \
             awk '/-- iOS/{os=$3} /iPhone/{print os, $0}' | \
             sort -t. -k1,1nr -k2,2nr | head -1 | \
