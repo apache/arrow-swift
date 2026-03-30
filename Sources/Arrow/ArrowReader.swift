@@ -202,7 +202,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         guard lastOffset >= 0 else {
             return .failure(.invalid("Negative last offset (\(lastOffset)) in variable-width buffer"))
         }
-        guard lastOffset <= valueBuffer.length else {
+        guard Int64(lastOffset) <= valueBuffer.length else {
             return .failure(.invalid(
                                 "Last offset (\(lastOffset)) exceeds value buffer length (\(valueBuffer.length))"))
         }

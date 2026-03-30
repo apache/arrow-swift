@@ -29,9 +29,9 @@ public class ArrowData {
         let arrayLength: UInt
         switch arrowType.info {
         case .variableInfo:
-            guard buffers.count >= 2 else {
+            guard buffers.count >= 3 else {
                 throw ArrowError.invalid(
-                    "Variable-width ArrowData requires at least two buffers (null bitmap and offsets).")
+                    "Variable-width ArrowData requires at least three buffers (null bitmap, offsets, and values).")
             }
             let offsetsLength = buffers[1].length
             guard offsetsLength >= 1 else {
