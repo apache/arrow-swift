@@ -199,6 +199,13 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let lastOffset = arrowOffsetBuffer.rawPointer
             .advanced(by: Int(node.length) * MemoryLayout<Int32>.stride)
             .load(as: Int32.self)
+        guard lastOffset >= 0 else {
+            return .failure(.invalid("Negative last offset (\(lastOffset)) in variable-width buffer"))
+        }
+        guard lastOffset <= valueBuffer.length else {
+            return .failure(.invalid(
+                "Last offset (\(lastOffset)) exceeds value buffer length (\(valueBuffer.length))"))
+        }
         let arrowValueBuffer = makeBuffer(valueBuffer, fileData: loadInfo.fileData,
                                           length: UInt(lastOffset), messageOffset: loadInfo.messageOffset)
         return makeArrayHolder(field, buffers: [arrowNullBuffer, arrowOffsetBuffer, arrowValueBuffer],

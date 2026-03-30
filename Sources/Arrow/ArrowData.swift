@@ -29,7 +29,11 @@ public class ArrowData {
         let arrayLength: UInt
         switch arrowType.info {
         case .variableInfo:
-            arrayLength = max(buffers[1].length, 1) - 1
+            guard buffers.count >= 2, buffers[1].length >= 1 else {
+                throw ArrowError.invalid(
+                    "Variable-width type requires an offsets buffer with length >= 1")
+            }
+            arrayLength = buffers[1].length - 1
         default:
             arrayLength = buffers[1].length
         }

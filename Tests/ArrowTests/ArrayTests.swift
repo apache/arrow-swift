@@ -411,10 +411,25 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
     }
 
     func checkHolderForType(_ checkType: ArrowType) throws {
-        let buffers = [ArrowBuffer(length: 0, capacity: 0,
-                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)),
-                       ArrowBuffer(length: 0, capacity: 0,
-                                   rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))]
+        let emptyPtr = UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero)
+        let buffers: [ArrowBuffer]
+        switch checkType.info {
+        case .variableInfo:
+            let offsetPtr = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Int32>.stride, alignment: 4)
+            offsetPtr.storeBytes(of: Int32(0), as: Int32.self)
+            buffers = [
+                ArrowBuffer(length: 0, capacity: 0, rawPointer: emptyPtr),
+                ArrowBuffer(length: 1, capacity: UInt(MemoryLayout<Int32>.stride), rawPointer: offsetPtr),
+                ArrowBuffer(length: 0, capacity: 0,
+                            rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))
+            ]
+        default:
+            buffers = [
+                ArrowBuffer(length: 0, capacity: 0, rawPointer: emptyPtr),
+                ArrowBuffer(length: 0, capacity: 0,
+                            rawPointer: UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: .zero))
+            ]
+        }
         let field = ArrowField("", type: checkType, isNullable: true)
         switch makeArrayHolder(field, buffers: buffers, nullCount: 0, children: nil, rbLength: 0) {
         case .success(let holder):
