@@ -29,11 +29,16 @@ public class ArrowData {
         let arrayLength: UInt
         switch arrowType.info {
         case .variableInfo:
-            guard buffers.count >= 2, buffers[1].length >= 1 else {
+            guard buffers.count >= 2 else {
                 throw ArrowError.invalid(
-                    "Variable-width type requires an offsets buffer with length >= 1")
+                    "Variable-width ArrowData requires at least two buffers (null bitmap and offsets).")
             }
-            arrayLength = buffers[1].length - 1
+            let offsetsLength = buffers[1].length
+            guard offsetsLength >= 1 else {
+                throw ArrowError.invalid(
+                    "Variable-width ArrowData requires a non-empty offsets buffer.")
+            }
+            arrayLength = offsetsLength - 1
         default:
             arrayLength = buffers[1].length
         }
