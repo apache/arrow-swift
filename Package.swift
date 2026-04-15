@@ -23,7 +23,8 @@ import PackageDescription
 let package = Package(
     name: "Arrow",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v10_15),
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -70,6 +71,11 @@ let package = Package(
         .testTarget(
             name: "ArrowTests",
             dependencies: ["Arrow", "ArrowC"],
+            resources: [
+                .copy("testdata_bool.arrow"),
+                .copy("testdata_double.arrow"),
+                .copy("testdata_struct.arrow")
+            ],
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
