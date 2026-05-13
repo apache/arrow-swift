@@ -21,7 +21,7 @@ public class ArrowField {
     public let name: String
     public let isNullable: Bool
 
-    init(_ name: String, type: ArrowType, isNullable: Bool) {
+    public init(_ name: String, type: ArrowType, isNullable: Bool) {
         self.name = name
         self.type = type
         self.isNullable = isNullable

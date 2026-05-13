@@ -146,6 +146,10 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, NestedAr
         try super.init(ArrowTypeStruct(ArrowType.ArrowStruct, fields: fields))
     }
 
+    public override func appendAny(_ val: Any?) {
+        self.append(val as? [Any?])
+    }
+
     public override func append(_ values: [Any?]?) {
         self.bufferBuilder.append(values)
         if let anyValues = values {
@@ -184,6 +188,10 @@ public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, NestedArray>
         let arrowField = listType.elementField
         self.valueBuilder = try ArrowArrayBuilders.loadBuilder(arrowType: arrowField.type)
         try super.init(arrowType)
+    }
+
+    public override func appendAny(_ val: Any?) {
+        self.append(val as? [Any?])
     }
 
     public override func append(_ values: [Any?]?) {

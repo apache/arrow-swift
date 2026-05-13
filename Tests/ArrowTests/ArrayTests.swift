@@ -524,4 +524,115 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let emptyList = nestedArray[3]!
         XCTAssertEqual(emptyList.count, 0)
     }
+
+    func testStructArrayBuilderAppendAny() throws {
+        let structType = ArrowTypeStruct(ArrowType.ArrowStruct, fields: [
+            ArrowField("name", type: ArrowType(ArrowType.ArrowString), isNullable: true),
+            ArrowField("age", type: ArrowType(ArrowType.ArrowInt32), isNullable: true)
+        ])
+        let builder = try ArrowArrayBuilders.loadBuilder(arrowType: structType)
+
+        builder.appendAny(["Alice", Int32(30)] as [Any?])
+        builder.appendAny(nil)
+        builder.appendAny(["Bob", Int32(25)] as [Any?])
+
+        let holder = try builder.toHolder()
+        let structArray = holder.array as? NestedArray
+        XCTAssertNotNil(structArray)
+        XCTAssertEqual(structArray!.length, 3)
+        XCTAssertEqual(holder.nullCount, 1)
+
+        let row0 = structArray![0]
+        XCTAssertNotNil(row0)
+        XCTAssertEqual(row0![0] as? String, "Alice")
+        XCTAssertEqual(row0![1] as? Int32, 30)
+
+        XCTAssertNil(structArray![1])
+
+        let row2 = structArray![2]
+        XCTAssertNotNil(row2)
+        XCTAssertEqual(row2![0] as? String, "Bob")
+        XCTAssertEqual(row2![1] as? Int32, 25)
+
+        XCTAssertNotNil(structArray!.fields)
+        XCTAssertEqual(structArray!.fields!.count, 2)
+        XCTAssertEqual(structArray!.fields![0].length, 3)
+        XCTAssertEqual(structArray!.fields![1].length, 3)
+    }
+
+    func testListArrayBuilderAppendAny() throws {
+        let listType = ArrowTypeList(ArrowType(ArrowType.ArrowInt32))
+        let listBuilder = try ListArrayBuilder(listType)
+
+        listBuilder.appendAny([Int32(10), Int32(20), Int32(30)] as [Any?])
+        listBuilder.appendAny([Int32(40)] as [Any?])
+        listBuilder.appendAny(nil)
+
+        let listArray = try listBuilder.finish()
+        XCTAssertEqual(listArray.length, 3)
+        XCTAssertEqual(listArray.nullCount, 1)
+
+        let row0 = listArray[0]
+        XCTAssertNotNil(row0)
+        XCTAssertEqual(row0!.count, 3)
+        XCTAssertEqual(row0![0] as? Int32, 10)
+        XCTAssertEqual(row0![1] as? Int32, 20)
+        XCTAssertEqual(row0![2] as? Int32, 30)
+
+        let row1 = listArray[1]
+        XCTAssertNotNil(row1)
+        XCTAssertEqual(row1!.count, 1)
+        XCTAssertEqual(row1![0] as? Int32, 40)
+
+        XCTAssertNil(listArray[2])
+
+        let valuesHolder = listArray.values
+        XCTAssertNotNil(valuesHolder)
+        XCTAssertEqual(valuesHolder!.length, 4)
+    }
+
+    func testListOfStructAppendAny() throws {
+        let structType = ArrowTypeStruct(ArrowType.ArrowStruct, fields: [
+            ArrowField("name", type: ArrowType(ArrowType.ArrowString), isNullable: false),
+            ArrowField("value", type: ArrowType(ArrowType.ArrowFloat), isNullable: false)
+        ])
+        let listType = ArrowTypeList(ArrowField("item", type: structType, isNullable: true))
+        let listBuilder = try ListArrayBuilder(listType)
+
+        let listRow0: [Any?] = [["Alice", Float(1.5)] as [Any?], ["Bob", Float(2.5)] as [Any?]]
+        let listRow1: [Any?] = [["Charlie", Float(3.5)] as [Any?]]
+        listBuilder.appendAny(listRow0)
+        listBuilder.appendAny(listRow1)
+        listBuilder.appendAny(nil)
+
+        let listArray = try listBuilder.finish()
+        XCTAssertEqual(listArray.length, 3)
+        XCTAssertEqual(listArray.nullCount, 1)
+
+        let row0 = listArray[0]
+        XCTAssertNotNil(row0)
+        XCTAssertEqual(row0!.count, 2)
+        let struct0 = row0![0] as? [Any?]
+        XCTAssertNotNil(struct0)
+        XCTAssertEqual(struct0![0] as? String, "Alice")
+        XCTAssertEqual(struct0![1] as? Float, 1.5)
+        let struct1 = row0![1] as? [Any?]
+        XCTAssertNotNil(struct1)
+        XCTAssertEqual(struct1![0] as? String, "Bob")
+        XCTAssertEqual(struct1![1] as? Float, 2.5)
+
+        let row1 = listArray[1]
+        XCTAssertNotNil(row1)
+        XCTAssertEqual(row1!.count, 1)
+        let struct2 = row1![0] as? [Any?]
+        XCTAssertNotNil(struct2)
+        XCTAssertEqual(struct2![0] as? String, "Charlie")
+        XCTAssertEqual(struct2![1] as? Float, 3.5)
+
+        XCTAssertNil(listArray[2])
+
+        let valuesHolder = listArray.values
+        XCTAssertNotNil(valuesHolder)
+        XCTAssertEqual(valuesHolder!.length, 3)
+    }
 }
