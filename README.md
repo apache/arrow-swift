@@ -48,6 +48,12 @@ Then add `Arrow` to your target's dependencies:
 2. Enter the repository URL: `https://github.com/apache/arrow-swift.git`
 3. Select your desired version rules and click **Add Package**
 
+## Supported Platforms
+
+- macOS 10.15+
+- iOS 15.0+
+- Linux (Ubuntu)
+
 ## Getting Started
 
 For API documentation and usage examples, see the [documentation on Swift Package Index](https://swiftpackageindex.com/apache/arrow-swift/documentation).
