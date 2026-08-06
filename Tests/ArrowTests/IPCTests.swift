@@ -211,6 +211,59 @@ func makeRecordBatch() throws -> RecordBatch {
 }
 
 final class IPCStreamReaderTests: XCTestCase {
+    func testVariableWidthColumnsRoundTripLongFirstValue() throws {
+        let longFirstValue = String(repeating: "x", count: 256)
+        let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+        stringBuilder.append(longFirstValue)
+        stringBuilder.append(nil)
+        stringBuilder.append("tail")
+
+        let stringHolder = ArrowArrayHolderImpl(try stringBuilder.finish())
+        let recordBatchResult = RecordBatch.Builder()
+            .addColumn("message", arrowArray: stringHolder)
+            .finish()
+
+        let recordBatch: RecordBatch
+        switch recordBatchResult {
+        case .success(let batch):
+            recordBatch = batch
+        case .failure(let error):
+            throw error
+        }
+
+        let schema = ArrowSchema.Builder()
+            .addField("message", type: ArrowType(ArrowType.ArrowString), isNullable: true)
+            .finish()
+
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+
+        let streamingData: Data
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let data):
+            streamingData = data
+        case .failure(let error):
+            throw error
+        }
+
+        let arrowReader = ArrowReader()
+        switch arrowReader.readStreaming(streamingData) {
+        case .success(let result):
+            XCTAssertEqual(result.batches.count, 1)
+            let firstBatch = result.batches[0]
+            XCTAssertEqual(firstBatch.length, 3)
+            XCTAssertEqual(firstBatch.schema.fields.count, 1)
+            XCTAssertEqual(firstBatch.schema.fields[0].name, "message")
+            XCTAssertEqual(firstBatch.schema.fields[0].type.info, ArrowType.ArrowString)
+            let stringColumn = firstBatch.columns[0]
+            XCTAssertEqual((stringColumn.array as? StringArray)?[0], longFirstValue)
+            XCTAssertNil((stringColumn.array as? StringArray)?[1])
+            XCTAssertEqual((stringColumn.array as? StringArray)?[2], "tail")
+        case .failure(let error):
+            throw error
+        }
+    }
+
     func testRBInMemoryToFromStream() throws {
         let schema = makeSchema()
         let recordBatch = try makeRecordBatch()

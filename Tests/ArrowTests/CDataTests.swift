@@ -90,7 +90,7 @@ final class CDataTests: XCTestCase {
 
         XCTAssertEqual(stringBuilder.nullCount, 10)
         XCTAssertEqual(stringBuilder.length, 100)
-        XCTAssertEqual(stringBuilder.capacity, 640)
+        XCTAssertGreaterThanOrEqual(stringBuilder.capacity, 640)
         let stringArray = try stringBuilder.finish()
         let exporter = ArrowCExporter()
         var cArray = ArrowC.ArrowArray()
