@@ -27,6 +27,9 @@ xcuserdata/
 # Docker
 /.docker/
 
+# Written by the file writer tests
+/Tests/ArrowTests/testfilewriter_*.arrow
+
 # Release Audit Tool
 /dev/release/apache-rat-*.jar
 /dev/release/filtered_rat.txt

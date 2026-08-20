@@ -210,6 +210,51 @@ func makeRecordBatch() throws -> RecordBatch {
     }
 }
 
+func makeBoolRecordBatch() throws -> RecordBatch {
+    let boolBuilder = try ArrowArrayBuilders.loadBoolArrayBuilder()
+    boolBuilder.append(true)
+    boolBuilder.append(false)
+    boolBuilder.append(nil)
+    boolBuilder.append(false)
+    boolBuilder.append(true)
+    let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+    stringBuilder.append("zero")
+    stringBuilder.append("one")
+    stringBuilder.append("two")
+    stringBuilder.append("three")
+    stringBuilder.append("four")
+    let result = RecordBatch.Builder()
+        .addColumn("one", arrowArray: ArrowArrayHolderImpl(try boolBuilder.finish()))
+        .addColumn("two", arrowArray: ArrowArrayHolderImpl(try stringBuilder.finish()))
+        .finish()
+    switch result {
+    case .success(let recordBatch):
+        return recordBatch
+    case .failure(let error):
+        throw error
+    }
+}
+
+func makeTwoFieldStructRecordBatch() throws -> RecordBatch {
+    let fields = [
+        ArrowField("field0", type: ArrowType(ArrowType.ArrowString), isNullable: true),
+        ArrowField("field1", type: ArrowType(ArrowType.ArrowBool), isNullable: true)
+    ]
+    let structBuilder = try ArrowArrayBuilders.loadStructArrayBuilder(fields)
+    structBuilder.append(["0", false])
+    structBuilder.append(["1", true])
+    structBuilder.append(nil)
+    let result = RecordBatch.Builder()
+        .addColumn("my struct", arrowArray: ArrowArrayHolderImpl(try structBuilder.finish()))
+        .finish()
+    switch result {
+    case .success(let recordBatch):
+        return recordBatch
+    case .failure(let error):
+        throw error
+    }
+}
+
 final class IPCStreamReaderTests: XCTestCase {
     func testRBInMemoryToFromStream() throws {
         let schema = makeSchema()
@@ -265,62 +310,20 @@ final class IPCStreamReaderTests: XCTestCase {
 }
 
 final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body_length
-    func testFileReader_double() throws {
-        let fileURL = currentDirectory().appendingPathComponent("testdata_double.arrow")
-        let arrowReader = ArrowReader()
-        let result = arrowReader.fromFile(fileURL)
-        let recordBatches: [RecordBatch]
-        switch result {
-        case .success(let result):
-            recordBatches = result.batches
-        case .failure(let error):
-            throw error
-        }
-
-        XCTAssertEqual(recordBatches.count, 1)
-        for recordBatch in recordBatches {
-            XCTAssertEqual(recordBatch.length, 5)
-            XCTAssertEqual(recordBatch.columns.count, 2)
-            XCTAssertEqual(recordBatch.schema.fields.count, 2)
-            XCTAssertEqual(recordBatch.schema.fields[0].name, "one")
-            XCTAssertEqual(recordBatch.schema.fields[0].type.info, ArrowType.ArrowDouble)
-            XCTAssertEqual(recordBatch.schema.fields[1].name, "two")
-            XCTAssertEqual(recordBatch.schema.fields[1].type.info, ArrowType.ArrowString)
-            for index in 0..<recordBatch.length {
-                let column = recordBatch.columns[1]
-                let str = column.array as! AsString // swiftlint:disable:this force_cast
-                let val = "\(str.asString(index))"
-                if index != 1 {
-                    XCTAssertNotEqual(val, "")
-                } else {
-                    XCTAssertEqual(val, "")
-                }
-            }
-        }
-    }
-
-    func testFileReader_bool() throws {
-        let fileURL = currentDirectory().appendingPathComponent("testdata_bool.arrow")
-        let arrowReader = ArrowReader()
-        try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
-    }
-
     func testFileWriter_bool() throws {
-        // read existing file
-        let fileURL = currentDirectory().appendingPathComponent("testdata_bool.arrow")
-        let arrowReader = ArrowReader()
-        let fileRBs = try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
+        let recordBatch = try makeBoolRecordBatch()
         let arrowWriter = ArrowWriter()
-        // write data from file to a stream
-        let writerInfo = ArrowWriter.Info(.recordbatch, schema: fileRBs[0].schema, batches: fileRBs)
+        let writerInfo = ArrowWriter.Info(
+            .recordbatch, schema: recordBatch.schema, batches: [recordBatch])
+        let arrowReader = ArrowReader()
+        // write to an in-memory buffer and read it back
         switch arrowWriter.writeFile(writerInfo) {
         case .success(let writeData):
-            // read stream back into recordbatches
             try checkBoolRecordBatch(arrowReader.readFile(writeData))
         case .failure(let error):
             throw error
         }
-        // write file record batches to another file
+        // write to a file and read it back
         let outputUrl = currentDirectory().appendingPathComponent("testfilewriter_bool.arrow")
         switch arrowWriter.toFile(outputUrl, info: writerInfo) {
         case .success:
@@ -330,28 +333,20 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
         }
     }
 
-    func testFileReader_struct() throws {
-        let fileURL = currentDirectory().appendingPathComponent("testdata_struct.arrow")
-        let arrowReader = ArrowReader()
-        try checkStructRecordBatch(arrowReader.fromFile(fileURL))
-    }
-
     func testFileWriter_struct() throws {
-        // read existing file
-        let fileURL = currentDirectory().appendingPathComponent("testdata_struct.arrow")
-        let arrowReader = ArrowReader()
-        let fileRBs = try checkStructRecordBatch(arrowReader.fromFile(fileURL))
+        let recordBatch = try makeTwoFieldStructRecordBatch()
         let arrowWriter = ArrowWriter()
-        // write data from file to a stream
-        let writerInfo = ArrowWriter.Info(.recordbatch, schema: fileRBs[0].schema, batches: fileRBs)
+        let writerInfo = ArrowWriter.Info(
+            .recordbatch, schema: recordBatch.schema, batches: [recordBatch])
+        let arrowReader = ArrowReader()
+        // write to an in-memory buffer and read it back
         switch arrowWriter.writeFile(writerInfo) {
         case .success(let writeData):
-            // read stream back into recordbatches
             try checkStructRecordBatch(arrowReader.readFile(writeData))
         case .failure(let error):
             throw error
         }
-        // write file record batches to another file
+        // write to a file and read it back
         let outputUrl = currentDirectory().appendingPathComponent("testfilewriter_struct.arrow")
         switch arrowWriter.toFile(outputUrl, info: writerInfo) {
         case .success:

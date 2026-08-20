@@ -18,9 +18,3 @@
 ARG SWIFT=5.10
 ARG UBUNTU_CODE_NAME=noble
 FROM swift:${SWIFT}-${UBUNTU_CODE_NAME}
-
-# Go is needed for generating test data
-RUN apt-get update -y -q && \
-    apt-get install -y -q --no-install-recommends \
-        golang-go && \
-    apt-get clean

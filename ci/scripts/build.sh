@@ -43,17 +43,21 @@ if [ -d /cache ]; then
 fi
 github_actions_group_end
 
-github_actions_group_begin "Generate data"
-data_gen_dir="${build_dir}/source/data-generator/swift-datagen"
-if [ -d /cache ]; then
-  export GOCACHE="/cache/go-build"
-  export GOMODCACHE="/cache/go-mod"
+github_actions_group_begin "Initialize arrow-testing submodule or fetch"
+pushd "${build_dir}/source"
+git config --global --add safe.directory "$(pwd)"
+if [ -d .git ]; then
+  git submodule update --init --depth 1 testing
+else
+  # Running from extracted tarball; submodules are not present in the
+  # archive (rc.yaml builds it with git archive), so fetch the data
+  # directly instead.
+  git clone --depth 1 \
+    https://github.com/apache/arrow-testing.git testing-tmp
+  mkdir -p testing
+  cp -a testing-tmp/data testing/
+  rm -rf testing-tmp
 fi
-export GOPATH="${build_dir}"
-pushd "${data_gen_dir}"
-go get -d ./...
-go run .
-cp *.arrow ../../Tests/ArrowTests
 popd
 github_actions_group_end
 

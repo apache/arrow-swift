@@ -15,8 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-*/*/go.sum
 */Package.resolved
 */go.sum
 .github/pull_request_template.md
+.gitmodules
 Package.resolved

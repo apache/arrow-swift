@@ -52,10 +52,3 @@ updates:
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
-  - package-ecosystem: "gomod"
-    directory: "/data-generator/swift-datagen/"
-    schedule:
-      interval: "daily"
-    commit-message:
-      prefix: "chore: "
-    open-pull-requests-limit: 10
