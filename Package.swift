@@ -34,7 +34,7 @@ let package = Package(
             targets: ["ArrowFlight"])
     ],
     dependencies: [
-        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.2.10"),
+        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.12.19"),
         .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.25.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.29.0"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
