@@ -324,9 +324,10 @@ func validateBufferIndex(_ recordBatch: org_apache_arrow_flatbuf_RecordBatch, in
 }
 
 func validateFileData(_ data: Data) -> Bool {
-    let markerLength = FILEMARKER.utf8.count
-    let startString = String(decoding: data[..<markerLength], as: UTF8.self)
-    let endString = String(decoding: data[(data.count - markerLength)...], as: UTF8.self)
+    let markerLength: Int = FILEMARKER.utf8.count
+    guard data.count >= markerLength * 2 else { return false }
+    let startString: String = String(decoding: data.prefix(markerLength), as: UTF8.self)
+    let endString: String = String(decoding: data.suffix(markerLength), as: UTF8.self)
     return startString == FILEMARKER && endString == FILEMARKER
 }
 

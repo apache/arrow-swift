@@ -671,5 +671,48 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
     }
+
+    func testFromFileWithInvalidData() throws {
+        let reader = ArrowReader()
+
+        // Test empty file
+        let emptyUrl = FileManager.default.temporaryDirectory
+            .appendingPathComponent("empty_\(UUID().uuidString).bin")
+        try Data().write(to: emptyUrl)
+        defer { try? FileManager.default.removeItem(at: emptyUrl) }
+
+        switch reader.fromFile(emptyUrl) {
+        case .success:
+            XCTFail("Expected failure for empty file")
+        case .failure:
+            break // Correct: should fail gracefully
+        }
+
+        // Test file with single byte
+        let singleByteUrl = FileManager.default.temporaryDirectory
+            .appendingPathComponent("single_\(UUID().uuidString).bin")
+        try Data([0x41]).write(to: singleByteUrl)
+        defer { try? FileManager.default.removeItem(at: singleByteUrl) }
+
+        switch reader.fromFile(singleByteUrl) {
+        case .success:
+            XCTFail("Expected failure for single byte file")
+        case .failure:
+            break
+        }
+
+        // Test file with partial marker
+        let partialUrl = FileManager.default.temporaryDirectory
+            .appendingPathComponent("partial_\(UUID().uuidString).bin")
+        try Data("ARROW".utf8).write(to: partialUrl)  // "ARROW" = 5 bytes, marker is 6
+        defer { try? FileManager.default.removeItem(at: partialUrl) }
+
+        switch reader.fromFile(partialUrl) {
+        case .success:
+            XCTFail("Expected failure for partial marker file")
+        case .failure:
+            break
+        }
+    }
 }
 // swiftlint:disable:this file_length
