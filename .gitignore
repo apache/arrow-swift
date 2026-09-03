@@ -23,7 +23,7 @@
 DerivedData/
 Packages/
 xcuserdata/
-
+.vscode/
 # Docker
 /.docker/
 

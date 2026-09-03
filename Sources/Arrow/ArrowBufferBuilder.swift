@@ -42,7 +42,7 @@ public class BaseBufferBuilder {
     }
 
     public func isNull(_ index: UInt) -> Bool {
-        return self.nulls.length == 0 || BitUtility.isSet(index + self.offset, buffer: self.nulls)
+        return !BitUtility.isSet(index + self.offset, buffer: self.nulls)
     }
 
     func resizeLength(_ data: ArrowBuffer, len: UInt = 0) -> UInt {
@@ -427,10 +427,6 @@ public class ListBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
             BitUtility.clearBit(index + self.offset, buffer: self.nulls)
             self.offsets.rawPointer.advanced(by: offsetIndex + MemoryLayout<Int32>.stride).storeBytes(of: currentOffset, as: Int32.self)
         }
-    }
-
-    public override func isNull(_ index: UInt) -> Bool {
-        return !BitUtility.isSet(index + self.offset, buffer: self.nulls)
     }
 
     public func resize(_ length: UInt) {
