@@ -262,6 +262,50 @@ final class IPCStreamReaderTests: XCTestCase {
             throw error
         }
     }
+
+    func testReadStreamingRecordBatchBeforeSchema() throws {
+        // Build a minimal streaming message: a RecordBatch header with no
+        // preceding Schema message. This should fail gracefully instead
+        // of crashing on a force unwrap.
+        let schema = makeSchema()
+        let recordBatch = try makeRecordBatch()
+        let arrowWriter = ArrowWriter()
+        let writerInfo = ArrowWriter.Info(.recordbatch, schema: schema, batches: [recordBatch])
+
+        switch arrowWriter.writeStreaming(writerInfo) {
+        case .success(let writeData):
+            // Mirror the parsing logic in ArrowReader.readStreaming to advance
+            // past exactly one message (the Schema message), leaving the
+            // RecordBatch message intact and correctly positioned for
+            // readStreaming to parse on its own.
+            var offset = 0
+            var length = getUInt32(writeData, offset: offset)
+            if length == CONTINUATIONMARKER {
+                offset += Int(MemoryLayout<UInt32>.size)
+                length = getUInt32(writeData, offset: offset)
+            }
+            offset += Int(MemoryLayout<UInt32>.size)
+
+            var dataBuffer = ByteBuffer(
+                data: writeData[offset...],
+                allowReadingUnalignedBuffers: false)
+            let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &dataBuffer)
+            XCTAssertEqual(message.headerType, .schema)
+
+            offset += Int(message.bodyLength + Int64(length))
+            let truncatedData = writeData[offset...]
+
+            let arrowReader = ArrowReader()
+            switch arrowReader.readStreaming(truncatedData) {
+            case .success:
+                XCTFail("Expected failure when RecordBatch precedes Schema")
+            case .failure:
+                break // Correct: should fail gracefully, not crash
+            }
+        case .failure(let error):
+            throw error
+        }
+    }
 }
 
 final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body_length
@@ -671,5 +715,6 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
             throw error
         }
     }
+
 }
 // swiftlint:disable:this file_length

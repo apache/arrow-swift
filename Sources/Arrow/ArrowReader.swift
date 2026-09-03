@@ -274,7 +274,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             }
 
             offset += Int(MemoryLayout<UInt32>.size)
-            streamData = input[offset...]
+            streamData = input[(input.startIndex + offset)...]
             var dataBuffer = ByteBuffer(
                 data: streamData,
                 allowReadingUnalignedBuffers: useUnalignedBuffers
@@ -282,11 +282,19 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &dataBuffer)
             switch message.headerType {
             case .recordbatch:
-                let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+                guard let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self) else {
+                    return .failure(.invalid("RecordBatch header not found"))
+                }
+                guard let schemaMsg = schemaMessage else {
+                    return .failure(.invalid("Schema must be defined before RecordBatch"))
+                }
+                guard let schema = result.schema else {
+                    return .failure(.invalid("Schema not loaded"))
+                }
                 let recordBatchResult = loadRecordBatch(
                     rbMessage,
-                    schema: schemaMessage!,
-                    arrowSchema: result.schema!,
+                    schema: schemaMsg,
+                    arrowSchema: schema,
                     data: input,
                     messageEndOffset: (Int64(offset) + Int64(length)))
                 switch recordBatchResult {
@@ -335,7 +343,10 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             data: footerData,
             allowReadingUnalignedBuffers: useUnalignedBuffers)
         let footer: org_apache_arrow_flatbuf_Footer = getRoot(byteBuffer: &footerBuffer)
-        let schemaResult = loadSchema(footer.schema!)
+        guard let footerSchema = footer.schema else {
+            return .failure(.invalid("Footer schema not found"))
+        }
+        let schemaResult = loadSchema(footerSchema)
         switch schemaResult {
         case .success(let schema):
             result.schema = schema
@@ -368,11 +379,16 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &mbb)
             switch message.headerType {
             case .recordbatch:
-                let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+                guard let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self) else {
+                    return .failure(.invalid("RecordBatch header not found"))
+                }
+                guard let schema = result.schema else {
+                    return .failure(.invalid("Schema not loaded"))
+                }
                 let recordBatchResult = loadRecordBatch(
                     rbMessage,
-                    schema: footer.schema!,
-                    arrowSchema: result.schema!,
+                    schema: footerSchema,
+                    arrowSchema: schema,
                     data: fileData,
                     messageEndOffset: messageEndOffset)
                 switch recordBatchResult {
@@ -421,7 +437,9 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &mbb)
         switch message.headerType {
         case .schema:
-            let sMessage = message.header(type: org_apache_arrow_flatbuf_Schema.self)!
+            guard let sMessage = message.header(type: org_apache_arrow_flatbuf_Schema.self) else {
+                return .failure(.invalid("Schema header not found"))
+            }
             switch loadSchema(sMessage) {
             case .success(let schema):
                 result.schema = schema
@@ -431,9 +449,17 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
                 return .failure(error)
             }
         case .recordbatch:
-            let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self)!
+            guard let rbMessage = message.header(type: org_apache_arrow_flatbuf_RecordBatch.self) else {
+                return .failure(.invalid("RecordBatch header not found"))
+            }
+            guard let messageSchema = result.messageSchema else {
+                return .failure(.invalid("Schema must be defined before RecordBatch"))
+            }
+            guard let schema = result.schema else {
+                return .failure(.invalid("Schema not loaded"))
+            }
             let recordBatchResult = loadRecordBatch(
-                rbMessage, schema: result.messageSchema!, arrowSchema: result.schema!,
+                rbMessage, schema: messageSchema, arrowSchema: schema,
                 data: dataBody, messageEndOffset: 0)
             switch recordBatchResult {
             case .success(let recordBatch):
