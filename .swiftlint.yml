@@ -30,3 +30,5 @@ excluded:
 identifier_name:
   min_length: 2 # only warning
 allow_zero_lintable_files: false
+cyclomatic_complexity:
+  ignores_case_statements: true
