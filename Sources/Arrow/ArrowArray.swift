@@ -230,7 +230,7 @@ public class Date64Array: ArrowArray<Date> {
 
         let byteOffset = self.arrowData.stride * Int(index)
         let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: Int64.self)
-        return Date(timeIntervalSince1970: TimeInterval(milliseconds / 1000))
+        return Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 }
 
