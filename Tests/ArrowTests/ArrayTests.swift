@@ -127,6 +127,42 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         XCTAssertEqual(date64Array[0]!, date1)
     }
 
+    func testDate32ArrayOutsideUnsignedRange() throws {
+        // 0001-01-01, 1969-12-31, 1970-01-01, 2038-01-20, 2106-02-07, 2106-02-08, 9999-12-31
+        let days: [Int32] = [-719162, -1, 0, 24856, 49710, 49711, 2932896]
+        let date32Builder: Date32ArrayBuilder = try ArrowArrayBuilders.loadDate32ArrayBuilder()
+        for day in days {
+            date32Builder.append(Date(timeIntervalSince1970: TimeInterval(day) * 86400))
+        }
+        let date32Array = try date32Builder.finish()
+        for (index, day) in days.enumerated() {
+            let rawDay = date32Array.arrowData.buffers[1].rawPointer
+                .advanced(by: index * MemoryLayout<Int32>.stride).load(as: Int32.self)
+            XCTAssertEqual(rawDay, day)
+            XCTAssertEqual(date32Array[UInt(index)]!.timeIntervalSince1970, TimeInterval(day) * 86400)
+        }
+    }
+
+    func testDate32BuilderPreEpochTimeOfDay() throws {
+        let date32Builder: Date32ArrayBuilder = try ArrowArrayBuilders.loadDate32ArrayBuilder()
+        date32Builder.append(Date(timeIntervalSince1970: -43200)) // 1969-12-31T12:00:00Z
+        date32Builder.append(Date(timeIntervalSince1970: -1)) // 1969-12-31T23:59:59Z
+        date32Builder.append(Date(timeIntervalSince1970: 43200)) // 1970-01-01T12:00:00Z
+        let date32Array = try date32Builder.finish()
+        XCTAssertEqual(date32Array[0]!.timeIntervalSince1970, -86400)
+        XCTAssertEqual(date32Array[1]!.timeIntervalSince1970, -86400)
+        XCTAssertEqual(date32Array[2]!.timeIntervalSince1970, 0)
+    }
+
+    func testDate64ArrayPreEpoch() throws {
+        let date64Builder: Date64ArrayBuilder = try ArrowArrayBuilders.loadDate64ArrayBuilder()
+        date64Builder.append(Date(timeIntervalSince1970: -86400 * 719162)) // 0001-01-01
+        date64Builder.append(Date(timeIntervalSince1970: -86400)) // 1969-12-31
+        let date64Array = try date64Builder.finish()
+        XCTAssertEqual(date64Array[0]!.timeIntervalSince1970, -86400 * 719162)
+        XCTAssertEqual(date64Array[1]!.timeIntervalSince1970, -86400)
+    }
+
     func testBinaryArray() throws {
         let binaryBuilder = try ArrowArrayBuilders.loadBinaryArrayBuilder()
         for index in 0..<100 {
