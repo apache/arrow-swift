@@ -31,13 +31,15 @@ let package = Package(
             targets: ["Arrow"]),
         .library(
             name: "ArrowFlight",
-            targets: ["ArrowFlight"])
+            targets: ["ArrowFlight"]),
+        .executable(name: "arrow-json-integration-test", targets: ["ArrowJSONIntegrationTest"])
     ],
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", exact: "25.2.10"),
         .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.25.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.29.0"),
-        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
+        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0")
     ],
     targets: [
         .target(
@@ -80,7 +82,13 @@ let package = Package(
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
+        ),
+        .executableTarget(
+            name: "ArrowJSONIntegrationTest",
+            dependencies: [
+                "Arrow",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ]
         )
-
     ]
 )
