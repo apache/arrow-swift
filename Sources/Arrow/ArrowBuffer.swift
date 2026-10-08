@@ -32,6 +32,10 @@ public class ArrowBuffer {
         self.isMemoryOwner = isMemoryOwner
     }
 
+    func updateLength(_ newLength: UInt) {
+        self.length = newLength
+    }
+
     deinit {
         if isMemoryOwner {
             self.rawPointer.deallocate()

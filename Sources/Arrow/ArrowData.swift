@@ -26,9 +26,26 @@ public class ArrowData {
     public let stride: Int
 
     convenience init(_ arrowType: ArrowType, buffers: [ArrowBuffer], nullCount: UInt) throws {
+        let arrayLength: UInt
+        switch arrowType.info {
+        case .variableInfo:
+            guard buffers.count >= 3 else {
+                throw ArrowError.invalid(
+                    "Variable-width ArrowData requires at least three buffers (null bitmap, offsets, and values).")
+            }
+            let offsetsLength = buffers[1].length
+            guard offsetsLength >= 1 else {
+                throw ArrowError.invalid(
+                    "Variable-width ArrowData requires a non-empty offsets buffer.")
+            }
+            arrayLength = offsetsLength - 1
+        default:
+            arrayLength = buffers[1].length
+        }
+
         try self.init(arrowType, buffers: buffers,
                       children: [ArrowData](), nullCount: nullCount,
-                      length: buffers[1].length)
+                      length: arrayLength)
     }
 
     init(_ arrowType: ArrowType, buffers: [ArrowBuffer], children: [ArrowData], nullCount: UInt, length: UInt) throws {

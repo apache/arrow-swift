@@ -137,7 +137,7 @@ public class ArrowCImporter {
                 }
 
                 appendToBuffer(cArray.buffers[0], arrowBuffers: &arrowBuffers, length: (length + 7) / 8)
-                appendToBuffer(cArray.buffers[1], arrowBuffers: &arrowBuffers, length: length)
+                appendToBuffer(cArray.buffers[1], arrowBuffers: &arrowBuffers, length: length + 1)
                 let lastOffsetLength = cArray.buffers[1]!
                     .advanced(by: Int(length) * MemoryLayout<Int32>.stride)
                     .load(as: Int32.self)
