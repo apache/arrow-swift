@@ -35,8 +35,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/google/flatbuffers.git", exact: "25.12.19"),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.25.0"),
-        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.29.0"),
+        .package(url: "https://github.com/grpc/grpc-swift-2.git", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.35.1"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
     ],
     targets: [
@@ -60,7 +60,7 @@ let package = Package(
             name: "ArrowFlight",
             dependencies: [
                 "Arrow",
-                .product(name: "GRPC", package: "grpc-swift"),
+                .product(name: "GRPCCore", package: "grpc-swift-2"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf")
             ],
             swiftSettings: [
