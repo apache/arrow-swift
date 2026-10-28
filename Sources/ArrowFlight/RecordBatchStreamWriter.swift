@@ -17,56 +17,61 @@
 
 import Foundation
 import Arrow
-import GRPC
+import GRPCCore
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class ActionTypeStreamWriter {
-    let stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_ActionType>
-    init(_ stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_ActionType>) {
+    let stream: RPCWriter<Arrow_Flight_Protocol_ActionType>
+    init(_ stream: RPCWriter<Arrow_Flight_Protocol_ActionType>) {
         self.stream = stream
     }
 
     public func write(_ actionType: FlightActionType) async throws {
-        try await self.stream.send(actionType.toProtocol())
+        try await self.stream.write(actionType.toProtocol())
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class ResultStreamWriter {
-    let stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_Result>
-    init(_ stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_Result>) {
+    let stream: RPCWriter<Arrow_Flight_Protocol_Result>
+    init(_ stream: RPCWriter<Arrow_Flight_Protocol_Result>) {
         self.stream = stream
     }
 
     public func write(_ result: FlightResult) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await self.stream.write(result.toProtocol())
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class FlightInfoStreamWriter {
-    let stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightInfo>
-    init(_ stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightInfo>) {
+    let stream: RPCWriter<Arrow_Flight_Protocol_FlightInfo>
+    init(_ stream: RPCWriter<Arrow_Flight_Protocol_FlightInfo>) {
         self.stream = stream
     }
 
     public func write(_ result: FlightInfo) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await self.stream.write(result.toProtocol())
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class PutResultDataStreamWriter {
-    let stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_PutResult>
-    init(_ stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_PutResult>) {
+    let stream: RPCWriter<Arrow_Flight_Protocol_PutResult>
+    init(_ stream: RPCWriter<Arrow_Flight_Protocol_PutResult>) {
         self.stream = stream
     }
 
     public func write(_ result: FlightPutResult) async throws {
-        try await self.stream.send(result.toProtocol())
+        try await self.stream.write(result.toProtocol())
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class RecordBatchStreamWriter {
     let writer = ArrowWriter()
-    let stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightData>
-    init(_ stream: GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightData>) {
+    let stream: RPCWriter<Arrow_Flight_Protocol_FlightData>
+    init(_ stream: RPCWriter<Arrow_Flight_Protocol_FlightData>) {
         self.stream = stream
     }
 
@@ -77,7 +82,7 @@ public class RecordBatchStreamWriter {
                 $0.dataHeader = schemaData
             }
 
-            try await self.stream.send(schemaFlightData)
+            try await self.stream.write(schemaFlightData)
             switch writer.toMessage(rb) {
             case .success(let recordMessages):
                 let rbMessage = Arrow_Flight_Protocol_FlightData.with {
@@ -85,7 +90,7 @@ public class RecordBatchStreamWriter {
                     $0.dataBody = recordMessages[1]
                 }
 
-                try await self.stream.send(rbMessage)
+                try await self.stream.write(rbMessage)
             case .failure(let error):
                 throw error
             }

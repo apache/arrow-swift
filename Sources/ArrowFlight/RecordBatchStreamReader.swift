@@ -17,8 +17,9 @@
 
 import Foundation
 import Arrow
-import GRPC
+import GRPCCore
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
     public typealias AsyncIterator = RecordBatchStreamReader
     public typealias Element = (Arrow.RecordBatch?, FlightDescriptor?)
@@ -26,9 +27,9 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
     var batches = [RecordBatch]()
     var descriptor: FlightDescriptor?
     var batchIndex = 0
-    var streamIterator: any AsyncIteratorProtocol
-    let stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>
-    init(_ stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>) {
+    var streamIterator: RPCAsyncSequence<Arrow_Flight_Protocol_FlightData, any Swift.Error>.AsyncIterator
+    let stream: RPCAsyncSequence<Arrow_Flight_Protocol_FlightData, any Swift.Error>
+    init(_ stream: RPCAsyncSequence<Arrow_Flight_Protocol_FlightData, any Swift.Error>) {
         self.stream = stream
         self.streamIterator = self.stream.makeAsyncIterator()
     }
@@ -46,12 +47,10 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
 
         let result = ArrowReader.makeArrowReaderResult()
         while true {
-            let streamData = try await self.streamIterator.next()
-            if streamData == nil {
+            guard let flightData = try await self.streamIterator.next() else {
                 return nil
             }
 
-            let flightData = (streamData as? Arrow_Flight_Protocol_FlightData)!
             let dataBody = flightData.dataBody
             let dataHeader = flightData.dataHeader
             descriptor = FlightDescriptor(flightData.flightDescriptor)
