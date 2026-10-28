@@ -217,8 +217,8 @@ public class Date32Array: ArrowArray<Date> {
         }
 
         let byteOffset = self.arrowData.stride * Int(index)
-        let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt32.self)
-        return Date(timeIntervalSince1970: TimeInterval(milliseconds * 86400))
+        let days = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: Int32.self)
+        return Date(timeIntervalSince1970: TimeInterval(days) * 86400)
     }
 }
 
@@ -229,8 +229,8 @@ public class Date64Array: ArrowArray<Date> {
         }
 
         let byteOffset = self.arrowData.stride * Int(index)
-        let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: UInt64.self)
-        return Date(timeIntervalSince1970: TimeInterval(milliseconds / 1000))
+        let milliseconds = self.arrowData.buffers[1].rawPointer.advanced(by: byteOffset).load(as: Int64.self)
+        return Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 }
 
