@@ -27,13 +27,10 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
     var descriptor: FlightDescriptor?
     var batchIndex = 0
     var streamIterator: any AsyncIteratorProtocol
-    var useUnalignedBuffers: Bool
     let stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>
-    init(_ stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>,
-         useUnalignedBuffers: Bool = false) {
+    init(_ stream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>) {
         self.stream = stream
         self.streamIterator = self.stream.makeAsyncIterator()
-        self.useUnalignedBuffers = useUnalignedBuffers
     }
 
     public func next() async throws -> (Arrow.RecordBatch?, FlightDescriptor?)? {
@@ -61,8 +58,7 @@ public class RecordBatchStreamReader: AsyncSequence, AsyncIteratorProtocol {
             switch reader.fromMessage(
                 dataHeader,
                 dataBody: dataBody,
-                result: result,
-                useUnalignedBuffers: useUnalignedBuffers) {
+                result: result) {
             case .success(()):
                 if result.batches.count > 0 {
                     batches = result.batches

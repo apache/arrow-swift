@@ -18,12 +18,18 @@
 # under the License.
 
 set -eu
-pushd Arrow/Sources/Arrow/
-flatc --swift ../../../../format/Message.fbs
-flatc --swift ../../../../format/Schema.fbs
-flatc --swift ../../../../format/SparseTensor.fbs
-flatc --swift ../../../../format/Tensor.fbs
-flatc --swift ../../../../format/File.fbs
+
+# The .fbs format files are maintained in the apache/arrow repository.
+# Either check out apache/arrow next to this repository, or set
+# ARROW_FORMAT_DIR to point at its format/ directory.
+FORMAT_DIR="${ARROW_FORMAT_DIR:-../arrow/format}"
+
+pushd Sources/Arrow/
+flatc --swift "${FORMAT_DIR}/Message.fbs"
+flatc --swift "${FORMAT_DIR}/Schema.fbs"
+flatc --swift "${FORMAT_DIR}/SparseTensor.fbs"
+flatc --swift "${FORMAT_DIR}/Tensor.fbs"
+flatc --swift "${FORMAT_DIR}/File.fbs"
 cat <<HEADER > header.swift
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file

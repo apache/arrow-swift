@@ -18,26 +18,27 @@
 // swiftlint:disable all
 // swiftformat:disable all
 
+#if canImport(Common)
+import Common
+#endif
+
 import FlatBuffers
 
-public struct org_apache_arrow_flatbuf_Block: NativeStruct, Verifiable, FlatbuffersInitializable {
+public struct org_apache_arrow_flatbuf_Block: NativeStruct, FlatbuffersVectorInitializable, Verifiable, FlatbuffersInitializable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
 
-  ///  Index to the start of the RecordBlock (note this is past the Message header)
+  ///  Index to the start of the RecordBatch (note this is past the Message header)
   private var _offset: Int64
   ///  Length of the metadata
   private var _metaDataLength: Int32
-  private let padding0__: UInt32 = 0
+  private var padding0__: UInt32 = 0
   ///  Length of the data (this is aligned so there can be a gap between this and
   ///  the metadata).
   private var _bodyLength: Int64
 
   public init(_ bb: ByteBuffer, o: Int32) {
-    let _accessor = Struct(bb: bb, position: o)
-    _offset = _accessor.readBuffer(of: Int64.self, at: 0)
-    _metaDataLength = _accessor.readBuffer(of: Int32.self, at: 8)
-    _bodyLength = _accessor.readBuffer(of: Int64.self, at: 16)
+    self = bb.read(def: Self.self, position: Int(o))
   }
 
   public init(offset: Int64, metaDataLength: Int32, bodyLength: Int64) {
@@ -52,7 +53,7 @@ public struct org_apache_arrow_flatbuf_Block: NativeStruct, Verifiable, Flatbuff
     _bodyLength = 0
   }
 
-  ///  Index to the start of the RecordBlock (note this is past the Message header)
+  ///  Index to the start of the RecordBatch (note this is past the Message header)
   public var offset: Int64 { _offset }
   ///  Length of the metadata
   public var metaDataLength: Int32 { _metaDataLength }
@@ -65,9 +66,9 @@ public struct org_apache_arrow_flatbuf_Block: NativeStruct, Verifiable, Flatbuff
   }
 }
 
-public struct org_apache_arrow_flatbuf_Block_Mutable: FlatBufferObject {
+public struct org_apache_arrow_flatbuf_Block_Mutable: FlatBufferStruct, FlatbuffersVectorInitializable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Struct
 
@@ -81,9 +82,9 @@ public struct org_apache_arrow_flatbuf_Block_Mutable: FlatBufferObject {
 ///  ----------------------------------------------------------------------
 ///  Arrow File metadata
 /// 
-public struct org_apache_arrow_flatbuf_Footer: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_Footer: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -102,18 +103,14 @@ public struct org_apache_arrow_flatbuf_Footer: FlatBufferObject, Verifiable {
 
   public var version: org_apache_arrow_flatbuf_MetadataVersion { let o = _accessor.offset(VTOFFSET.version.v); return o == 0 ? .v1 : org_apache_arrow_flatbuf_MetadataVersion(rawValue: _accessor.readBuffer(of: Int16.self, at: o)) ?? .v1 }
   public var schema: org_apache_arrow_flatbuf_Schema? { let o = _accessor.offset(VTOFFSET.schema.v); return o == 0 ? nil : org_apache_arrow_flatbuf_Schema(_accessor.bb, o: _accessor.indirect(o + _accessor.position)) }
-  public var hasDictionaries: Bool { let o = _accessor.offset(VTOFFSET.dictionaries.v); return o == 0 ? false : true }
-  public var dictionariesCount: Int32 { let o = _accessor.offset(VTOFFSET.dictionaries.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func dictionaries(at index: Int32) -> org_apache_arrow_flatbuf_Block? { let o = _accessor.offset(VTOFFSET.dictionaries.v); return o == 0 ? nil : _accessor.directRead(of: org_apache_arrow_flatbuf_Block.self, offset: _accessor.vector(at: o) + index * 24) }
-  public func mutableDictionaries(at index: Int32) -> org_apache_arrow_flatbuf_Block_Mutable? { let o = _accessor.offset(VTOFFSET.dictionaries.v); return o == 0 ? nil : org_apache_arrow_flatbuf_Block_Mutable(_accessor.bb, o: _accessor.vector(at: o) + index * 24) }
-  public var hasRecordBatches: Bool { let o = _accessor.offset(VTOFFSET.recordBatches.v); return o == 0 ? false : true }
-  public var recordBatchesCount: Int32 { let o = _accessor.offset(VTOFFSET.recordBatches.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func recordBatches(at index: Int32) -> org_apache_arrow_flatbuf_Block? { let o = _accessor.offset(VTOFFSET.recordBatches.v); return o == 0 ? nil : _accessor.directRead(of: org_apache_arrow_flatbuf_Block.self, offset: _accessor.vector(at: o) + index * 24) }
-  public func mutableRecordBatches(at index: Int32) -> org_apache_arrow_flatbuf_Block_Mutable? { let o = _accessor.offset(VTOFFSET.recordBatches.v); return o == 0 ? nil : org_apache_arrow_flatbuf_Block_Mutable(_accessor.bb, o: _accessor.vector(at: o) + index * 24) }
+  public var dictionaries: FlatbufferVector<org_apache_arrow_flatbuf_Block> { return _accessor.vector(at: VTOFFSET.dictionaries.v, byteSize: 24) }
+  public var mutableDictionaries: FlatbufferVector<org_apache_arrow_flatbuf_Block_Mutable> { return _accessor.vector(at: VTOFFSET.dictionaries.v, byteSize: 24) }
+  public func withUnsafePointerToDictionaries<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.dictionaries.v, body: body) }
+  public var recordBatches: FlatbufferVector<org_apache_arrow_flatbuf_Block> { return _accessor.vector(at: VTOFFSET.recordBatches.v, byteSize: 24) }
+  public var mutableRecordBatches: FlatbufferVector<org_apache_arrow_flatbuf_Block_Mutable> { return _accessor.vector(at: VTOFFSET.recordBatches.v, byteSize: 24) }
+  public func withUnsafePointerToRecordBatches<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.recordBatches.v, body: body) }
   ///  User-defined metadata
-  public var hasCustomMetadata: Bool { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? false : true }
-  public var customMetadataCount: Int32 { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func customMetadata(at index: Int32) -> org_apache_arrow_flatbuf_KeyValue? { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? nil : org_apache_arrow_flatbuf_KeyValue(_accessor.bb, o: _accessor.indirect(_accessor.vector(at: o) + index * 4)) }
+  public var customMetadata: FlatbufferVector<org_apache_arrow_flatbuf_KeyValue> { return _accessor.vector(at: VTOFFSET.customMetadata.v, byteSize: 4) }
   public static func startFooter(_ fbb: inout FlatBufferBuilder) -> UOffset { fbb.startTable(with: 5) }
   public static func add(version: org_apache_arrow_flatbuf_MetadataVersion, _ fbb: inout FlatBufferBuilder) { fbb.add(element: version.rawValue, def: 0, at: VTOFFSET.version.p) }
   public static func add(schema: Offset, _ fbb: inout FlatBufferBuilder) { fbb.add(offset: schema, at: VTOFFSET.schema.p) }

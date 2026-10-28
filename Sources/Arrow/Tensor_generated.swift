@@ -18,14 +18,18 @@
 // swiftlint:disable all
 // swiftformat:disable all
 
+#if canImport(Common)
+import Common
+#endif
+
 import FlatBuffers
 
 ///  ----------------------------------------------------------------------
 ///  Data structures for dense tensors
 ///  Shape data for a single axis in a tensor
-public struct org_apache_arrow_flatbuf_TensorDim: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_TensorDim: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -67,9 +71,9 @@ public struct org_apache_arrow_flatbuf_TensorDim: FlatBufferObject, Verifiable {
   }
 }
 
-public struct org_apache_arrow_flatbuf_Tensor: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_Tensor: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -91,15 +95,11 @@ public struct org_apache_arrow_flatbuf_Tensor: FlatBufferObject, Verifiable {
   ///  value types are supported, no strings or nested types
   public func type<T: FlatbuffersInitializable>(type: T.Type) -> T! { let o = _accessor.offset(VTOFFSET.type.v); return _accessor.union(o) }
   ///  The dimensions of the tensor, optionally named
-  public var hasShape: Bool { let o = _accessor.offset(VTOFFSET.shape.v); return o == 0 ? false : true }
-  public var shapeCount: Int32 { let o = _accessor.offset(VTOFFSET.shape.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func shape(at index: Int32) -> org_apache_arrow_flatbuf_TensorDim? { let o = _accessor.offset(VTOFFSET.shape.v); return o == 0 ? nil : org_apache_arrow_flatbuf_TensorDim(_accessor.bb, o: _accessor.indirect(_accessor.vector(at: o) + index * 4)) }
+  public var shape: FlatbufferVector<org_apache_arrow_flatbuf_TensorDim> { return _accessor.vector(at: VTOFFSET.shape.v, byteSize: 4) }
   ///  Non-negative byte offsets to advance one value cell along each dimension
   ///  If omitted, default to row-major order (C-like).
-  public var hasStrides: Bool { let o = _accessor.offset(VTOFFSET.strides.v); return o == 0 ? false : true }
-  public var stridesCount: Int32 { let o = _accessor.offset(VTOFFSET.strides.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func strides(at index: Int32) -> Int64 { let o = _accessor.offset(VTOFFSET.strides.v); return o == 0 ? 0 : _accessor.directRead(of: Int64.self, offset: _accessor.vector(at: o) + index * 8) }
-  public var strides: [Int64] { return _accessor.getVector(at: VTOFFSET.strides.v) ?? [] }
+  public var strides: FlatbufferVector<Int64> { return _accessor.vector(at: VTOFFSET.strides.v, byteSize: 8) }
+  public func withUnsafePointerToStrides<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.strides.v, body: body) }
   ///  The location and size of the tensor's data
   public var data: org_apache_arrow_flatbuf_Buffer! { let o = _accessor.offset(VTOFFSET.data.v); return _accessor.readBuffer(of: org_apache_arrow_flatbuf_Buffer.self, at: o) }
   public var mutableData: org_apache_arrow_flatbuf_Buffer_Mutable! { let o = _accessor.offset(VTOFFSET.data.v); return org_apache_arrow_flatbuf_Buffer_Mutable(_accessor.bb, o: o + _accessor.position) }
