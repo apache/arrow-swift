@@ -16,9 +16,7 @@
 // under the License.
 
 import Foundation
-import GRPC
-import NIO
-import NIOConcurrencyHelpers
+import GRPCCore
 import SwiftProtobuf
 import Arrow
 
@@ -62,6 +60,7 @@ public func schemaFromMessage(_ schemaData: Data) -> ArrowSchema? {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public protocol ArrowFlightServer: Sendable {
     func listFlights(_ criteria: FlightCriteria, writer: FlightInfoStreamWriter) async throws
     func getFlightInfo(_ request: FlightDescriptor) async throws -> FlightInfo
@@ -73,31 +72,34 @@ public protocol ArrowFlightServer: Sendable {
     func doExchange(_ reader: RecordBatchStreamReader, writer: RecordBatchStreamWriter) async throws
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 extension ArrowFlightServer {
 }
 
-public func makeFlightServer(_ handler: ArrowFlightServer) -> CallHandlerProvider {
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+public func makeFlightServer(_ handler: ArrowFlightServer) -> any RegistrableRPCService {
     return InternalFlightServer(handler)
 }
 
-internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAsyncProvider {
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightService.SimpleServiceProtocol {
     let arrowFlightServer: ArrowFlightServer?
 
     init(_ arrowFlightServer: ArrowFlightServer?) {
         self.arrowFlightServer = arrowFlightServer
     }
 
-    func handshake(requestStream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_HandshakeRequest>,
-                   responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_HandshakeResponse>,
-                   context: GRPC.GRPCAsyncServerCallContext) async throws {
+    func handshake(request: GRPCCore.RPCAsyncSequence<Arrow_Flight_Protocol_HandshakeRequest, any Swift.Error>,
+                   response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_HandshakeResponse>,
+                   context: GRPCCore.ServerContext) async throws {
         throw ArrowFlightError.notImplemented()
     }
 
     func listFlights(request: Arrow_Flight_Protocol_Criteria,
-                     responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightInfo>,
-                     context: GRPC.GRPCAsyncServerCallContext) async throws {
+                     response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_FlightInfo>,
+                     context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            let writer = FlightInfoStreamWriter(responseStream)
+            let writer = FlightInfoStreamWriter(response)
             try await server.listFlights(FlightCriteria(request), writer: writer)
             return
         }
@@ -106,7 +108,7 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
     }
 
     func getFlightInfo(request: Arrow_Flight_Protocol_FlightDescriptor,
-                       context: GRPC.GRPCAsyncServerCallContext) async throws -> Arrow_Flight_Protocol_FlightInfo {
+                       context: GRPCCore.ServerContext) async throws -> Arrow_Flight_Protocol_FlightInfo {
         if let server = arrowFlightServer {
             return try await server.getFlightInfo(FlightDescriptor(request)).toProtocol()
         }
@@ -114,8 +116,13 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
         throw ArrowFlightError.notImplemented()
     }
 
+    func pollFlightInfo(request: Arrow_Flight_Protocol_FlightDescriptor,
+                        context: GRPCCore.ServerContext) async throws -> Arrow_Flight_Protocol_PollInfo {
+        throw ArrowFlightError.notImplemented()
+    }
+
     func getSchema(request: Arrow_Flight_Protocol_FlightDescriptor,
-                   context: GRPC.GRPCAsyncServerCallContext) async throws -> Arrow_Flight_Protocol_SchemaResult {
+                   context: GRPCCore.ServerContext) async throws -> Arrow_Flight_Protocol_SchemaResult {
         if let server = arrowFlightServer {
             return try await server.getSchema(FlightDescriptor(request)).toProtocol()
         }
@@ -124,10 +131,10 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
     }
 
     func doGet(request: Arrow_Flight_Protocol_Ticket,
-               responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightData>,
-               context: GRPC.GRPCAsyncServerCallContext) async throws {
+               response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_FlightData>,
+               context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            let writer = RecordBatchStreamWriter(responseStream)
+            let writer = RecordBatchStreamWriter(response)
             let ticket = FlightTicket(request)
             try await server.doGet(ticket, writer: writer)
             return
@@ -136,12 +143,12 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
         throw ArrowFlightError.notImplemented()
     }
 
-    func doPut(requestStream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>,
-               responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_PutResult>,
-               context: GRPC.GRPCAsyncServerCallContext) async throws {
+    func doPut(request: GRPCCore.RPCAsyncSequence<Arrow_Flight_Protocol_FlightData, any Swift.Error>,
+               response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_PutResult>,
+               context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            let reader = RecordBatchStreamReader(requestStream)
-            let writer = PutResultDataStreamWriter(responseStream)
+            let reader = RecordBatchStreamReader(request)
+            let writer = PutResultDataStreamWriter(response)
             try await server.doPut(reader, writer: writer)
             return
         }
@@ -149,12 +156,12 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
         throw ArrowFlightError.notImplemented()
     }
 
-    func doExchange(requestStream: GRPC.GRPCAsyncRequestStream<Arrow_Flight_Protocol_FlightData>,
-                    responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_FlightData>,
-                    context: GRPC.GRPCAsyncServerCallContext) async throws {
+    func doExchange(request: GRPCCore.RPCAsyncSequence<Arrow_Flight_Protocol_FlightData, any Swift.Error>,
+                    response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_FlightData>,
+                    context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            let reader = RecordBatchStreamReader(requestStream)
-            let writer = RecordBatchStreamWriter(responseStream)
+            let reader = RecordBatchStreamReader(request)
+            let writer = RecordBatchStreamWriter(response)
             try await server.doExchange(reader, writer: writer)
             return
         }
@@ -163,10 +170,10 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
     }
 
     func doAction(request: Arrow_Flight_Protocol_Action,
-                  responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_Result>,
-                  context: GRPC.GRPCAsyncServerCallContext) async throws {
+                  response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_Result>,
+                  context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            try await server.doAction(FlightAction(request), writer: ResultStreamWriter(responseStream))
+            try await server.doAction(FlightAction(request), writer: ResultStreamWriter(response))
             return
         }
 
@@ -174,17 +181,14 @@ internal final class InternalFlightServer: Arrow_Flight_Protocol_FlightServiceAs
     }
 
     func listActions(request: Arrow_Flight_Protocol_Empty,
-                     responseStream: GRPC.GRPCAsyncResponseStreamWriter<Arrow_Flight_Protocol_ActionType>,
-                     context: GRPC.GRPCAsyncServerCallContext) async throws {
+                     response: GRPCCore.RPCWriter<Arrow_Flight_Protocol_ActionType>,
+                     context: GRPCCore.ServerContext) async throws {
         if let server = arrowFlightServer {
-            let writer = ActionTypeStreamWriter(responseStream)
+            let writer = ActionTypeStreamWriter(response)
             try await server.listActions(writer)
             return
         }
 
         throw ArrowFlightError.notImplemented()
     }
-
-    internal var interceptors: Arrow_Flight_Protocol_FlightServiceServerInterceptorFactoryProtocol? { return nil }
-
 }
