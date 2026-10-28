@@ -18,9 +18,8 @@
 import XCTest
 import struct Foundation.Data
 import struct Foundation.URL
-import GRPC
-import NIOCore
-import NIOPosix
+import GRPCCore
+import GRPCNIOTransportHTTP2
 import Arrow
 
 @testable import ArrowFlight
@@ -68,6 +67,7 @@ func makeRecordBatch() throws -> RecordBatch {
 }
 
 var flights = [String: FlightInfo]()
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class MyFlightServer: ArrowFlightServer {
     func doExchange(
         _ reader: ArrowFlight.RecordBatchStreamReader,
@@ -137,55 +137,43 @@ final class MyFlightServer: ArrowFlightServer {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 struct FlightServerImpl {
-    var port = 1234
-    static var server: Server?
-    static var group: MultiThreadedEventLoopGroup?
+    static var server: GRPCServer<HTTP2ServerTransport.Posix>?
+    static var serverTask: Task<Void, any Error>?
     static func run() async throws {
         do {
-            // Create an event loop group for the server to run on.
-            let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            // Create a provider using the features we read.
-            let provider = ArrowFlight.makeFlightServer(MyFlightServer())
+            let server = GRPCServer(
+                transport: .http2NIOPosix(
+                    address: .ipv4(host: "127.0.0.1", port: 8088),
+                    transportSecurity: .plaintext),
+                services: [ArrowFlight.makeFlightServer(MyFlightServer())])
 
-            // Start the server and print its address once it has started.
-            FlightServerImpl.server = try await Server.insecure(group: group)
-                .withServiceProviders([provider])
-                .bind(host: "localhost", port: 8088)
-                .get()
+            FlightServerImpl.server = server
+            FlightServerImpl.serverTask = Task {
+                try await server.serve()
+            }
 
-            print("server started on port \(server!.channel.localAddress!.port!)")
-            // Wait on the server's `onClose` future to stop the program from exiting.
+            // Wait for the server to start listening before returning.
+            _ = try await server.listeningAddress
+            print("server started on port 8088")
         } catch {
             print("Unknown server error: \(error)")
         }
     }
 
-    static func syncShutdown() throws {
-        try group?.syncShutdownGracefully()
+    static func syncShutdown() async throws {
+        server?.beginGracefulShutdown()
+        try await serverTask?.value
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class FlightClientTester {
-    var client: FlightClient?
-    var group: MultiThreadedEventLoopGroup?
-    var channel: GRPCChannel?
+    var client: FlightClient<HTTP2ClientTransport.Posix>?
 
-    init() async throws {
-        // Load the features.
-        let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
-        let channel = try GRPCChannelPool.with(
-            target: .host("localhost", port: 8088),
-            transportSecurity: .plaintext,
-            eventLoopGroup: group
-        )
-
-        client = FlightClient(channel: channel)
-    }
-
-    func syncShutdown() throws {
-        try group?.syncShutdownGracefully()
-        try channel?.close().wait()
+    init(client: FlightClient<HTTP2ClientTransport.Posix>) {
+        self.client = client
     }
 
     func listActionTest() async throws {
@@ -314,50 +302,40 @@ actor FlightServerData {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class FlightTest: XCTestCase {
     let serverData = FlightServerData()
 
     func testFlightServer() async throws {
         let basicTask = Task {
             try await FlightServerImpl.run()
-            defer {
-                print("server shutting down")
-                do {
-                    try FlightServerImpl.syncShutdown()
-                } catch {
-                }
-            }
-
             await serverData.setServerUp(true)
-            try await FlightServerImpl.server?.onClose.get()
             return "done"
         }
 
         let secondTask = Task {
-            defer {
-                _ = FlightServerImpl.server?.close()
-            }
-
             while await !serverData.isServerUp() {
                 try await Task.sleep(nanoseconds: 1_000_000)
             }
 
-            let clientImpl = try await FlightClientTester()
-            defer {
-                do {
-                    try clientImpl.syncShutdown()
-                } catch {
-                }
+            try await withGRPCClient(
+                transport: .http2NIOPosix(
+                    target: .ipv4(host: "127.0.0.1", port: 8088),
+                    transportSecurity: .plaintext)
+            ) { grpcClient in
+                let clientImpl = FlightClientTester(client: FlightClient(wrapping: grpcClient))
+                try await clientImpl.listActionTest()
+                try await clientImpl.doPutTest("flight_ticket")
+                try await clientImpl.doPutTest("flight_another")
+                try await clientImpl.listFlightsTest()
+                try await clientImpl.doActionTest("healthcheck", actionBody: Data("healthcheck body".utf8))
+                try await clientImpl.getSchemaTest(Data("schema info".utf8))
+                try await clientImpl.doGetTest(Data("'flight_ticket'".utf8))
+                try await clientImpl.doGetTestFlightData(Data("'flight_another'".utf8))
+                try await clientImpl.doExchangeTest()
             }
-            try await clientImpl.listActionTest()
-            try await clientImpl.doPutTest("flight_ticket")
-            try await clientImpl.doPutTest("flight_another")
-            try await clientImpl.listFlightsTest()
-            try await clientImpl.doActionTest("healthcheck", actionBody: Data("healthcheck body".utf8))
-            try await clientImpl.getSchemaTest(Data("schema info".utf8))
-            try await clientImpl.doGetTest(Data("'flight_ticket'".utf8))
-            try await clientImpl.doGetTestFlightData(Data("'flight_another'".utf8))
-            try await clientImpl.doExchangeTest()
+
+            try await FlightServerImpl.syncShutdown()
             return "done"
         }
 

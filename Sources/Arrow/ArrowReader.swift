@@ -35,25 +35,25 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         }
 
         func nextNode() -> org_apache_arrow_flatbuf_FieldNode? {
-            if nodeIndex >= self.recordBatch.nodesCount {return nil}
+            if nodeIndex >= self.recordBatch.nodes.count {return nil}
             defer {nodeIndex += 1}
-            return self.recordBatch.nodes(at: nodeIndex)
+            return self.recordBatch.nodes[Int(nodeIndex)]
         }
 
         func nextBuffer() -> org_apache_arrow_flatbuf_Buffer? {
-            if bufferIndex >= self.recordBatch.buffersCount {return nil}
+            if bufferIndex >= self.recordBatch.buffers.count {return nil}
             defer {bufferIndex += 1}
-            return self.recordBatch.buffers(at: bufferIndex)
+            return self.recordBatch.buffers[Int(bufferIndex)]
         }
 
         func nextField() -> org_apache_arrow_flatbuf_Field? {
-            if fieldIndex >= self.schema.fieldsCount {return nil}
+            if fieldIndex >= self.schema.fields.count {return nil}
             defer {fieldIndex += 1}
-            return self.schema.fields(at: fieldIndex)
+            return self.schema.fields[Int(fieldIndex)]
         }
 
         func isDone() -> Bool {
-            return nodeIndex >= self.recordBatch.nodesCount
+            return nodeIndex >= self.recordBatch.nodes.count
         }
     }
 
@@ -73,8 +73,8 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
 
     private func loadSchema(_ schema: org_apache_arrow_flatbuf_Schema) -> Result<ArrowSchema, ArrowError> {
         let builder = ArrowSchema.Builder()
-        for index in 0 ..< schema.fieldsCount {
-            let field = schema.fields(at: index)!
+        for index in 0 ..< schema.fields.count {
+            let field = schema.fields[index]
             let fieldType = findArrowType(field)
             if fieldType.info == ArrowType.ArrowUnknown {
                 return .failure(.unknownType("Unsupported field type found: \(field.typeType)"))
@@ -101,8 +101,8 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let arrowNullBuffer = makeBuffer(nullBuffer, fileData: loadInfo.fileData,
                                          length: nullLength, messageOffset: loadInfo.messageOffset)
         var children = [ArrowData]()
-        for index in 0..<field.childrenCount {
-            let childField = field.children(at: index)!
+        for index in 0..<field.children.count {
+            let childField = field.children[index]
             switch loadField(loadInfo, field: childField) {
             case .success(let holder):
                 children.append(holder.array.arrowData)
@@ -133,9 +133,10 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let arrowNullBuffer = makeBuffer(nullBuffer, fileData: loadInfo.fileData, length: nullLength, messageOffset: loadInfo.messageOffset)
         let arrowOffsetBuffer = makeBuffer(offsetBuffer, fileData: loadInfo.fileData, length: UInt(node.length + 1), messageOffset: loadInfo.messageOffset)
 
-        guard field.childrenCount == 1, let childField = field.children(at: 0) else {
+        guard field.children.count == 1 else {
             return .failure(.invalid("List must have exactly one child"))
         }
+        let childField = field.children[0]
 
         switch loadField(loadInfo, field: childField) {
         case .success(let childHolder):
@@ -256,8 +257,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
      and footer.
      */
     public func readStreaming( // swiftlint:disable:this function_body_length
-        _ input: Data,
-        useUnalignedBuffers: Bool = false
+        _ input: Data
     ) -> Result<ArrowReaderResult, ArrowError> {
         let result = ArrowReaderResult()
         var offset: Int = 0
@@ -276,8 +276,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             offset += Int(MemoryLayout<UInt32>.size)
             streamData = input[(input.startIndex + offset)...]
             var dataBuffer = ByteBuffer(
-                data: streamData,
-                allowReadingUnalignedBuffers: useUnalignedBuffers
+                data: streamData
             )
             let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &dataBuffer)
             switch message.headerType {
@@ -329,8 +328,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
      footer around the Arrow streaming format.
      */
     public func readFile( // swiftlint:disable:this function_body_length
-        _ fileData: Data,
-        useUnalignedBuffers: Bool = false
+        _ fileData: Data
     ) -> Result<ArrowReaderResult, ArrowError> {
         let footerLength = fileData.withUnsafeBytes { rawBuffer in
             rawBuffer.loadUnaligned(fromByteOffset: fileData.count - 4, as: Int32.self)
@@ -340,8 +338,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         let footerStartOffset = fileData.count - Int(footerLength + 4)
         let footerData = fileData[footerStartOffset...]
         var footerBuffer = ByteBuffer(
-            data: footerData,
-            allowReadingUnalignedBuffers: useUnalignedBuffers)
+            data: footerData)
         let footer: org_apache_arrow_flatbuf_Footer = getRoot(byteBuffer: &footerBuffer)
         guard let footerSchema = footer.schema else {
             return .failure(.invalid("Footer schema not found"))
@@ -354,8 +351,8 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             return .failure(error)
         }
 
-        for index in 0 ..< footer.recordBatchesCount {
-            let recordBatch = footer.recordBatches(at: index)!
+        for index in 0 ..< footer.recordBatches.count {
+            let recordBatch = footer.recordBatches[index]
             var messageLength = fileData.withUnsafeBytes { rawBuffer in
                 rawBuffer.loadUnaligned(fromByteOffset: Int(recordBatch.offset), as: UInt32.self)
             }
@@ -374,8 +371,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             let messageEndOffset = messageStartOffset + Int64(messageLength)
             let recordBatchData = fileData[messageStartOffset ..< messageEndOffset]
             var mbb = ByteBuffer(
-                data: recordBatchData,
-                allowReadingUnalignedBuffers: useUnalignedBuffers)
+                data: recordBatchData)
             let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &mbb)
             switch message.headerType {
             case .recordbatch:
@@ -428,12 +424,10 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
     public func fromMessage(
         _ dataHeader: Data,
         dataBody: Data,
-        result: ArrowReaderResult,
-        useUnalignedBuffers: Bool = false
+        result: ArrowReaderResult
     ) -> Result<Void, ArrowError> {
         var mbb = ByteBuffer(
-            data: dataHeader,
-            allowReadingUnalignedBuffers: useUnalignedBuffers)
+            data: dataHeader)
         let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &mbb)
         switch message.headerType {
         case .schema:

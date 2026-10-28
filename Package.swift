@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -34,9 +34,11 @@ let package = Package(
             targets: ["ArrowFlight"])
     ],
     dependencies: [
-        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.2.10"),
-        .package(url: "https://github.com/grpc/grpc-swift.git", from: "1.25.0"),
-        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.29.0"),
+        .package(url: "https://github.com/google/flatbuffers.git", exact: "25.12.19"),
+        .package(url: "https://github.com/grpc/grpc-swift-2.git", from: "2.0.0"),
+        .package(url: "https://github.com/grpc/grpc-swift-nio-transport.git", from: "2.0.0"),
+        .package(url: "https://github.com/grpc/grpc-swift-protobuf.git", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.35.1"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.3.0")
     ],
     targets: [
@@ -60,7 +62,9 @@ let package = Package(
             name: "ArrowFlight",
             dependencies: [
                 "Arrow",
-                .product(name: "GRPC", package: "grpc-swift"),
+                .product(name: "GRPCCore", package: "grpc-swift-2"),
+                .product(name: "GRPCNIOTransportHTTP2", package: "grpc-swift-nio-transport"),
+                .product(name: "GRPCProtobuf", package: "grpc-swift-protobuf"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf")
             ],
             swiftSettings: [
@@ -76,11 +80,17 @@ let package = Package(
         ),
         .testTarget(
             name: "ArrowFlightTests",
-            dependencies: ["ArrowFlight"],
+            dependencies: [
+                "ArrowFlight",
+                .product(name: "GRPCCore", package: "grpc-swift-2"),
+                .product(name: "GRPCNIOTransportHTTP2", package: "grpc-swift-nio-transport")
+            ],
             swiftSettings: [
                 // build: .unsafeFlags(["-warnings-as-errors"])
             ]
         )
 
-    ]
+    ],
+    // TODO: The package is not yet Swift 6 language mode clean; migrate gradually.
+    swiftLanguageModes: [.v5]
 )

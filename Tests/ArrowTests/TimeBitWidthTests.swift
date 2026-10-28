@@ -33,7 +33,7 @@ final class TimeBitWidthTests: XCTestCase {
         var buffer = ByteBuffer(data: data)
         let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &buffer)
         let fbSchema: org_apache_arrow_flatbuf_Schema = message.header(type: org_apache_arrow_flatbuf_Schema.self)!
-        let field = fbSchema.fields(at: 0)!
+        let field = fbSchema.fields[0]
         let timeType: org_apache_arrow_flatbuf_Time = field.type(type: org_apache_arrow_flatbuf_Time.self)!
         return timeType.bitWidth
     }

@@ -109,9 +109,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # grpc-swift-2 (2.x) requires swift-tools 6.1 or later.
         swift-version:
-          - "5.10"
-          - "6.0"
           - "6.1"
     env:
       RC: ${{ needs.target.outputs.rc }}
