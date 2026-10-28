@@ -287,8 +287,7 @@ final class IPCStreamReaderTests: XCTestCase {
             offset += Int(MemoryLayout<UInt32>.size)
 
             var dataBuffer = ByteBuffer(
-                data: writeData[offset...],
-                allowReadingUnalignedBuffers: false)
+                data: writeData[offset...])
             let message: org_apache_arrow_flatbuf_Message = getRoot(byteBuffer: &dataBuffer)
             XCTAssertEqual(message.headerType, .schema)
 

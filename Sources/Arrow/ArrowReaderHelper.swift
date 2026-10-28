@@ -297,8 +297,8 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
     case .struct_:
         _ = field.type(type: org_apache_arrow_flatbuf_Struct_.self)!
         var fields = [ArrowField]()
-        for index in 0..<field.childrenCount {
-            let childField = field.children(at: index)!
+        for index in 0..<field.children.count {
+            let childField = field.children[index]
             let childType = findArrowType(childField)
             fields.append(
                 ArrowField(childField.name ?? "", type: childType, isNullable: childField.nullable))
@@ -306,9 +306,10 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
 
         return ArrowTypeStruct(ArrowType.ArrowStruct, fields: fields)
     case .list:
-        guard field.childrenCount == 1, let childField = field.children(at: 0) else {
+        guard field.children.count == 1 else {
             return ArrowType(ArrowType.ArrowUnknown)
         }
+        let childField = field.children[0]
         let childType = findArrowType(childField)
         let childFieldName = childField.name ?? "item"
         return ArrowTypeList(ArrowField(childFieldName, type: childType, isNullable: childField.nullable))
@@ -318,7 +319,7 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
 }
 
 func validateBufferIndex(_ recordBatch: org_apache_arrow_flatbuf_RecordBatch, index: Int32) throws {
-    if index >= recordBatch.buffersCount {
+    if index >= recordBatch.buffers.count {
         throw ArrowError.outOfBounds(index: Int64(index))
     }
 }
