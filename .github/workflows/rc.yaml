@@ -104,7 +104,9 @@ jobs:
     needs:
       - source
       - target
-    runs-on: ubuntu-latest
+    # setup-swift@v2 does not support Ubuntu 26.04 yet (swift-actions/setup-swift#805).
+    # Pin to 24.04 until the action gains support; ubuntu-latest now resolves to 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false
