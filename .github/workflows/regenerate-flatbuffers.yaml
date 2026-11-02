@@ -1,0 +1,179 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# Regenerates the committed FlatBuffers Swift sources when Dependabot bumps
+# the FlatBuffers runtime. The generated sources must be produced by the
+# flatc that matches the runtime, so Dependabot's Package.swift-only change
+# can't pass CI on its own.
+#
+# This only automates regeneration. If the runtime API changed, the
+# hand-written code still needs manual updates; the build and test below fail
+# in that case and nothing is pushed.
+
+name: Regenerate FlatBuffers sources
+
+on:
+  pull_request:
+    paths:
+      - Package.swift
+      - Package.resolved
+      - gen-flatbuffers.sh
+      - .github/workflows/regenerate-flatbuffers.yaml
+
+concurrency:
+  group: >-
+    ${{ github.repository }}-${{ github.event.pull_request.number }}-flatbuffers
+  cancel-in-progress: true
+
+# Dependabot-triggered runs get a read-only token by default, but this
+# workflow pushes the regenerated sources back to the pull request branch.
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    name: Regenerate
+    if: >-
+      github.repository == 'apache/arrow-swift' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          # The base commit is needed to tell whether the FlatBuffers runtime
+          # version actually changed.
+          fetch-depth: 0
+
+      - name: Detect FlatBuffers update
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -eu
+          version=$(sed -n \
+            's|.*google/flatbuffers\.git", exact: "\([^"]*\)".*|\1|p' \
+            Package.swift)
+          if [ -z "${version}" ]; then
+            echo "No exact FlatBuffers version in Package.swift; nothing to do."
+            exit 0
+          fi
+          base_version=$(git show "${BASE_SHA}:Package.swift" | sed -n \
+            's|.*google/flatbuffers\.git", exact: "\([^"]*\)".*|\1|p')
+          if [ "${version}" = "${base_version}" ]; then
+            echo "FlatBuffers is still ${version}; nothing to do."
+            exit 0
+          fi
+          echo "FlatBuffers ${base_version} -> ${version}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Download matching flatc
+        if: steps.detect.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -eu
+          tag="v${VERSION}"
+          asset=$(gh release view "${tag}" --repo google/flatbuffers \
+                    --json assets --jq '.assets[].name' |
+                    grep -E '^Linux\.flatc\.binary\..+\.zip$' | head -n 1)
+          if [ -z "${asset}" ]; then
+            echo "::error::google/flatbuffers ${tag} has no Linux flatc binary"
+            exit 1
+          fi
+          echo "Using ${asset} from ${tag}"
+          mkdir -p "${RUNNER_TEMP}/flatc"
+          gh release download "${tag}" --repo google/flatbuffers \
+            --pattern "${asset}" --dir "${RUNNER_TEMP}/flatc"
+          unzip -o -j "${RUNNER_TEMP}/flatc/${asset}" flatc \
+            -d "${RUNNER_TEMP}/flatc/bin"
+          chmod +x "${RUNNER_TEMP}/flatc/bin/flatc"
+          "${RUNNER_TEMP}/flatc/bin/flatc" --version
+          echo "${RUNNER_TEMP}/flatc/bin" >> "${GITHUB_PATH}"
+
+      - name: Fetch format definitions
+        id: format
+        if: steps.detect.outputs.version != ''
+        run: |
+          set -eu
+          revision=$(sed -n 's|^ARROW_REVISION=\(.*\)$|\1|p' gen-flatbuffers.sh)
+          if [ -z "${revision}" ]; then
+            echo "::error::ARROW_REVISION not found in gen-flatbuffers.sh"
+            exit 1
+          fi
+          echo "Using apache/arrow ${revision}"
+          echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
+          mkdir -p "${RUNNER_TEMP}/arrow-format"
+          for name in File Message Schema SparseTensor Tensor; do
+            curl --fail --silent --show-error --location \
+              --output "${RUNNER_TEMP}/arrow-format/${name}.fbs" \
+              "https://raw.githubusercontent.com/apache/arrow/${revision}/format/${name}.fbs"
+          done
+
+      - name: Regenerate
+        if: steps.detect.outputs.version != ''
+        env:
+          ARROW_FORMAT_DIR: ${{ runner.temp }}/arrow-format
+        run: ./gen-flatbuffers.sh
+
+      - name: Check for changes
+        id: changes
+        if: steps.detect.outputs.version != ''
+        run: |
+          set -eu
+          if [ -z "$(git status --porcelain -- Sources/Arrow)" ]; then
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+            echo "Generated sources are already up to date."
+          else
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+            git status --short -- Sources/Arrow
+          fi
+
+      # Commits pushed with GITHUB_TOKEN don't trigger other workflows, so
+      # verify here rather than waiting for the regular CI jobs.
+      - name: Build and test
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          SWIFT: "6.1"
+        run: |
+          docker compose pull --ignore-pull-failures ubuntu
+          docker compose build ubuntu
+          docker compose run --rm ubuntu
+
+      - name: Fix permissions for .docker/
+        if: always() && steps.changes.outputs.changed == 'true'
+        run: sudo chown -R "${USER}:" .docker 2>/dev/null || true
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          VERSION: ${{ steps.detect.outputs.version }}
+          REVISION: ${{ steps.format.outputs.revision }}
+        run: |
+          set -eu
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Sources/Arrow
+          git commit \
+            -m "chore: Regenerate FlatBuffers sources for flatc ${VERSION}" \
+            -m "Generated from apache/arrow ${REVISION}."
+          git push origin "HEAD:${BRANCH}"
