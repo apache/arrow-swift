@@ -18,9 +18,13 @@
 // swiftlint:disable all
 // swiftformat:disable all
 
+#if canImport(Common)
+import Common
+#endif
+
 import FlatBuffers
 
-public enum org_apache_arrow_flatbuf_CompressionType: Int8, Enum, Verifiable {
+public enum org_apache_arrow_flatbuf_CompressionType: Int8, FlatbuffersVectorInitializable, Enum, Verifiable {
   public typealias T = Int8
   public static var byteSize: Int { return MemoryLayout<Int8>.size }
   public var value: Int8 { return self.rawValue }
@@ -35,7 +39,7 @@ public enum org_apache_arrow_flatbuf_CompressionType: Int8, Enum, Verifiable {
 ///  Provided for forward compatibility in case we need to support different
 ///  strategies for compressing the IPC message body (like whole-body
 ///  compression rather than buffer-level) in the future
-public enum org_apache_arrow_flatbuf_BodyCompressionMethod: Int8, Enum, Verifiable {
+public enum org_apache_arrow_flatbuf_BodyCompressionMethod: Int8, FlatbuffersVectorInitializable, Enum, Verifiable {
   public typealias T = Int8
   public static var byteSize: Int { return MemoryLayout<Int8>.size }
   public var value: Int8 { return self.rawValue }
@@ -46,6 +50,8 @@ public enum org_apache_arrow_flatbuf_BodyCompressionMethod: Int8, Enum, Verifiab
   ///  uncompressed length may be set to -1 to indicate that the data that
   ///  follows is not compressed, which can be useful for cases where
   ///  compression does not yield appreciable savings.
+  ///  Also, empty buffers can optionally be written out as 0-byte compressed
+  ///  buffers, thereby omitting the 8-bytes length header.
   case buffer = 0
 
   public static var max: org_apache_arrow_flatbuf_BodyCompressionMethod { return .buffer }
@@ -61,7 +67,7 @@ public enum org_apache_arrow_flatbuf_BodyCompressionMethod: Int8, Enum, Verifiab
 ///  Arrow implementations do not need to implement all of the message types,
 ///  which may include experimental metadata types. For maximum compatibility,
 ///  it is best to send data using RecordBatch
-public enum org_apache_arrow_flatbuf_MessageHeader: UInt8, UnionEnum {
+public enum org_apache_arrow_flatbuf_MessageHeader: UInt8, FlatbuffersVectorInitializable, UnionEnum {
   public typealias T = UInt8
 
   public init?(value: T) {
@@ -91,9 +97,9 @@ public enum org_apache_arrow_flatbuf_MessageHeader: UInt8, UnionEnum {
 ///  For example, a List<Int16> with values `[[1, 2, 3], null, [4], [5, 6], null]`
 ///  would have {length: 5, null_count: 2} for its List node, and {length: 6,
 ///  null_count: 0} for its Int16 node, as separate FieldNode structs
-public struct org_apache_arrow_flatbuf_FieldNode: NativeStruct, Verifiable, FlatbuffersInitializable {
+public struct org_apache_arrow_flatbuf_FieldNode: NativeStruct, FlatbuffersVectorInitializable, Verifiable, FlatbuffersInitializable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
 
   ///  The number of value slots in the Arrow array at this level of a nested
   ///  tree
@@ -104,9 +110,7 @@ public struct org_apache_arrow_flatbuf_FieldNode: NativeStruct, Verifiable, Flat
   private var _nullCount: Int64
 
   public init(_ bb: ByteBuffer, o: Int32) {
-    let _accessor = Struct(bb: bb, position: o)
-    _length = _accessor.readBuffer(of: Int64.self, at: 0)
-    _nullCount = _accessor.readBuffer(of: Int64.self, at: 8)
+    self = bb.read(def: Self.self, position: Int(o))
   }
 
   public init(length: Int64, nullCount: Int64) {
@@ -141,9 +145,9 @@ public struct org_apache_arrow_flatbuf_FieldNode: NativeStruct, Verifiable, Flat
 ///  For example, a List<Int16> with values `[[1, 2, 3], null, [4], [5, 6], null]`
 ///  would have {length: 5, null_count: 2} for its List node, and {length: 6,
 ///  null_count: 0} for its Int16 node, as separate FieldNode structs
-public struct org_apache_arrow_flatbuf_FieldNode_Mutable: FlatBufferObject {
+public struct org_apache_arrow_flatbuf_FieldNode_Mutable: FlatBufferStruct, FlatbuffersVectorInitializable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Struct
 
@@ -156,9 +160,9 @@ public struct org_apache_arrow_flatbuf_FieldNode_Mutable: FlatBufferObject {
 ///  Optional compression for the memory buffers constituting IPC message
 ///  bodies. Intended for use with RecordBatch but could be used for other
 ///  message types
-public struct org_apache_arrow_flatbuf_BodyCompression: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_BodyCompression: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -203,9 +207,9 @@ public struct org_apache_arrow_flatbuf_BodyCompression: FlatBufferObject, Verifi
 ///  A data header describing the shared memory layout of a "record" or "row"
 ///  batch. Some systems call this a "row batch" internally and others a "record
 ///  batch".
-public struct org_apache_arrow_flatbuf_RecordBatch: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_RecordBatch: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -226,25 +230,23 @@ public struct org_apache_arrow_flatbuf_RecordBatch: FlatBufferObject, Verifiable
   ///  length
   public var length: Int64 { let o = _accessor.offset(VTOFFSET.length.v); return o == 0 ? 0 : _accessor.readBuffer(of: Int64.self, at: o) }
   ///  Nodes correspond to the pre-ordered flattened logical schema
-  public var hasNodes: Bool { let o = _accessor.offset(VTOFFSET.nodes.v); return o == 0 ? false : true }
-  public var nodesCount: Int32 { let o = _accessor.offset(VTOFFSET.nodes.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func nodes(at index: Int32) -> org_apache_arrow_flatbuf_FieldNode? { let o = _accessor.offset(VTOFFSET.nodes.v); return o == 0 ? nil : _accessor.directRead(of: org_apache_arrow_flatbuf_FieldNode.self, offset: _accessor.vector(at: o) + index * 16) }
-  public func mutableNodes(at index: Int32) -> org_apache_arrow_flatbuf_FieldNode_Mutable? { let o = _accessor.offset(VTOFFSET.nodes.v); return o == 0 ? nil : org_apache_arrow_flatbuf_FieldNode_Mutable(_accessor.bb, o: _accessor.vector(at: o) + index * 16) }
+  public var nodes: FlatbufferVector<org_apache_arrow_flatbuf_FieldNode> { return _accessor.vector(at: VTOFFSET.nodes.v, byteSize: 16) }
+  public var mutableNodes: FlatbufferVector<org_apache_arrow_flatbuf_FieldNode_Mutable> { return _accessor.vector(at: VTOFFSET.nodes.v, byteSize: 16) }
+  public func withUnsafePointerToNodes<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.nodes.v, body: body) }
   ///  Buffers correspond to the pre-ordered flattened buffer tree
   /// 
   ///  The number of buffers appended to this list depends on the schema. For
   ///  example, most primitive arrays will have 2 buffers, 1 for the validity
   ///  bitmap and 1 for the values. For struct arrays, there will only be a
   ///  single buffer for the validity (nulls) bitmap
-  public var hasBuffers: Bool { let o = _accessor.offset(VTOFFSET.buffers.v); return o == 0 ? false : true }
-  public var buffersCount: Int32 { let o = _accessor.offset(VTOFFSET.buffers.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func buffers(at index: Int32) -> org_apache_arrow_flatbuf_Buffer? { let o = _accessor.offset(VTOFFSET.buffers.v); return o == 0 ? nil : _accessor.directRead(of: org_apache_arrow_flatbuf_Buffer.self, offset: _accessor.vector(at: o) + index * 16) }
-  public func mutableBuffers(at index: Int32) -> org_apache_arrow_flatbuf_Buffer_Mutable? { let o = _accessor.offset(VTOFFSET.buffers.v); return o == 0 ? nil : org_apache_arrow_flatbuf_Buffer_Mutable(_accessor.bb, o: _accessor.vector(at: o) + index * 16) }
+  public var buffers: FlatbufferVector<org_apache_arrow_flatbuf_Buffer> { return _accessor.vector(at: VTOFFSET.buffers.v, byteSize: 16) }
+  public var mutableBuffers: FlatbufferVector<org_apache_arrow_flatbuf_Buffer_Mutable> { return _accessor.vector(at: VTOFFSET.buffers.v, byteSize: 16) }
+  public func withUnsafePointerToBuffers<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.buffers.v, body: body) }
   ///  Optional compression of the message body
   public var compression: org_apache_arrow_flatbuf_BodyCompression? { let o = _accessor.offset(VTOFFSET.compression.v); return o == 0 ? nil : org_apache_arrow_flatbuf_BodyCompression(_accessor.bb, o: _accessor.indirect(o + _accessor.position)) }
   ///  Some types such as Utf8View are represented using a variable number of buffers.
   ///  For each such Field in the pre-ordered flattened logical schema, there will be
-  ///  an entry in variadicBufferCounts to indicate the number of number of variadic
+  ///  an entry in variadicBufferCounts to indicate the number of variadic
   ///  buffers which belong to that Field in the current RecordBatch.
   /// 
   ///  For example, the schema
@@ -256,10 +258,8 @@ public struct org_apache_arrow_flatbuf_RecordBatch: FlatBufferObject, Verifiable
   /// 
   ///  This field may be omitted if and only if the schema contains no Fields with
   ///  a variable number of buffers, such as BinaryView and Utf8View.
-  public var hasVariadicBufferCounts: Bool { let o = _accessor.offset(VTOFFSET.variadicBufferCounts.v); return o == 0 ? false : true }
-  public var variadicBufferCountsCount: Int32 { let o = _accessor.offset(VTOFFSET.variadicBufferCounts.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func variadicBufferCounts(at index: Int32) -> Int64 { let o = _accessor.offset(VTOFFSET.variadicBufferCounts.v); return o == 0 ? 0 : _accessor.directRead(of: Int64.self, offset: _accessor.vector(at: o) + index * 8) }
-  public var variadicBufferCounts: [Int64] { return _accessor.getVector(at: VTOFFSET.variadicBufferCounts.v) ?? [] }
+  public var variadicBufferCounts: FlatbufferVector<Int64> { return _accessor.vector(at: VTOFFSET.variadicBufferCounts.v, byteSize: 8) }
+  public func withUnsafePointerToVariadicBufferCounts<T>(_ body: (UnsafeRawBufferPointer, Int) throws -> T) rethrows -> T? { return try _accessor.withUnsafePointerToSlice(at: VTOFFSET.variadicBufferCounts.v, body: body) }
   public static func startRecordBatch(_ fbb: inout FlatBufferBuilder) -> UOffset { fbb.startTable(with: 5) }
   public static func add(length: Int64, _ fbb: inout FlatBufferBuilder) { fbb.add(element: length, def: 0, at: VTOFFSET.length.p) }
   public static func addVectorOf(nodes: Offset, _ fbb: inout FlatBufferBuilder) { fbb.add(offset: nodes, at: VTOFFSET.nodes.p) }
@@ -307,9 +307,9 @@ public struct org_apache_arrow_flatbuf_RecordBatch: FlatBufferObject, Verifiable
 ///  There is one vector / column per dictionary, but that vector / column
 ///  may be spread across multiple dictionary batches by using the isDelta
 ///  flag
-public struct org_apache_arrow_flatbuf_DictionaryBatch: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_DictionaryBatch: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -358,9 +358,9 @@ public struct org_apache_arrow_flatbuf_DictionaryBatch: FlatBufferObject, Verifi
   }
 }
 
-public struct org_apache_arrow_flatbuf_Message: FlatBufferObject, Verifiable {
+public struct org_apache_arrow_flatbuf_Message: FlatBufferTable, FlatbuffersVectorInitializable, Verifiable {
 
-  static func validateVersion() { FlatBuffersVersion_25_2_10() }
+  static func validateVersion() { FlatBuffersVersion_25_12_19() }
   public var __buffer: ByteBuffer! { return _accessor.bb }
   private var _accessor: Table
 
@@ -381,9 +381,7 @@ public struct org_apache_arrow_flatbuf_Message: FlatBufferObject, Verifiable {
   public var headerType: org_apache_arrow_flatbuf_MessageHeader { let o = _accessor.offset(VTOFFSET.headerType.v); return o == 0 ? .none_ : org_apache_arrow_flatbuf_MessageHeader(rawValue: _accessor.readBuffer(of: UInt8.self, at: o)) ?? .none_ }
   public func header<T: FlatbuffersInitializable>(type: T.Type) -> T? { let o = _accessor.offset(VTOFFSET.header.v); return o == 0 ? nil : _accessor.union(o) }
   public var bodyLength: Int64 { let o = _accessor.offset(VTOFFSET.bodyLength.v); return o == 0 ? 0 : _accessor.readBuffer(of: Int64.self, at: o) }
-  public var hasCustomMetadata: Bool { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? false : true }
-  public var customMetadataCount: Int32 { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? 0 : _accessor.vector(count: o) }
-  public func customMetadata(at index: Int32) -> org_apache_arrow_flatbuf_KeyValue? { let o = _accessor.offset(VTOFFSET.customMetadata.v); return o == 0 ? nil : org_apache_arrow_flatbuf_KeyValue(_accessor.bb, o: _accessor.indirect(_accessor.vector(at: o) + index * 4)) }
+  public var customMetadata: FlatbufferVector<org_apache_arrow_flatbuf_KeyValue> { return _accessor.vector(at: VTOFFSET.customMetadata.v, byteSize: 4) }
   public static func startMessage(_ fbb: inout FlatBufferBuilder) -> UOffset { fbb.startTable(with: 5) }
   public static func add(version: org_apache_arrow_flatbuf_MetadataVersion, _ fbb: inout FlatBufferBuilder) { fbb.add(element: version.rawValue, def: 0, at: VTOFFSET.version.p) }
   public static func add(headerType: org_apache_arrow_flatbuf_MessageHeader, _ fbb: inout FlatBufferBuilder) { fbb.add(element: headerType.rawValue, def: 0, at: VTOFFSET.headerType.p) }

@@ -16,14 +16,38 @@
 // under the License.
 
 import XCTest
+import class Foundation.NSLock
 import struct Foundation.Data
 import struct Foundation.URL
-import GRPC
-import NIOCore
-import NIOPosix
+import GRPCCore
+import GRPCNIOTransportHTTP2
 import Arrow
 
 @testable import ArrowFlight
+
+/// A value wrapper that `@Sendable` closures can safely share.
+final class LockedBox<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Value
+
+    init(_ value: Value) {
+        self.value = value
+    }
+
+    /// The wrapped value.
+    var current: Value {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+
+    /// Updates the wrapped value while holding the lock.
+    func withValue<Result>(_ body: (inout Value) throws -> Result) rethrows -> Result {
+        lock.lock()
+        defer { lock.unlock() }
+        return try body(&value)
+    }
+}
 
 func makeSchema() -> ArrowSchema {
     let schemaBuilder = ArrowSchema.Builder()
@@ -68,6 +92,7 @@ func makeRecordBatch() throws -> RecordBatch {
 }
 
 var flights = [String: FlightInfo]()
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class MyFlightServer: ArrowFlightServer {
     func doExchange(
         _ reader: ArrowFlight.RecordBatchStreamReader,
@@ -137,93 +162,83 @@ final class MyFlightServer: ArrowFlightServer {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 struct FlightServerImpl {
-    var port = 1234
-    static var server: Server?
-    static var group: MultiThreadedEventLoopGroup?
+    static var server: GRPCServer<HTTP2ServerTransport.Posix>?
+    static var serverTask: Task<Void, any Error>?
     static func run() async throws {
         do {
-            // Create an event loop group for the server to run on.
-            let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-            // Create a provider using the features we read.
-            let provider = ArrowFlight.makeFlightServer(MyFlightServer())
+            let server = GRPCServer(
+                transport: .http2NIOPosix(
+                    address: .ipv4(host: "127.0.0.1", port: 8088),
+                    transportSecurity: .plaintext),
+                services: [ArrowFlight.makeFlightServer(MyFlightServer())])
 
-            // Start the server and print its address once it has started.
-            FlightServerImpl.server = try await Server.insecure(group: group)
-                .withServiceProviders([provider])
-                .bind(host: "localhost", port: 8088)
-                .get()
+            FlightServerImpl.server = server
+            FlightServerImpl.serverTask = Task {
+                try await server.serve()
+            }
 
-            print("server started on port \(server!.channel.localAddress!.port!)")
-            // Wait on the server's `onClose` future to stop the program from exiting.
+            // Wait for the server to start listening before returning.
+            _ = try await server.listeningAddress
+            print("server started on port 8088")
         } catch {
             print("Unknown server error: \(error)")
         }
     }
 
-    static func syncShutdown() throws {
-        try group?.syncShutdownGracefully()
+    static func syncShutdown() async throws {
+        server?.beginGracefulShutdown()
+        try await serverTask?.value
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public class FlightClientTester {
-    var client: FlightClient?
-    var group: MultiThreadedEventLoopGroup?
-    var channel: GRPCChannel?
+    var client: FlightClient<HTTP2ClientTransport.Posix>?
 
-    init() async throws {
-        // Load the features.
-        let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
-        let channel = try GRPCChannelPool.with(
-            target: .host("localhost", port: 8088),
-            transportSecurity: .plaintext,
-            eventLoopGroup: group
-        )
-
-        client = FlightClient(channel: channel)
-    }
-
-    func syncShutdown() throws {
-        try group?.syncShutdownGracefully()
-        try channel?.close().wait()
+    init(client: FlightClient<HTTP2ClientTransport.Posix>) {
+        self.client = client
     }
 
     func listActionTest() async throws {
-        var actionTypes = [FlightActionType]()
+        let actionTypes = LockedBox<[FlightActionType]>([])
         try await client?.listActions({ action in
-            actionTypes.append(action)
+            actionTypes.withValue { $0.append(action) }
         })
 
-        XCTAssertEqual(actionTypes.count, 2)
+        let actions = actionTypes.current
+        XCTAssertEqual(actions.count, 2)
 
-        XCTAssertEqual(actionTypes[0].type, "clear")
-        XCTAssertEqual(actionTypes[0].description, "Clear the stored flights.")
-        XCTAssertEqual(actionTypes[1].type, "shutdown")
-        XCTAssertEqual(actionTypes[1].description, "Shut down this server.")
+        XCTAssertEqual(actions[0].type, "clear")
+        XCTAssertEqual(actions[0].description, "Clear the stored flights.")
+        XCTAssertEqual(actions[1].type, "shutdown")
+        XCTAssertEqual(actions[1].description, "Shut down this server.")
     }
 
     func listFlightsTest() async throws {
         let flightCriteria = FlightCriteria("flight criteria expression".data(using: .utf8)!)
-        var numCalls = 0
+        let numCalls = LockedBox(0)
         try await client?.listFlights(flightCriteria, closure: { data in
             if let schema = data.schema {
                 XCTAssertGreaterThanOrEqual(schema.fields.count, 0)
-                numCalls += 1
+                numCalls.withValue { $0 += 1 }
             }
         })
 
-        XCTAssertEqual(numCalls, 2)
+        XCTAssertEqual(numCalls.current, 2)
     }
 
     func doActionTest(_ type: String, actionBody: Data) async throws {
         let action = FlightAction(type, body: actionBody)
-        var actionResults = [FlightResult]()
+        let actionResults = LockedBox<[FlightResult]>([])
         try await client?.doAction(action, closure: { result in
-            actionResults.append(result)
+            actionResults.withValue { $0.append(result) }
         })
 
-        XCTAssertEqual(actionResults.count, 1)
-        XCTAssertEqual(String(bytes: actionResults[0].body, encoding: .utf8), "test_action result")
+        let results = actionResults.current
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(String(bytes: results[0].body, encoding: .utf8), "test_action result")
     }
 
     func getSchemaTest(_ cmd: Data) async throws {
@@ -235,9 +250,9 @@ public class FlightClientTester {
 
     func doGetTest(_ flightData: Data) async throws {
         let ticket = FlightTicket(flightData)
-        var numCall = 0
+        let numCall = LockedBox(0)
         try await client?.doGet(ticket, readerResultClosure: { rb in
-            numCall += 1
+            numCall.withValue { $0 += 1 }
             XCTAssertEqual(rb.schema!.fields.count, 3)
             XCTAssertEqual(rb.batches[0].length, 4)
             switch ArrowTable.from(recordBatches: rb.batches) {
@@ -258,48 +273,48 @@ public class FlightClientTester {
             }
         })
 
-        XCTAssertEqual(numCall, 1)
+        XCTAssertEqual(numCall.current, 1)
     }
 
     func doGetTestFlightData(_ flightData: Data) async throws {
         let ticket = FlightTicket(flightData)
-        var numCall = 0
+        let numCall = LockedBox(0)
         let reader = ArrowReader()
         let arrowResult = ArrowReader.makeArrowReaderResult()
         try await client?.doGet(ticket, flightDataClosure: { flightData in
             switch reader.fromMessage(flightData.dataHeader, dataBody: flightData.dataBody, result: arrowResult) {
             case .success:
-                numCall += 1
+                numCall.withValue { $0 += 1 }
             case .failure(let error):
                 throw error
             }
         })
 
-        XCTAssertEqual(numCall, 2)
+        XCTAssertEqual(numCall.current, 2)
     }
 
     func doPutTest(_ cmd: String) async throws {
         let descriptor = FlightDescriptor(cmd: cmd.data(using: .utf8)!)
         let rb = try makeRecordBatch()
-        var numCall = 0
+        let numCall = LockedBox(0)
         try await client?.doPut(descriptor, recordBatches: [rb], closure: { _ in
-            numCall += 1
+            numCall.withValue { $0 += 1 }
         })
 
-        XCTAssertEqual(numCall, 1)
+        XCTAssertEqual(numCall.current, 1)
     }
 
     func doExchangeTest() async throws {
         let descriptor = FlightDescriptor(cmd: "flight_ticket".data(using: .utf8)!)
         let rb = try makeRecordBatch()
-        var numCall = 0
+        let numCall = LockedBox(0)
         try await client?.doExchange(descriptor, recordBatches: [rb], closure: { result in
-            numCall += 1
+            numCall.withValue { $0 += 1 }
             XCTAssertEqual(result.schema?.fields.count, 3)
             XCTAssertEqual(result.batches[0].length, 4)
         })
 
-        XCTAssertEqual(numCall, 1)
+        XCTAssertEqual(numCall.current, 1)
     }
 }
 
@@ -314,50 +329,40 @@ actor FlightServerData {
     }
 }
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class FlightTest: XCTestCase {
     let serverData = FlightServerData()
 
     func testFlightServer() async throws {
         let basicTask = Task {
             try await FlightServerImpl.run()
-            defer {
-                print("server shutting down")
-                do {
-                    try FlightServerImpl.syncShutdown()
-                } catch {
-                }
-            }
-
             await serverData.setServerUp(true)
-            try await FlightServerImpl.server?.onClose.get()
             return "done"
         }
 
         let secondTask = Task {
-            defer {
-                _ = FlightServerImpl.server?.close()
-            }
-
             while await !serverData.isServerUp() {
                 try await Task.sleep(nanoseconds: 1_000_000)
             }
 
-            let clientImpl = try await FlightClientTester()
-            defer {
-                do {
-                    try clientImpl.syncShutdown()
-                } catch {
-                }
+            try await withGRPCClient(
+                transport: .http2NIOPosix(
+                    target: .ipv4(address: "127.0.0.1", port: 8088),
+                    transportSecurity: .plaintext)
+            ) { grpcClient in
+                let clientImpl = FlightClientTester(client: FlightClient(wrapping: grpcClient))
+                try await clientImpl.listActionTest()
+                try await clientImpl.doPutTest("flight_ticket")
+                try await clientImpl.doPutTest("flight_another")
+                try await clientImpl.listFlightsTest()
+                try await clientImpl.doActionTest("healthcheck", actionBody: Data("healthcheck body".utf8))
+                try await clientImpl.getSchemaTest(Data("schema info".utf8))
+                try await clientImpl.doGetTest(Data("'flight_ticket'".utf8))
+                try await clientImpl.doGetTestFlightData(Data("'flight_another'".utf8))
+                try await clientImpl.doExchangeTest()
             }
-            try await clientImpl.listActionTest()
-            try await clientImpl.doPutTest("flight_ticket")
-            try await clientImpl.doPutTest("flight_another")
-            try await clientImpl.listFlightsTest()
-            try await clientImpl.doActionTest("healthcheck", actionBody: Data("healthcheck body".utf8))
-            try await clientImpl.getSchemaTest(Data("schema info".utf8))
-            try await clientImpl.doGetTest(Data("'flight_ticket'".utf8))
-            try await clientImpl.doGetTestFlightData(Data("'flight_another'".utf8))
-            try await clientImpl.doExchangeTest()
+
+            try await FlightServerImpl.syncShutdown()
             return "done"
         }
 

@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-ARG SWIFT=5.10
+ARG SWIFT=6.1
 ARG UBUNTU_CODE_NAME=noble
 FROM swift:${SWIFT}-${UBUNTU_CODE_NAME}
 
