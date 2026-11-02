@@ -31,20 +31,6 @@ updates:
     commit-message:
       prefix: "chore: "
     open-pull-requests-limit: 10
-  - package-ecosystem: "swift"
-    directory: "/Arrow/"
-    schedule:
-      interval: "daily"
-    commit-message:
-      prefix: "chore: "
-    open-pull-requests-limit: 10
-  - package-ecosystem: "swift"
-    directory: "/ArrowFlight/"
-    schedule:
-      interval: "daily"
-    commit-message:
-      prefix: "chore: "
-    open-pull-requests-limit: 10
   - package-ecosystem: "gomod"
     directory: "/CDataWGo/"
     schedule:
