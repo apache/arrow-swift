@@ -82,4 +82,98 @@ final class ArrayBuilderTests: XCTestCase {
         XCTAssertThrowsError(try ArrowArrayBuilders.loadBuilder(Int?.self))
         XCTAssertThrowsError(try ArrowArrayBuilders.loadBuilder(UInt?.self))
     }
+
+    func testFixedBufferBuilderIsNull() throws {
+        let builder: FixedBufferBuilder<Int32> = try FixedBufferBuilder()
+        builder.append(42)
+        builder.append(nil)
+        builder.append(7)
+
+        XCTAssertFalse(builder.isNull(0), "Value 42 should not be null")
+        XCTAssertTrue(builder.isNull(1), "Nil value should be null")
+        XCTAssertFalse(builder.isNull(2), "Value 7 should not be null")
+        XCTAssertEqual(builder.nullCount, 1)
+    }
+
+    func testBoolBufferBuilderIsNull() throws {
+        let builder = try BoolBufferBuilder()
+        builder.append(true)
+        builder.append(nil)
+        builder.append(false)
+
+        XCTAssertFalse(builder.isNull(0), "Value true should not be null")
+        XCTAssertTrue(builder.isNull(1), "Nil value should be null")
+        XCTAssertFalse(builder.isNull(2), "Value false should not be null")
+        XCTAssertEqual(builder.nullCount, 1)
+    }
+
+    func testVariableBufferBuilderIsNull() throws {
+        let builder = try VariableBufferBuilder<String>()
+        builder.append("hello")
+        builder.append(nil)
+        builder.append("world")
+
+        XCTAssertFalse(builder.isNull(0), "String 'hello' should not be null")
+        XCTAssertTrue(builder.isNull(1), "Nil value should be null")
+        XCTAssertFalse(builder.isNull(2), "String 'world' should not be null")
+        XCTAssertEqual(builder.nullCount, 1)
+    }
+
+    func testFixedBufferBuilderIsNullMultiple() throws {
+        let builder: FixedBufferBuilder<Double> = try FixedBufferBuilder()
+        builder.append(1.5)
+        builder.append(nil)
+        builder.append(2.5)
+        builder.append(nil)
+        builder.append(3.5)
+
+        XCTAssertFalse(builder.isNull(0))
+        XCTAssertTrue(builder.isNull(1))
+        XCTAssertFalse(builder.isNull(2))
+        XCTAssertTrue(builder.isNull(3))
+        XCTAssertFalse(builder.isNull(4))
+        XCTAssertEqual(builder.nullCount, 2)
+    }
+
+    func testBoolBufferBuilderIsNullMultiple() throws {
+        let builder = try BoolBufferBuilder()
+        builder.append(true)
+        builder.append(true)
+        builder.append(nil)
+        builder.append(false)
+        builder.append(nil)
+        builder.append(false)
+
+        XCTAssertFalse(builder.isNull(0))
+        XCTAssertFalse(builder.isNull(1))
+        XCTAssertTrue(builder.isNull(2))
+        XCTAssertFalse(builder.isNull(3))
+        XCTAssertTrue(builder.isNull(4))
+        XCTAssertFalse(builder.isNull(5))
+        XCTAssertEqual(builder.nullCount, 2)
+    }
+
+    func testFixedBufferBuilderIsNullAllNulls() throws {
+        let builder: FixedBufferBuilder<Int8> = try FixedBufferBuilder()
+        builder.append(nil)
+        builder.append(nil)
+        builder.append(nil)
+
+        XCTAssertTrue(builder.isNull(0))
+        XCTAssertTrue(builder.isNull(1))
+        XCTAssertTrue(builder.isNull(2))
+        XCTAssertEqual(builder.nullCount, 3)
+    }
+
+    func testFixedBufferBuilderIsNullNoNulls() throws {
+        let builder: FixedBufferBuilder<UInt64> = try FixedBufferBuilder()
+        builder.append(100)
+        builder.append(200)
+        builder.append(300)
+
+        XCTAssertFalse(builder.isNull(0))
+        XCTAssertFalse(builder.isNull(1))
+        XCTAssertFalse(builder.isNull(2))
+        XCTAssertEqual(builder.nullCount, 0)
+    }
 }
