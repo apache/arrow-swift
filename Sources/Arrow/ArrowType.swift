@@ -87,7 +87,7 @@ public enum ArrowTime64Unit {
 }
 
 public class ArrowTypeTime32: ArrowType {
-    let unit: ArrowTime32Unit
+    public let unit: ArrowTime32Unit
     public init(_ unit: ArrowTime32Unit) {
         self.unit = unit
         super.init(ArrowType.ArrowTime32)
@@ -106,7 +106,7 @@ public class ArrowTypeTime32: ArrowType {
 }
 
 public class ArrowTypeTime64: ArrowType {
-    let unit: ArrowTime64Unit
+    public let unit: ArrowTime64Unit
     public init(_ unit: ArrowTime64Unit) {
         self.unit = unit
         super.init(ArrowType.ArrowTime64)
@@ -132,8 +132,8 @@ public enum ArrowTimestampUnit {
 }
 
 public class ArrowTypeTimestamp: ArrowType {
-    let unit: ArrowTimestampUnit
-    let timezone: String?
+    public let unit: ArrowTimestampUnit
+    public let timezone: String?
 
     public init(_ unit: ArrowTimestampUnit, timezone: String? = nil) {
         self.unit = unit
@@ -166,7 +166,7 @@ public class ArrowTypeTimestamp: ArrowType {
 }
 
 public class ArrowTypeStruct: ArrowType {
-    let fields: [ArrowField]
+    public let fields: [ArrowField]
     public init(_ info: ArrowType.Info, fields: [ArrowField]) {
         self.fields = fields
         super.init(info)
