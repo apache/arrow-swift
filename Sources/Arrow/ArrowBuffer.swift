@@ -56,6 +56,10 @@ public class ArrowBuffer {
         let memory = MemoryAllocator(64)
         let rawPointer = memory.allocateArray(Int(capacity))
         rawPointer.copyMemory(from: data, byteCount: data.count)
+        // Zero the padding up to the 64-byte aligned capacity so that it is
+        // never read (or written out) uninitialized.
+        (rawPointer + data.count).initializeMemory(
+            as: UInt8.self, repeating: 0, count: Int(capacity) - data.count)
         return ArrowBuffer(length: length, capacity: capacity, rawPointer: rawPointer)
     }
 
