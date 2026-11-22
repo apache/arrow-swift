@@ -374,6 +374,51 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
         }
     }
 
+    func testFileReader_completeFileData() throws {
+        // readFile accepts the bytes of a complete Arrow file.
+        let fileURL = currentDirectory().appendingPathComponent("testdata_bool.arrow")
+        try checkBoolRecordBatch(ArrowReader().readFile(Data(contentsOf: fileURL)))
+    }
+
+    func testFileWriter_fileFormat() throws {
+        let batch = try makeRecordBatch()
+        let info = ArrowWriter.Info(.recordbatch, schema: batch.schema, batches: [batch, batch])
+        let fileData = try ArrowWriter().writeFile(info).get()
+
+        // The file starts with the padded magic string and ends with the magic string.
+        let marker = Data("ARROW1".utf8)
+        XCTAssertEqual(Data(fileData.prefix(8)), marker + Data([0, 0]))
+        XCTAssertEqual(Data(fileData.suffix(6)), marker)
+
+        // toFile writes the same bytes as writeFile.
+        let outputUrl = FileManager.default.temporaryDirectory
+            .appendingPathComponent("arrow-swift-\(UUID().uuidString).arrow")
+        defer { try? FileManager.default.removeItem(at: outputUrl) }
+        _ = try ArrowWriter().toFile(outputUrl, info: info).get()
+        XCTAssertEqual(try Data(contentsOf: outputUrl), fileData)
+
+        let reader = ArrowReader()
+        let results = [
+            try reader.readFile(fileData).get(),
+            // The file without its trailing magic string is still accepted.
+            try reader.readFile(fileData.dropLast(marker.count)).get(),
+            // Between the magic strings and the footer the file is a valid stream.
+            try reader.readStreaming(Data(fileData.dropFirst(8))).get()
+        ]
+        for result in results {
+            XCTAssertEqual(result.schema?.fields.count, batch.schema.fields.count)
+            XCTAssertEqual(result.batches.count, 2)
+            for resultBatch in result.batches {
+                XCTAssertEqual(resultBatch.length, batch.length)
+                XCTAssertEqual(resultBatch.columns.count, batch.columns.count)
+                for index in 0..<batch.length {
+                    XCTAssertEqual(resultBatch.columns[1].array.asAny(index) as? String,
+                                   batch.columns[1].array.asAny(index) as? String)
+                }
+            }
+        }
+    }
+
     func testFileReader_struct() throws {
         let fileURL = currentDirectory().appendingPathComponent("testdata_struct.arrow")
         let arrowReader = ArrowReader()
