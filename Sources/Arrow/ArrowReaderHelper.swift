@@ -227,6 +227,15 @@ func makeBuffer(_ buffer: org_apache_arrow_flatbuf_Buffer, fileData: Data,
     return ArrowBuffer.createBuffer(bufferData, length: length)
 }
 
+// The validity buffer may be omitted (written with length 0) when a field has
+// no nulls. In that case the returned buffer has length 0, which ArrowData.isNull
+// treats as "no nulls", instead of claiming bits that the message did not carry.
+func makeValidityBuffer(_ buffer: org_apache_arrow_flatbuf_Buffer, fileData: Data,
+                        nodeLength: UInt, messageOffset: Int64) -> ArrowBuffer {
+    let length = buffer.length == 0 ? 0 : (nodeLength + 7) / 8
+    return makeBuffer(buffer, fileData: fileData, length: length, messageOffset: messageOffset)
+}
+
 func isFixedPrimitive(_ type: org_apache_arrow_flatbuf_Type_) -> Bool {
     switch type {
     case .int, .bool, .floatingpoint, .date, .time, .timestamp:

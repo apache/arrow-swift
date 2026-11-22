@@ -349,6 +349,50 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
         try checkBoolRecordBatch(arrowReader.fromFile(fileURL))
     }
 
+    func testFileReader_absentValidityBuffer() throws {
+        // The "two" column has no nulls, so the writer omits its validity buffer.
+        let fileURL = currentDirectory().appendingPathComponent("testdata_bool.arrow")
+        let recordBatches = try checkBoolRecordBatch(ArrowReader().fromFile(fileURL))
+        let column = recordBatches[0].columns[1]
+        XCTAssertEqual(column.array.arrowData.nullCount, 0)
+        XCTAssertEqual(column.array.arrowData.buffers[0].length, 0)
+        for index in 0..<recordBatches[0].length {
+            XCTAssertFalse(column.array.arrowData.isNull(index))
+            XCTAssertNotNil(column.array.asAny(index))
+        }
+    }
+
+    func testMakeValidityBuffer() throws {
+        let fileData = Data([0b0000_0101, 0b0000_0010, 0xFF, 0xFF])
+        // Absent validity buffer: no bits are claimed, so nothing is null.
+        let absent = makeValidityBuffer(
+            org_apache_arrow_flatbuf_Buffer(offset: 0, length: 0),
+            fileData: fileData, nodeLength: 10, messageOffset: 0)
+        XCTAssertEqual(absent.length, 0)
+        XCTAssertEqual(absent.capacity, 0)
+        let absentData = try ArrowData(
+            ArrowType(ArrowType.ArrowInt8),
+            buffers: [absent, ArrowBuffer.createBuffer(10, size: 1)],
+            children: [], nullCount: 0, length: 10)
+        for index in 0..<UInt(10) {
+            XCTAssertFalse(absentData.isNull(index))
+        }
+
+        // Present validity buffer: bits are read and the padding is zeroed.
+        let present = makeValidityBuffer(
+            org_apache_arrow_flatbuf_Buffer(offset: 0, length: 2),
+            fileData: fileData, nodeLength: 10, messageOffset: 0)
+        XCTAssertEqual(present.length, 2)
+        XCTAssertEqual(present.capacity, 64)
+        let validBits: Set<UInt> = [0, 2, 9]
+        for index in 0..<UInt(10) {
+            XCTAssertEqual(BitUtility.isSet(index, buffer: present), validBits.contains(index))
+        }
+        for byteIndex in 2..<Int(present.capacity) {
+            XCTAssertEqual(present.rawPointer.load(fromByteOffset: byteIndex, as: UInt8.self), 0)
+        }
+    }
+
     func testFileWriter_bool() throws {
         // read existing file
         let fileURL = currentDirectory().appendingPathComponent("testdata_bool.arrow")
