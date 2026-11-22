@@ -209,6 +209,7 @@ public class ArrowType {
     public static let ArrowTimestamp = Info.timeInfo(ArrowTypeId.timestamp)
     public static let ArrowStruct = Info.complexInfo(ArrowTypeId.strct)
     public static let ArrowList = Info.complexInfo(ArrowTypeId.list)
+    public static let ArrowNull = Info.primitiveInfo(ArrowTypeId.null)
 
     public init(_ info: ArrowType.Info) {
         self.info = info
@@ -334,7 +335,7 @@ public class ArrowType {
             return MemoryLayout<Int8>.stride
         case .string:
             return MemoryLayout<Int8>.stride
-        case .strct, .list:
+        case .strct, .list, .null:
             return 0
         default:
             fatalError("Stride requested for unknown type: \(self)")
@@ -366,6 +367,8 @@ public class ArrowType {
                 return "g"
             case ArrowTypeId.boolean:
                 return "b"
+            case ArrowTypeId.null:
+                return "n"
             case ArrowTypeId.date32:
                 return "tdD"
             case ArrowTypeId.date64:
@@ -467,6 +470,8 @@ public class ArrowType {
             return ArrowType(ArrowType.ArrowBinary)
         } else if  from == "u" {
             return ArrowType(ArrowType.ArrowString)
+        } else if from == "n" {
+            return ArrowType(ArrowType.ArrowNull)
         }
 
         throw ArrowError.notImplemented

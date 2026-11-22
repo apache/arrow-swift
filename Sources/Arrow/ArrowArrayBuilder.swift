@@ -174,6 +174,22 @@ public class StructArrayBuilder: ArrowArrayBuilder<StructBufferBuilder, NestedAr
     }
 }
 
+public class NullArrayBuilder: ArrowArrayBuilder<NullBufferBuilder, NullArray> {
+    fileprivate convenience init() throws {
+        try self.init(ArrowType(ArrowType.ArrowNull))
+    }
+
+    public func appendNull() {
+        self.bufferBuilder.append(nil)
+    }
+
+    public override func finish() throws -> NullArray {
+        let arrowData = try ArrowData(self.type, buffers: [], children: [],
+                                      nullCount: self.length, length: self.length)
+        return try NullArray(arrowData)
+    }
+}
+
 public class ListArrayBuilder: ArrowArrayBuilder<ListBufferBuilder, NestedArray> {
     let valueBuilder: any ArrowArrayHolderBuilder
 
@@ -300,6 +316,8 @@ public class ArrowArrayBuilders {
             return try BoolArrayBuilder()
         case .binary:
             return try BinaryArrayBuilder()
+        case .null:
+            return try NullArrayBuilder()
         case .date32:
             return try Date32ArrayBuilder()
         case .date64:
@@ -363,6 +381,10 @@ public class ArrowArrayBuilders {
 
     public static func loadStringArrayBuilder() throws -> StringArrayBuilder {
         return try StringArrayBuilder()
+    }
+
+    public static func loadNullArrayBuilder() throws -> NullArrayBuilder {
+        return try NullArrayBuilder()
     }
 
     public static func loadBoolArrayBuilder() throws -> BoolArrayBuilder {

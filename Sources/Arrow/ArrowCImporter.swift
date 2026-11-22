@@ -153,8 +153,10 @@ public class ArrowCImporter {
             }
         }
 
+        // Only the null type, which has no buffers, takes its length from rbLength.
         switch makeArrayHolder(arrowField, buffers: arrowBuffers,
-                               nullCount: nullCount, children: nil, rbLength: 0) {
+                               nullCount: nullCount, children: nil,
+                               rbLength: arrowType.id == .null ? length : 0) {
         case .success(let holder):
             return .success(ImportArrayHolder(holder, cArrayPtr: cArrayPtr))
         case .failure(let err):

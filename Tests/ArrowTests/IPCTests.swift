@@ -374,6 +374,51 @@ final class IPCFileReaderTests: XCTestCase { // swiftlint:disable:this type_body
         }
     }
 
+    func makeNullRecordBatch() throws -> RecordBatch {
+        // The null column sits between two others so that a wrong buffer
+        // count for it would shift the buffers of the column that follows.
+        let int32Builder: NumberArrayBuilder<Int32> = try ArrowArrayBuilders.loadNumberArrayBuilder()
+        int32Builder.append(1, nil, 3)
+        let nullBuilder = try ArrowArrayBuilders.loadNullArrayBuilder()
+        nullBuilder.append(nil, nil, nil)
+        let stringBuilder = try ArrowArrayBuilders.loadStringArrayBuilder()
+        stringBuilder.append("one", "two", nil)
+        return try RecordBatch.Builder()
+            .addColumn("ints", arrowArray: ArrowArrayHolderImpl(try int32Builder.finish()))
+            .addColumn("nulls", arrowArray: ArrowArrayHolderImpl(try nullBuilder.finish()))
+            .addColumn("strings", arrowArray: ArrowArrayHolderImpl(try stringBuilder.finish()))
+            .finish().get()
+    }
+
+    func checkNullRecordBatch(_ result: ArrowReader.ArrowReaderResult) throws {
+        XCTAssertEqual(result.schema?.fields.map { $0.type.id }, [.int32, .null, .string])
+        XCTAssertEqual(result.batches.count, 2)
+        for batch in result.batches {
+            XCTAssertEqual(batch.length, 3)
+            XCTAssertEqual(batch.columns[0].array.asAny(0) as? Int32, 1)
+            XCTAssertNil(batch.columns[0].array.asAny(1))
+            XCTAssertEqual(batch.columns[0].array.asAny(2) as? Int32, 3)
+            let nulls = batch.columns[1]
+            XCTAssertTrue(nulls.array is NullArray)
+            XCTAssertEqual(nulls.length, 3)
+            XCTAssertEqual(nulls.nullCount, 3)
+            for index in 0..<nulls.length {
+                XCTAssertNil(nulls.array.asAny(index))
+            }
+            XCTAssertEqual(batch.columns[2].array.asAny(0) as? String, "one")
+            XCTAssertEqual(batch.columns[2].array.asAny(1) as? String, "two")
+            XCTAssertNil(batch.columns[2].array.asAny(2))
+        }
+    }
+
+    func testNullTypeInMemoryToFromStream() throws {
+        let batch = try makeNullRecordBatch()
+        let info = ArrowWriter.Info(.recordbatch, schema: batch.schema, batches: [batch, batch])
+        let reader = ArrowReader()
+        try checkNullRecordBatch(reader.readStreaming(ArrowWriter().writeStreaming(info).get()).get())
+        try checkNullRecordBatch(reader.readFile(ArrowWriter().writeFile(info).get()).get())
+    }
+
     func testFileReader_struct() throws {
         let fileURL = currentDirectory().appendingPathComponent("testdata_struct.arrow")
         let arrowReader = ArrowReader()

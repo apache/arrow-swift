@@ -50,6 +50,7 @@ final class CDataTests: XCTestCase {
             .addField("colTimestamptn", type: ArrowTypeTimestamp(.nanoseconds), isNullable: false)
             .addField("colFloat", type: ArrowType(ArrowType.ArrowFloat), isNullable: false)
             .addField("colDouble", type: ArrowType(ArrowType.ArrowDouble), isNullable: false)
+            .addField("colNull", type: ArrowType(ArrowType.ArrowNull), isNullable: true)
             .finish()
     }
 
@@ -125,5 +126,30 @@ final class CDataTests: XCTestCase {
         case .failure(let error):
             throw error
         }
+    }
+
+    func testImportExportNullArray() throws {
+        let nullBuilder = try ArrowArrayBuilders.loadNullArrayBuilder()
+        nullBuilder.append(nil, nil, nil)
+        let nullArray = try nullBuilder.finish()
+        let exporter = ArrowCExporter()
+        var cArray = ArrowC.ArrowArray()
+        exporter.exportArray(&cArray, arrowData: nullArray.arrowData)
+        XCTAssertEqual(cArray.n_buffers, 0)
+        XCTAssertEqual(cArray.length, 3)
+        XCTAssertEqual(cArray.null_count, 3)
+        let cArrayMutPtr = UnsafeMutablePointer<ArrowC.ArrowArray>.allocate(capacity: 1)
+        cArrayMutPtr.pointee = cArray
+        defer {
+            cArrayMutPtr.deallocate()
+        }
+
+        let importer = ArrowCImporter()
+        let holder = try importer.importArray(
+            UnsafePointer(cArrayMutPtr), arrowType: ArrowType(ArrowType.ArrowNull)).get()
+        XCTAssertEqual(holder.type.id, .null)
+        XCTAssertEqual(holder.length, 3)
+        XCTAssertEqual(holder.nullCount, 3)
+        XCTAssertNil(holder.array.asAny(0))
     }
 }

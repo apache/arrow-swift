@@ -380,6 +380,31 @@ public final class StructBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
     }
 }
 
+/// Builds the null type, which has no buffers: only the length is tracked.
+public class NullBufferBuilder: ArrowBufferBuilder {
+    public typealias ItemType = Never
+    public let capacity: UInt = 0
+    public let offset: UInt = 0
+    public private(set) var length: UInt = 0
+    public var nullCount: UInt {return self.length}
+
+    public required init() throws {}
+
+    public func append(_ newValue: ItemType?) {
+        self.length += 1
+    }
+
+    public func isNull(_ index: UInt) -> Bool {
+        return true
+    }
+
+    public func resize(_ length: UInt) {}
+
+    public func finish() -> [ArrowBuffer] {
+        return []
+    }
+}
+
 public class ListBufferBuilder: BaseBufferBuilder, ArrowBufferBuilder {
     public typealias ItemType = [Any?]
     var offsets: ArrowBuffer

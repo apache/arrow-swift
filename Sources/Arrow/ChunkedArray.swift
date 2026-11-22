@@ -45,7 +45,9 @@ public class ChunkedArrayHolder {
             var numBuffers = 2
             switch toFBTypeEnum(chunked.type) {
             case .success(let fbType):
-                if !isFixedPrimitive(fbType) {
+                if fbType == .null {
+                    numBuffers = 0
+                } else if !isFixedPrimitive(fbType) {
                     numBuffers = 3
                 }
             case .failure(let error):
@@ -71,7 +73,9 @@ public class ChunkedArrayHolder {
 
             switch toFBTypeEnum(chunked.type) {
             case .success(let fbType):
-                if !isFixedPrimitive(fbType) {
+                if fbType == .null {
+                    numBuffers = 0
+                } else if !isFixedPrimitive(fbType) {
                     numBuffers = 3
                 }
             case .failure(let error):

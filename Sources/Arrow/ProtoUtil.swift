@@ -37,6 +37,8 @@ func fromProto( // swiftlint:disable:this cyclomatic_complexity function_body_le
         }
     case .bool:
         arrowType = ArrowType(ArrowType.ArrowBool)
+    case .null:
+        arrowType = ArrowType(ArrowType.ArrowNull)
     case .floatingpoint:
         let floatType = field.type(type: org_apache_arrow_flatbuf_FloatingPoint.self)!
         if floatType.precision == .single {
