@@ -22,7 +22,7 @@ import PackageDescription
 let package = Package(
     name: "go-swift",
     platforms: [
-        .macOS(.v10_14)
+        .macOS(.v10_15)
     ],
     products: [
         .library(
@@ -31,7 +31,7 @@ let package = Package(
             targets: ["go-swift"])
     ],
     dependencies: [
-        .package(path: "../Arrow")  // 👈  Reference to a Local Package
+        .package(name: "Arrow", path: "..")
     ],
     targets: [
         .target(
