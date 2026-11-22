@@ -329,9 +329,13 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
      footer around the Arrow streaming format.
      */
     public func readFile( // swiftlint:disable:this function_body_length
-        _ fileData: Data,
+        _ input: Data,
         useUnalignedBuffers: Bool = false
     ) -> Result<ArrowReaderResult, ArrowError> {
+        // Accept the complete file as well as the file without its trailing
+        // magic string, which is what this method took before.
+        let marker = Data(FILEMARKER.utf8)
+        let fileData = input.suffix(marker.count) == marker ? input.dropLast(marker.count) : input
         let footerLength = fileData.withUnsafeBytes { rawBuffer in
             rawBuffer.loadUnaligned(fromByteOffset: fileData.count - 4, as: Int32.self)
         }
@@ -412,10 +416,7 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
                 return .failure(.ioError("Not a valid arrow file."))
             }
 
-            let markerLength = FILEMARKER.utf8.count
-            let footerLengthEnd = Int(fileData.count - markerLength)
-            let data = fileData[..<(footerLengthEnd)]
-            return readFile(data)
+            return readFile(fileData)
         } catch {
             return .failure(.unknownError("Error loading file: \(error)"))
         }

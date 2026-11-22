@@ -295,6 +295,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
 
             let rbBlkEnd = fbb.endVector(len: rbBlocks.count)
             let footerStartOffset = org_apache_arrow_flatbuf_Footer.startFooter(&fbb)
+            org_apache_arrow_flatbuf_Footer.add(version: .max, &fbb)
             org_apache_arrow_flatbuf_Footer.add(schema: schemaOffset, &fbb)
             org_apache_arrow_flatbuf_Footer.addVectorOf(recordBatches: rbBlkEnd, &fbb)
             let footerOffset = org_apache_arrow_flatbuf_Footer.endFooter(&fbb, start: footerStartOffset)
@@ -306,21 +307,28 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
     }
 
     private func writeFile(_ writer: inout DataWriter, info: ArrowWriter.Info) -> Result<Bool, ArrowError> {
-        var fbb: FlatBufferBuilder = FlatBufferBuilder()
-        switch writeSchema(&fbb, schema: info.schema) {
-        case .success(let schemaOffset):
-            fbb.finish(offset: schemaOffset)
-            writer.append(fbb.data)
-            addPadForAlignment(&writer)
+        // The file format is the magic string, the streaming format (schema
+        // message, record batch messages, end-of-stream marker), the footer
+        // and the magic string again.
+        var markerData = FILEMARKER.data(using: .utf8)!
+        addPadForAlignment(&markerData)
+        writer.append(markerData)
+        switch toMessage(info.schema) {
+        case .success(var schemaData):
+            addPadForAlignment(&schemaData)
+            withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
+            withUnsafeBytes(of: UInt32(schemaData.count).littleEndian) {writer.append(Data($0))}
+            writer.append(schemaData)
         case .failure(let error):
             return .failure(error)
         }
 
         switch writeRecordBatches(&writer, batches: info.batches) {
         case .success(let rbBlocks):
+            withUnsafeBytes(of: CONTINUATIONMARKER.littleEndian) {writer.append(Data($0))}
+            withUnsafeBytes(of: UInt32(0).littleEndian) {writer.append(Data($0))}
             switch writeFooter(schema: info.schema, rbBlocks: rbBlocks) {
             case .success(let footerData):
-                fbb.finish(offset: Offset(offset: fbb.buffer.size))
                 let footerOffset = writer.count
                 writer.append(footerData)
                 addPadForAlignment(&writer)
@@ -328,6 +336,7 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
                 withUnsafeBytes(of: Int32(0).littleEndian) { writer.append(Data($0)) }
                 let footerDiff = (UInt32(writer.count) - UInt32(footerOffset))
                 withUnsafeBytes(of: footerDiff.littleEndian) { writer.append(Data($0)) }
+                writer.append(FILEMARKER.data(using: .utf8)!)
             case .failure(let error):
                 return .failure(error)
             }
@@ -394,19 +403,8 @@ public class ArrowWriter { // swiftlint:disable:this type_body_length
         let fileHandle = FileHandle(forUpdatingAtPath: fileName.path)!
         defer { fileHandle.closeFile() }
 
-        var markerData = FILEMARKER.data(using: .utf8)!
-        addPadForAlignment(&markerData)
-
         var writer: any DataWriter = FileDataWriter(fileHandle)
-        writer.append(markerData)
-        switch writeFile(&writer, info: info) {
-        case .success:
-            writer.append(FILEMARKER.data(using: .utf8)!)
-        case .failure(let error):
-            return .failure(error)
-        }
-
-        return .success(true)
+        return writeFile(&writer, info: info)
     }
 
     public func toMessage(_ batch: RecordBatch) -> Result<[Data], ArrowError> {
