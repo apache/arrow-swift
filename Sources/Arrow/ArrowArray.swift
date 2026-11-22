@@ -117,6 +117,8 @@ public class ArrowArrayHolderImpl: ArrowArrayHolder {
             return try ArrowArrayHolderImpl(NestedArray(with))
         case .list:
             return try ArrowArrayHolderImpl(NestedArray(with))
+        case .null:
+            return try ArrowArrayHolderImpl(NullArray(with))
         default:
             throw ArrowError.invalid("Array not found for type: \(arrowType)")
         }
@@ -354,6 +356,13 @@ public class BinaryArray: ArrowArray<Data> {
         } else {
             return String(data: data, encoding: .utf8)!
         }
+    }
+}
+
+/// An array of the null type. It has no buffers and every value is null.
+public class NullArray: ArrowArray<Never> {
+    public override subscript(_ index: UInt) -> Never? {
+        return nil
     }
 }
 

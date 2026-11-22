@@ -145,6 +145,18 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
         }
     }
 
+    // The null type has a field node but no buffers.
+    private func loadNullData(_ loadInfo: DataLoadInfo,
+                              field: org_apache_arrow_flatbuf_Field)
+    -> Result<ArrowArrayHolder, ArrowError> {
+        guard let node = loadInfo.batchData.nextNode() else {
+            return .failure(.invalid("Node not found"))
+        }
+
+        return makeArrayHolder(field, buffers: [], nullCount: UInt(node.nullCount),
+                               children: nil, rbLength: UInt(node.length))
+    }
+
     private func loadPrimitiveData(
         _ loadInfo: DataLoadInfo,
         field: org_apache_arrow_flatbuf_Field)
@@ -212,6 +224,8 @@ public class ArrowReader { // swiftlint:disable:this type_body_length
             return loadStructData(loadInfo, field: field)
         case .list:
             return loadListData(loadInfo, field: field)
+        case .null:
+            return loadNullData(loadInfo, field: field)
         default:
             if isFixedPrimitive(field.typeType) {
                 return loadPrimitiveData(loadInfo, field: field)

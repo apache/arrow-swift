@@ -37,6 +37,8 @@ func toFBTypeEnum(_ arrowType: ArrowType) -> Result<org_apache_arrow_flatbuf_Typ
         return .success(org_apache_arrow_flatbuf_Type_.binary)
     case .boolean:
         return .success(org_apache_arrow_flatbuf_Type_.bool)
+    case .null:
+        return .success(org_apache_arrow_flatbuf_Type_.null)
     case .date32, .date64:
         return .success(org_apache_arrow_flatbuf_Type_.date)
     case .time32, .time64:
@@ -81,6 +83,9 @@ func toFBType( // swiftlint:disable:this cyclomatic_complexity function_body_len
     case .boolean:
         return .success(org_apache_arrow_flatbuf_Bool.endBool(
                             &fbb, start: org_apache_arrow_flatbuf_Bool.startBool(&fbb)))
+    case .null:
+        return .success(org_apache_arrow_flatbuf_Null.endNull(
+                            &fbb, start: org_apache_arrow_flatbuf_Null.startNull(&fbb)))
     case .date32:
         let startOffset = org_apache_arrow_flatbuf_Date.startDate(&fbb)
         org_apache_arrow_flatbuf_Date.add(unit: .day, &fbb)

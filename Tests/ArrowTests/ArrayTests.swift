@@ -560,4 +560,35 @@ final class ArrayTests: XCTestCase { // swiftlint:disable:this type_body_length
         let emptyList = nestedArray[3]!
         XCTAssertEqual(emptyList.count, 0)
     }
+
+    func testNullArray() throws {
+        let builder = try ArrowArrayBuilders.loadNullArrayBuilder()
+        builder.appendNull()
+        builder.append(nil, nil)
+        XCTAssertEqual(builder.length, 3)
+        XCTAssertEqual(builder.nullCount, 3)
+
+        let array = try builder.finish()
+        XCTAssertEqual(array.arrowData.type.id, .null)
+        XCTAssertEqual(array.length, 3)
+        XCTAssertEqual(array.nullCount, 3)
+        XCTAssertTrue(array.arrowData.buffers.isEmpty)
+        for index in 0..<array.length {
+            XCTAssertTrue(try array.isNull(index))
+            XCTAssertNil(array[index])
+            XCTAssertNil(array.asAny(index))
+            XCTAssertEqual(array.asString(index), "")
+        }
+
+        XCTAssertThrowsError(try array.isNull(3))
+
+        let holderBuilder = try ArrowArrayBuilders.loadBuilder(arrowType: ArrowType(ArrowType.ArrowNull))
+        holderBuilder.appendAny(nil)
+        holderBuilder.appendAny(nil)
+        let holder = try holderBuilder.toHolder()
+        XCTAssertEqual(holder.type.id, .null)
+        XCTAssertEqual(holder.length, 2)
+        XCTAssertEqual(holder.nullCount, 2)
+        XCTAssertTrue(holder.getBufferData().isEmpty)
+    }
 }

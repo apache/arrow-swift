@@ -135,6 +135,17 @@ private func makeFixedHolder<T>(
     }
 }
 
+func makeNullHolder(_ field: ArrowField, length: UInt) -> Result<ArrowArrayHolder, ArrowError> {
+    do {
+        let arrowData = try ArrowData(field.type, buffers: [], children: [], nullCount: length, length: length)
+        return .success(ArrowArrayHolderImpl(try NullArray(arrowData)))
+    } catch let error as ArrowError {
+        return .failure(error)
+    } catch {
+        return .failure(.unknownError("\(error)"))
+    }
+}
+
 func makeNestedHolder(
     _ field: ArrowField,
     buffers: [ArrowBuffer],
@@ -204,6 +215,8 @@ func makeArrayHolder( // swiftlint:disable:this cyclomatic_complexity
         return makeStringHolder(buffers, nullCount: nullCount)
     case .binary:
         return makeBinaryHolder(buffers, nullCount: nullCount)
+    case .null:
+        return makeNullHolder(field, length: rbLength)
     case .date32, .date64:
         return makeDateHolder(field, buffers: buffers, nullCount: nullCount)
     case .time32, .time64:
@@ -250,6 +263,8 @@ func findArrowType( // swiftlint:disable:this cyclomatic_complexity function_bod
         return ArrowType(ArrowType.ArrowUnknown)
     case .bool:
         return ArrowType(ArrowType.ArrowBool)
+    case .null:
+        return ArrowType(ArrowType.ArrowNull)
     case .floatingpoint:
         let floatType = field.type(type: org_apache_arrow_flatbuf_FloatingPoint.self)!
         switch floatType.precision {
